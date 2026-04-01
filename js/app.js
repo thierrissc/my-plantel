@@ -3,7 +3,8 @@
    ============================================= */
 
 // ── STORAGE ──────────────────────────────────
-const STORAGE_KEY = "plantel-animais";
+const STORAGE_KEY       = "plantel-animais";
+const STORAGE_INIT_KEY  = "plantel-iniciado";
 
 const SEED_ANIMAIS = [
   {
@@ -53,20 +54,29 @@ const SEED_ANIMAIS = [
 
 function carregarAnimais() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    // Se o app já foi iniciado antes, sempre usa o que está salvo (mesmo lista vazia)
+    const jaIniciou = localStorage.getItem(STORAGE_INIT_KEY);
+    const raw       = localStorage.getItem(STORAGE_KEY);
+    if (jaIniciou) {
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed;
+      }
+      return [];
     }
   } catch (e) { /* ignora erro de parse */ }
+  // Primeira vez: usa seed e marca como iniciado
   return SEED_ANIMAIS.map(a => ({ ...a }));
 }
 
 function salvarAnimais() {
   try {
+    localStorage.setItem(STORAGE_INIT_KEY, "1");
     localStorage.setItem(STORAGE_KEY, JSON.stringify(animais));
   } catch (e) { /* ignora erro de storage cheio */ }
 }
+
+
 
 // ── DADOS ────────────────────────────────────
 let animais = carregarAnimais();
@@ -523,11 +533,16 @@ function adicionarVacina() {
 
 function removerVacina(i) {
   const a = animais.find(x => x.id === selecionado);
-  if (confirm(`Remover "${a.vacinas[i].nome}"?`)) {
-    a.vacinas.splice(i, 1);
-    salvarAnimais();
-    renderFicha();
-  }
+  if (!a) return;
+  mostrarConfirm(
+    `Remover a vacina "${a.vacinas[i].nome}"?`,
+    "Esta ação não pode ser desfeita.",
+    () => {
+      a.vacinas.splice(i, 1);
+      salvarAnimais();
+      renderFicha();
+    }
+  );
 }
 
 function carregarFoto(event) {
@@ -560,7 +575,7 @@ function fecharModalExterno(e) { if (e.target === document.getElementById("modal
 function salvarNovoAnimal() {
   const nome    = document.getElementById("m-nome")?.value?.trim();
   const especie = document.getElementById("m-especie")?.value;
-  if (!nome || !especie) { alert("Preencha pelo menos o nome e a espécie."); return; }
+  if (!nome || !especie) { mostrarAlerta("Preencha pelo menos o nome e a espécie."); return; }
   const novo = {
     id: Date.now(), nome, especie,
     raca:      document.getElementById("m-raca")?.value    || "",
@@ -584,12 +599,54 @@ function salvarNovoAnimal() {
 function confirmarExclusao(id) {
   const a = animais.find(x => x.id === id);
   if (!a) return;
-  if (confirm(`Excluir a ficha de "${a.nome}"?\n\nEsta ação não pode ser desfeita.`)) {
-    animais = animais.filter(x => x.id !== id);
-    selecionado = null; editando = false;
-    salvarAnimais();
-    renderSidebar(); renderFicha();
-  }
+  mostrarConfirm(
+    `Excluir a ficha de "${a.nome}"?`,
+    "Esta ação não pode ser desfeita.",
+    () => {
+      animais = animais.filter(x => x.id !== id);
+      selecionado = null; editando = false;
+      salvarAnimais();
+      renderSidebar(); renderFicha();
+    }
+  );
+}
+
+// ── MODAIS DE ALERTA / CONFIRM ────────────────
+function mostrarAlerta(mensagem) {
+  const overlay = document.getElementById("dialog-overlay");
+  document.getElementById("dialog-title").textContent    = mensagem;
+  document.getElementById("dialog-desc").textContent     = "";
+  document.getElementById("dialog-cancel").style.display = "none";
+  document.getElementById("dialog-confirm").textContent  = "OK";
+  document.getElementById("dialog-confirm").onclick = () => fecharDialog();
+  overlay.style.display = "flex";
+  requestAnimationFrame(() => overlay.classList.add("visible"));
+}
+
+function mostrarConfirm(titulo, desc, onConfirm) {
+  const overlay = document.getElementById("dialog-overlay");
+  document.getElementById("dialog-title").textContent    = titulo;
+  document.getElementById("dialog-desc").textContent     = desc || "";
+  document.getElementById("dialog-cancel").style.display = "";
+  document.getElementById("dialog-confirm").textContent  = "Confirmar";
+  document.getElementById("dialog-confirm").onclick = () => {
+    fecharDialog();
+    onConfirm();
+  };
+  overlay.style.display = "flex";
+  requestAnimationFrame(() => overlay.classList.add("visible"));
+}
+
+function fecharDialogExterno(e) {
+  if (e.target === document.getElementById("dialog-overlay")) fecharDialog();
+}
+
+function fecharDialog() {
+  const overlay = document.getElementById("dialog-overlay");
+  overlay.classList.remove("visible");
+  overlay.addEventListener("transitionend", () => {
+    overlay.style.display = "none";
+  }, { once: true });
 }
 
 // ── INIT ──────────────────────────────────────
