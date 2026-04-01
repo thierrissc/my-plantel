@@ -41,20 +41,6 @@ O sistema foi pensado para criadores, clínicas veterinárias, fazendeiros e tut
 
 ---
 
-## Screenshots
-
-| Tela principal — tema claro | Ficha do animal |
-|---|---|
-| ![Tela principal](.github/screenshot-main.png) | ![Ficha](.github/screenshot-ficha.png) |
-
-| Arvore Genealogica | Tema escuro |
-|---|---|
-| ![Genealogia](.github/screenshot-genealogia.png) | ![Dark mode](.github/screenshot-dark.png) |
-
-> As capturas de tela acima sao geradas a partir da versao mais recente do projeto.
-
----
-
 ## Como Usar
 
 Nenhuma instalacao e necessaria. Basta clonar o repositorio e abrir o arquivo `index.html` no navegador.
@@ -148,12 +134,6 @@ Contribuicoes sao bem-vindas! Para sugerir melhorias ou reportar problemas:
 2. Faca um fork e crie uma branch: `git checkout -b minha-melhoria`
 3. Commit suas alteracoes: `git commit -m 'feat: minha melhoria'`
 4. Abra um Pull Request
-
----
-
-## Licenca
-
-Distribuido sob a licenca MIT. Veja o arquivo `LICENSE` para mais detalhes.
 
 ---
 

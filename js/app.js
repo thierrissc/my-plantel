@@ -2,8 +2,10 @@
    PLANTEL — app.js
    ============================================= */
 
-// ── DADOS ────────────────────────────────────
-let animais = [
+// ── STORAGE ──────────────────────────────────
+const STORAGE_KEY = "plantel-animais";
+
+const SEED_ANIMAIS = [
   {
     id: 1, nome: "Thor", especie: "Cão", raca: "Labrador Retriever",
     sexo: "Macho", nasc: "2020-03-15", pelagem: "Amarelo dourado",
@@ -49,6 +51,26 @@ let animais = [
   }
 ];
 
+function carregarAnimais() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch (e) { /* ignora erro de parse */ }
+  return SEED_ANIMAIS.map(a => ({ ...a }));
+}
+
+function salvarAnimais() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(animais));
+  } catch (e) { /* ignora erro de storage cheio */ }
+}
+
+// ── DADOS ────────────────────────────────────
+let animais = carregarAnimais();
+
 const EMOJIS = {
   "Cão": "🐕", "Gato": "🐈", "Cavalo": "🐴", "Bovino": "🐄",
   "Suíno": "🐷", "Ave": "🐔", "Caprino": "🐐", "Ovino": "🐑", "Outro": "🐾"
@@ -71,6 +93,24 @@ function toggleTheme() {
   const saved = localStorage.getItem("plantel-theme");
   if (saved) document.documentElement.setAttribute("data-theme", saved);
 })();
+
+// ── MOBILE SIDEBAR ────────────────────────────
+function abrirSidebar() {
+  document.getElementById("sidebar").classList.add("open");
+  document.getElementById("sidebar-overlay").classList.add("visible");
+}
+function fecharSidebar() {
+  document.getElementById("sidebar").classList.remove("open");
+  document.getElementById("sidebar-overlay").classList.remove("visible");
+}
+function toggleSidebar() {
+  const sidebar = document.getElementById("sidebar");
+  if (sidebar.classList.contains("open")) {
+    fecharSidebar();
+  } else {
+    abrirSidebar();
+  }
+}
 
 // ── UTILS ─────────────────────────────────────
 function calcIdade(nasc) {
@@ -164,6 +204,8 @@ function renderFicha() {
     empty.style.display = "flex";
     topbar.style.display = "none";
     tabF.style.display = tabG.style.display = "none";
+    // atualiza mobile bottombar
+    atualizarMobileBottombar(false);
     return;
   }
   empty.style.display = "none";
@@ -171,8 +213,19 @@ function renderFicha() {
   tabF.style.display   = abaAtiva === "ficha"      ? "block" : "none";
   tabG.style.display   = abaAtiva === "genealogia" ? "block" : "none";
 
+  // atualiza mobile bottombar
+  atualizarMobileBottombar(true);
+
   if (abaAtiva === "ficha")      renderFichaContent(a);
   if (abaAtiva === "genealogia") renderGenealogia(a);
+}
+
+function atualizarMobileBottombar(temAnimal) {
+  const btns = document.querySelectorAll(".mobile-tab-btn");
+  btns.forEach(btn => {
+    btn.disabled = !temAnimal;
+    btn.style.opacity = temAnimal ? "1" : "0.4";
+  });
 }
 
 function renderFichaContent(a) {
@@ -322,7 +375,6 @@ function renderGenealogia(a) {
       </div>`;
   };
 
-  // Build ancestor nodes
   const paiNome    = a.paiNome    || "";
   const paiRaca    = a.paiRaca    || "";
   const maeNome    = a.maeNome    || "";
@@ -363,14 +415,12 @@ function renderGenealogia(a) {
     </div>
 
     <div class="gene-tree">
-      <!-- Geração 3 (avós) -->
       <div class="gene-gen" style="gap:40px">
         ${nodeHtml(avoPatNome, avoPatRaca, "avo", "Avô paterno", null, false)}
         <div style="min-width:160px"></div>
         ${nodeHtml(avoMatNome, avoMatRaca, "avo", "Avó materna", null, false)}
       </div>
 
-      <!-- Conectores avós → pais -->
       <div style="width:100%;height:36px;position:relative">
         <svg viewBox="0 0 700 36" preserveAspectRatio="none" style="width:100%;height:100%;overflow:visible">
           <path d="M175 0 L175 18 L350 18 L350 36" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
@@ -378,13 +428,11 @@ function renderGenealogia(a) {
         </svg>
       </div>
 
-      <!-- Geração 2 (pais) -->
       <div class="gene-gen" style="gap:60px">
         ${nodeHtml(paiNome, paiRaca, "pai", "Pai", null, false)}
         ${nodeHtml(maeNome, maeRaca, "mae", "Mãe", null, false)}
       </div>
 
-      <!-- Conectores pais → animal -->
       <div style="width:100%;height:40px;position:relative">
         <svg viewBox="0 0 700 40" preserveAspectRatio="none" style="width:100%;height:100%;overflow:visible">
           <path d="M245 0 L245 20 L350 20 L350 40" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
@@ -392,7 +440,6 @@ function renderGenealogia(a) {
         </svg>
       </div>
 
-      <!-- Geração 1 (animal focal) -->
       <div class="gene-gen">
         ${nodeHtml(a.nome, a.raca, "focal", "Animal", a.foto, false)}
       </div>
@@ -413,24 +460,28 @@ function salvarGenealogia() {
   a.avoPatRaca = document.getElementById("g-avopatRaca")?.value || "";
   a.avoMatNome = document.getElementById("g-avomatnome")?.value || "";
   a.avoMatRaca = document.getElementById("g-avomatraca")?.value || "";
+  salvarAnimais();
   renderGenealogia(a);
-  // Feedback visual rápido
   const btn = document.querySelector(".gene-edit-section .btn-save");
-  if (btn) { btn.textContent = "✓ Salvo!"; setTimeout(() => { btn.textContent = "Salvar Ancestrais"; }, 1500); }
+  if (btn) { btn.textContent = "Salvo!"; setTimeout(() => { btn.textContent = "Salvar Ancestrais"; }, 1500); }
 }
 
 // ── ACTIONS ───────────────────────────────────
 function selecionar(id) {
   selecionado = id; editando = false; fotoTemp = null;
   renderSidebar(); renderFicha();
+  // no mobile fecha o drawer ao selecionar
+  fecharSidebar();
 }
 function setFiltro(f) { filtro = f; renderSidebar(); }
 function filtrarAnimais() { renderSidebar(); }
 
 function switchTab(tab, el) {
   abaAtiva = tab;
-  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-  el.classList.add("active");
+  document.querySelectorAll(".tab-btn, .mobile-tab-btn").forEach(b => {
+    if (b.dataset.tab === tab) b.classList.add("active");
+    else b.classList.remove("active");
+  });
   renderFicha();
 }
 
@@ -453,6 +504,7 @@ function salvarEdicao() {
   a.obs       = g("f-obs");
   if (fotoTemp) { a.foto = fotoTemp; fotoTemp = null; }
   editando = false;
+  salvarAnimais();
   renderSidebar(); renderFicha();
 }
 
@@ -465,6 +517,7 @@ function adicionarVacina() {
     data: document.getElementById("nv-data")?.value || "",
     prox: document.getElementById("nv-prox")?.value || ""
   });
+  salvarAnimais();
   renderFicha();
 }
 
@@ -472,6 +525,7 @@ function removerVacina(i) {
   const a = animais.find(x => x.id === selecionado);
   if (confirm(`Remover "${a.vacinas[i].nome}"?`)) {
     a.vacinas.splice(i, 1);
+    salvarAnimais();
     renderFicha();
   }
 }
@@ -521,6 +575,7 @@ function salvarNovoAnimal() {
     vacinas: [], obs: ""
   };
   animais.push(novo);
+  salvarAnimais();
   fecharModal();
   selecionado = novo.id; editando = false;
   renderSidebar(); renderFicha();
@@ -532,6 +587,7 @@ function confirmarExclusao(id) {
   if (confirm(`Excluir a ficha de "${a.nome}"?\n\nEsta ação não pode ser desfeita.`)) {
     animais = animais.filter(x => x.id !== id);
     selecionado = null; editando = false;
+    salvarAnimais();
     renderSidebar(); renderFicha();
   }
 }

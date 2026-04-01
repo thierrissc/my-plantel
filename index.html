@@ -10,6 +10,9 @@
 </head>
 <body>
 
+  <!-- Overlay para fechar sidebar no mobile -->
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="fecharSidebar()"></div>
+
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
       <div class="brand-icon">
@@ -64,6 +67,11 @@
 
   <main class="main" id="main">
     <div class="topbar" id="topbar" style="display:none">
+      <button class="mobile-menu-btn" onclick="toggleSidebar()" aria-label="Menu">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
       <div class="topbar-tabs">
         <button class="tab-btn active" data-tab="ficha" onclick="switchTab('ficha', this)">
           <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="2" width="14" height="16" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M7 7h6M7 10.5h6M7 14h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -77,6 +85,11 @@
     </div>
 
     <div class="empty-state" id="empty-state">
+      <button class="mobile-menu-btn mobile-menu-empty" onclick="toggleSidebar()" aria-label="Abrir lista">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
       <div class="empty-art">
         <svg viewBox="0 0 120 100" fill="none">
           <ellipse cx="34" cy="30" rx="13" ry="16" fill="currentColor" opacity="0.10"/>
@@ -169,6 +182,39 @@
       </div>
     </div>
   </div>
+
+  <!-- Barra de navegacao mobile (bottom) -->
+  <nav class="mobile-bottombar" id="mobile-bottombar">
+    <button class="mobile-nav-btn" onclick="toggleSidebar()" aria-label="Lista de animais">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <span>Animais</span>
+    </button>
+    <button class="mobile-tab-btn active" data-tab="ficha" onclick="switchTab('ficha', this)" aria-label="Ficha">
+      <svg viewBox="0 0 24 24" fill="none">
+        <rect x="4" y="3" width="16" height="18" rx="2.5" stroke="currentColor" stroke-width="1.8"/>
+        <path d="M8 8h8M8 12h8M8 16h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <span>Ficha</span>
+    </button>
+    <button class="mobile-tab-btn" data-tab="genealogia" onclick="switchTab('genealogia', this)" aria-label="Genealogia">
+      <svg viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="19" r="2.5" stroke="currentColor" stroke-width="1.6"/>
+        <circle cx="6" cy="8" r="2.5" stroke="currentColor" stroke-width="1.6"/>
+        <circle cx="18" cy="8" r="2.5" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M12 16.5V13M12 13L6 10.5M12 13L18 10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <span>Genealogia</span>
+    </button>
+    <button class="mobile-nav-btn" onclick="abrirModal()" aria-label="Novo animal">
+      <svg viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>
+        <path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <span>Novo</span>
+    </button>
+  </nav>
 
   <input type="file" id="foto-input" accept="image/*" style="display:none" onchange="carregarFoto(event)" />
   <script src="js/app.js"></script>
