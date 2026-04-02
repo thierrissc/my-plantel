@@ -279,8 +279,9 @@ function renderFichaContent(a) {
 
   document.getElementById("ficha-content").innerHTML = `
     <div class="ficha-hero">
-      <label for="foto-input" ${ed?"":"style='cursor:default'"}>
-        <div class="foto-frame" ${ed?"":"style='cursor:default'"}>
+      <label style="${ed?"cursor:pointer":"cursor:default"}">
+        ${ed ? `<input type="file" id="foto-input" accept="image/*" style="display:none" onchange="carregarFoto(event)" />` : ""}
+        <div class="foto-frame" style="${ed?"cursor:pointer":"cursor:default"}" ${ed?`onclick="document.getElementById('foto-input').click()"`:""}> 
           ${a.foto
             ? `<img src="${a.foto}" alt="${a.nome}" />`
             : `<span class="foto-emoji">${EMOJIS[a.especie]||"🐾"}</span><span class="foto-hint">Sem foto</span>`
