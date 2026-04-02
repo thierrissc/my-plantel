@@ -117,7 +117,7 @@ body { display: flex; height: 100vh; overflow: hidden; }
   border-bottom: 1px solid var(--c-border);
 }
 .brand-icon {
-  width: 44px; height: 44px;
+  width: 60px; height: 60px;
   background: var(--c-accent);
   border-radius: var(--r-md);
   display: flex; align-items: center; justify-content: center;
@@ -126,6 +126,7 @@ body { display: flex; height: 100vh; overflow: hidden; }
   transition: background var(--t);
 }
 .brand-icon svg { width: 26px; height: 26px; }
+.brand-icon-img { width: 100%; height: 100%; object-fit: cover; border-radius: var(--r-md); display: block; }
 .brand-text { flex: 1; }
 .brand-name {
   font-family: var(--font-display);
@@ -613,7 +614,6 @@ body { display: flex; height: 100vh; overflow: hidden; }
   font-family: var(--font-body);
   outline: none;
   transition: border-color var(--t), background var(--t);
-  -webkit-appearance: none;
 }
 .form-field input:focus,
 .form-field select:focus,
