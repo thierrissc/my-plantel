@@ -1,17 +1,9 @@
-/* =============================================
-   PLANTEL — style.css
-   Tema Claro: branco + verde
-   Tema Escuro: preto + azul claro
-   ============================================= */
-
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ── TOKENS ─────────────────────────────────── */
 :root {
-  /* Sidebar width */
+
   --sidebar-w: 340px;
 
-  /* Light theme (default) */
   --c-bg:           #f4f6f5;
   --c-surface:      #eef2ef;
   --c-card:         #ffffff;
@@ -77,7 +69,6 @@
   --c-shadow:       rgba(0,0,0,0.35);
 }
 
-/* ── BASE ─────────────────────────────────────── */
 html, body {
   height: 100%;
   font-family: var(--font-body);
@@ -95,7 +86,7 @@ html, body {
 
 body { display: flex; height: 100vh; overflow: hidden; }
 
-/* ── SIDEBAR ─────────────────────────────────── */
+
 .sidebar {
   width: var(--sidebar-w);
   min-width: var(--sidebar-w);
@@ -108,7 +99,7 @@ body { display: flex; height: 100vh; overflow: hidden; }
   transition: background var(--t), border-color var(--t);
 }
 
-/* Brand */
+
 .sidebar-brand {
   display: flex;
   align-items: center;
@@ -143,7 +134,6 @@ body { display: flex; height: 100vh; overflow: hidden; }
   font-weight: 500;
 }
 
-/* Theme toggle */
 .theme-toggle {
   width: 34px; height: 34px;
   border-radius: var(--r-md);
@@ -160,7 +150,6 @@ body { display: flex; height: 100vh; overflow: hidden; }
 [data-theme="light"] .icon-moon { display: none; }
 [data-theme="dark"]  .icon-sun  { display: none; }
 
-/* Search */
 .sidebar-search {
   position: relative;
   padding: 12px 16px;
@@ -192,7 +181,6 @@ body { display: flex; height: 100vh; overflow: hidden; }
   background: var(--c-bg);
 }
 
-/* Filters */
 .sidebar-filters {
   display: flex; flex-wrap: wrap; gap: 6px;
   padding: 10px 16px;
@@ -212,7 +200,6 @@ body { display: flex; height: 100vh; overflow: hidden; }
 .ftab:hover { border-color: var(--c-accent); color: var(--c-accent); background: var(--c-accent-bg); }
 .ftab.active { background: var(--c-accent-bg); border-color: var(--c-accent); color: var(--c-accent-text); }
 
-/* Section label */
 .sidebar-section-label {
   display: flex; align-items: center; justify-content: space-between;
   padding: 16px 18px 8px;
@@ -231,7 +218,6 @@ body { display: flex; height: 100vh; overflow: hidden; }
   text-transform: none;
 }
 
-/* Animal list */
 .animal-list {
   flex: 1;
   overflow-y: auto;
@@ -292,7 +278,6 @@ body { display: flex; height: 100vh; overflow: hidden; }
 .pip-trat    { background: var(--c-amber); }
 .pip-inativo { background: var(--c-text-3); }
 
-/* Footer */
 .sidebar-footer {
   padding: 14px 16px 18px;
   border-top: 1px solid var(--c-border);
@@ -339,7 +324,6 @@ body { display: flex; height: 100vh; overflow: hidden; }
 }
 .btn-new-animal:active { transform: translateY(0); }
 
-/* ── MAIN ─────────────────────────────────────── */
 .main {
   flex: 1; overflow-y: auto;
   background: var(--c-bg);
@@ -347,7 +331,6 @@ body { display: flex; height: 100vh; overflow: hidden; }
   transition: background var(--t);
 }
 
-/* TOPBAR */
 .topbar {
   padding: 16px 32px 0;
   border-bottom: 1px solid var(--c-border);
@@ -373,10 +356,8 @@ body { display: flex; height: 100vh; overflow: hidden; }
 .tab-btn:hover { color: var(--c-accent); background: var(--c-accent-bg); }
 .tab-btn.active { color: var(--c-accent); border-bottom-color: var(--c-accent); }
 
-/* TAB CONTENT */
 .tab-content { flex: 1; overflow-y: auto; }
 
-/* EMPTY STATE */
 .empty-state {
   flex: 1;
   display: flex; flex-direction: column;
@@ -414,7 +395,6 @@ body { display: flex; height: 100vh; overflow: hidden; }
 .btn-cta svg { width: 16px; height: 16px; }
 .btn-cta:hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 6px 20px var(--c-shadow); }
 
-/* ── FICHA ───────────────────────────────────── */
 .ficha-wrap {
   max-width: 840px;
   margin: 0 auto;
@@ -422,7 +402,6 @@ body { display: flex; height: 100vh; overflow: hidden; }
   animation: fadeUp 0.28s ease;
 }
 
-/* Hero */
 .ficha-hero {
   background: var(--c-card);
   border: 1px solid var(--c-border);
@@ -441,7 +420,6 @@ body { display: flex; height: 100vh; overflow: hidden; }
   pointer-events: none;
 }
 
-/* Foto */
 .foto-frame {
   width: 160px; height: 160px; flex-shrink: 0;
   border-radius: var(--r-lg);
@@ -468,7 +446,6 @@ body { display: flex; height: 100vh; overflow: hidden; }
 .foto-overlay svg { width: 22px; height: 22px; color: white; }
 .foto-overlay span { font-size: 11px; color: rgba(255,255,255,0.85); }
 
-/* Ficha info */
 .ficha-info { flex: 1; min-width: 0; position: relative; z-index: 1; }
 .ficha-nome {
   font-family: var(--font-display);
@@ -558,7 +535,6 @@ body { display: flex; height: 100vh; overflow: hidden; }
 }
 .btn-delete:hover { background: var(--c-red-bg); color: var(--c-red); border-color: var(--c-red); }
 
-/* Section cards */
 .section-card {
   background: var(--c-card);
   border: 1px solid var(--c-border);
@@ -592,7 +568,6 @@ body { display: flex; height: 100vh; overflow: hidden; }
   text-transform: uppercase; letter-spacing: 0.1em;
 }
 
-/* Forms */
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
 .mt { margin-top: 14px; }
@@ -633,7 +608,6 @@ body { display: flex; height: 100vh; overflow: hidden; }
   font-weight: 500;
 }
 
-/* Vacinação */
 .vac-table-wrap { overflow-x: auto; }
 .vac-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .vac-table th {
@@ -690,7 +664,6 @@ body { display: flex; height: 100vh; overflow: hidden; }
   line-height: 1.8; white-space: pre-wrap; font-weight: 400;
 }
 
-/* ── GENEALOGIA ──────────────────────────────── */
 .gene-header { margin-bottom: 22px; }
 .gene-title {
   font-family: var(--font-display);
@@ -703,7 +676,6 @@ body { display: flex; height: 100vh; overflow: hidden; }
   gap: 0; position: relative;
 }
 
-/* Generations */
 .gene-gen {
   display: flex; gap: 20px; justify-content: center;
   position: relative; width: 100%;
@@ -793,7 +765,6 @@ body { display: flex; height: 100vh; overflow: hidden; }
   margin-bottom: 16px;
 }
 
-/* ── MODAL ───────────────────────────────────── */
 .modal-overlay {
   position: fixed; inset: 0;
   background: rgba(0,0,0,0.45);
@@ -865,7 +836,6 @@ body { display: flex; height: 100vh; overflow: hidden; }
 }
 .btn-primary:hover { filter: brightness(1.08); }
 
-/* ── OVERLAY MOBILE ──────────────────────────── */
 .sidebar-overlay {
   display: none;
   position: fixed; inset: 0;
@@ -879,7 +849,6 @@ body { display: flex; height: 100vh; overflow: hidden; }
   opacity: 1;
 }
 
-/* Botao hamburguer na topbar (so aparece no mobile) */
 .mobile-menu-btn {
   display: none;
   align-items: center; justify-content: center;
@@ -896,21 +865,18 @@ body { display: flex; height: 100vh; overflow: hidden; }
 .mobile-menu-btn:hover { background: var(--c-hover); color: var(--c-accent); }
 .mobile-menu-btn svg { width: 18px; height: 18px; }
 
-/* Barra de navegacao mobile (bottom) */
 .mobile-bottombar {
   display: none;
 }
 
-/* ── RESPONSIVE — tablet ────────────────────── */
 @media (max-width: 860px) {
   :root { --sidebar-w: 280px; }
   .grid-3 { grid-template-columns: 1fr 1fr; }
   .add-vac-form { grid-template-columns: 1fr 1fr; }
 }
 
-/* ── RESPONSIVE — mobile ────────────────────── */
 @media (max-width: 640px) {
-  /* Sidebar vira drawer deslizante */
+
   .sidebar-overlay { display: block; pointer-events: none; }
   .sidebar-overlay.visible { pointer-events: all; }
 
@@ -929,13 +895,11 @@ body { display: flex; height: 100vh; overflow: hidden; }
     box-shadow: 4px 0 30px rgba(0,0,0,0.18);
   }
 
-  /* Main ocupa tela toda */
   .main {
     width: 100%;
-    padding-bottom: 72px; /* espaco para a bottombar */
+    padding-bottom: 72px;
   }
 
-  /* Topbar compacta */
   .topbar {
     padding: 10px 14px 0;
     display: flex !important;
@@ -947,7 +911,6 @@ body { display: flex; height: 100vh; overflow: hidden; }
   .tab-btn { padding: 10px 14px; font-size: 13px; }
   .tab-btn svg { width: 16px; height: 16px; }
 
-  /* Ficha */
   .ficha-wrap { padding: 14px 14px 60px; }
   .ficha-hero { flex-direction: column; align-items: center; text-align: center; }
   .ficha-actions { justify-content: center; }
@@ -955,20 +918,16 @@ body { display: flex; height: 100vh; overflow: hidden; }
   .ficha-nome { font-size: 24px; }
   .badge-row, .tag-row { justify-content: center; }
 
-  /* Grids */
   .grid-2, .grid-3 { grid-template-columns: 1fr; }
   .form-grid-2 { grid-template-columns: 1fr; }
   .add-vac-form { grid-template-columns: 1fr; }
 
-  /* Tabela de vacinas rola horizontalmente */
   .vac-table-wrap { -webkit-overflow-scrolling: touch; }
 
-  /* Genealogia */
   .gene-tree { overflow-x: auto; padding-bottom: 8px; }
   .gene-gen { flex-wrap: nowrap; gap: 12px; }
   .gene-node { min-width: 130px; padding: 10px 12px; }
 
-  /* Modal tela cheia no mobile */
   .modal-overlay { padding: 0; align-items: flex-end; }
   .modal-box {
     border-radius: var(--r-xl) var(--r-xl) 0 0;
@@ -976,12 +935,10 @@ body { display: flex; height: 100vh; overflow: hidden; }
     max-width: 100%;
   }
 
-  /* Empty state compacto */
   .empty-state { padding: 30px 20px; }
   .empty-art svg { width: 70px; height: 56px; }
   .empty-title { font-size: 22px; }
 
-  /* Bottombar mobile */
   .mobile-bottombar {
     display: flex;
     position: fixed;
@@ -1020,7 +977,7 @@ body { display: flex; height: 100vh; overflow: hidden; }
   .mobile-tab-btn svg {
     width: 22px; height: 22px;
   }
-  /* Botao hamburguer visivel no empty-state mobile */
+  
   .mobile-menu-empty {
     display: flex;
     position: static;
@@ -1039,13 +996,12 @@ body { display: flex; height: 100vh; overflow: hidden; }
   .mobile-tab-btn.active svg {
     stroke: var(--c-accent);
   }
-  /* Botao "Novo" tem destaque */
+
   .mobile-bottombar .mobile-nav-btn:last-child {
     color: var(--c-accent);
   }
 }
 
-/* ── DIALOG CUSTOMIZADO ──────────────────────── */
 .dialog-overlay {
   position: fixed; inset: 0;
   background: rgba(0,0,0,0.45);

@@ -1,8 +1,3 @@
-/* =============================================
-   PLANTEL — app.js
-   ============================================= */
-
-// ── STORAGE ──────────────────────────────────
 const STORAGE_KEY       = "plantel-animais";
 const STORAGE_INIT_KEY  = "plantel-iniciado";
 
@@ -54,7 +49,6 @@ const SEED_ANIMAIS = [
 
 function carregarAnimais() {
   try {
-    // Se o app já foi iniciado antes, sempre usa o que está salvo (mesmo lista vazia)
     const jaIniciou = localStorage.getItem(STORAGE_INIT_KEY);
     const raw       = localStorage.getItem(STORAGE_KEY);
     if (jaIniciou) {
@@ -64,8 +58,7 @@ function carregarAnimais() {
       }
       return [];
     }
-  } catch (e) { /* ignora erro de parse */ }
-  // Primeira vez: usa seed e marca como iniciado
+  } catch (e) {}
   return SEED_ANIMAIS.map(a => ({ ...a }));
 }
 
@@ -73,12 +66,10 @@ function salvarAnimais() {
   try {
     localStorage.setItem(STORAGE_INIT_KEY, "1");
     localStorage.setItem(STORAGE_KEY, JSON.stringify(animais));
-  } catch (e) { /* ignora erro de storage cheio */ }
+  } catch (e) {}
 }
 
 
-
-// ── DADOS ────────────────────────────────────
 let animais = carregarAnimais();
 
 const EMOJIS = {
@@ -92,7 +83,6 @@ let filtro      = "Todos";
 let abaAtiva    = "ficha";
 let fotoTemp    = null;
 
-// ── TEMA ─────────────────────────────────────
 function toggleTheme() {
   const html  = document.documentElement;
   const atual = html.getAttribute("data-theme");
@@ -104,7 +94,6 @@ function toggleTheme() {
   if (saved) document.documentElement.setAttribute("data-theme", saved);
 })();
 
-// ── MOBILE SIDEBAR ────────────────────────────
 function abrirSidebar() {
   document.getElementById("sidebar").classList.add("open");
   document.getElementById("sidebar-overlay").classList.add("visible");
@@ -122,7 +111,6 @@ function toggleSidebar() {
   }
 }
 
-// ── UTILS ─────────────────────────────────────
 function calcIdade(nasc) {
   if (!nasc) return "—";
   const d = new Date(nasc + "T12:00:00"), hoje = new Date();
@@ -161,7 +149,6 @@ function getEspecies() {
   return ["Todos", ...new Set(animais.map(a => a.especie))];
 }
 
-// ── SIDEBAR ───────────────────────────────────
 function renderSidebar() {
   const busca = (document.getElementById("search-input")?.value || "").toLowerCase();
 
@@ -202,7 +189,6 @@ function renderSidebar() {
   `;
 }
 
-// ── FICHA ─────────────────────────────────────
 function renderFicha() {
   const a = animais.find(x => x.id === selecionado);
   const empty   = document.getElementById("empty-state");
@@ -214,7 +200,6 @@ function renderFicha() {
     empty.style.display = "flex";
     topbar.style.display = "none";
     tabF.style.display = tabG.style.display = "none";
-    // atualiza mobile bottombar
     atualizarMobileBottombar(false);
     return;
   }
@@ -223,7 +208,6 @@ function renderFicha() {
   tabF.style.display   = abaAtiva === "ficha"      ? "block" : "none";
   tabG.style.display   = abaAtiva === "genealogia" ? "block" : "none";
 
-  // atualiza mobile bottombar
   atualizarMobileBottombar(true);
 
   if (abaAtiva === "ficha")      renderFichaContent(a);
@@ -370,7 +354,6 @@ function renderFichaContent(a) {
   `;
 }
 
-// ── GENEALOGIA ────────────────────────────────
 function renderGenealogia(a) {
   const emoji = EMOJIS[a.especie] || "🐾";
 
@@ -477,11 +460,9 @@ function salvarGenealogia() {
   if (btn) { btn.textContent = "Salvo!"; setTimeout(() => { btn.textContent = "Salvar Ancestrais"; }, 1500); }
 }
 
-// ── ACTIONS ───────────────────────────────────
 function selecionar(id) {
   selecionado = id; editando = false; fotoTemp = null;
   renderSidebar(); renderFicha();
-  // no mobile fecha o drawer ao selecionar
   fecharSidebar();
 }
 function setFiltro(f) { filtro = f; renderSidebar(); }
@@ -565,7 +546,6 @@ function carregarFoto(event) {
   event.target.value = "";
 }
 
-// ── MODAL ─────────────────────────────────────
 function abrirModal() { document.getElementById("modal").style.display = "flex"; }
 function fecharModal() {
   document.getElementById("modal").style.display = "none";
@@ -612,7 +592,6 @@ function confirmarExclusao(id) {
   );
 }
 
-// ── MODAIS DE ALERTA / CONFIRM ────────────────
 function mostrarAlerta(mensagem) {
   const overlay = document.getElementById("dialog-overlay");
   document.getElementById("dialog-title").textContent    = mensagem;
@@ -650,6 +629,5 @@ function fecharDialog() {
   }, { once: true });
 }
 
-// ── INIT ──────────────────────────────────────
 renderSidebar();
 renderFicha();
