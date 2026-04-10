@@ -1,5 +1,5 @@
-const STORAGE_KEY       = "plantel-animais";
-const STORAGE_INIT_KEY  = "plantel-iniciado";
+const STORAGE_KEY = "plantel-animais";
+const STORAGE_INIT_KEY = "plantel-iniciado";
 
 const SEED_ANIMAIS = [
   {
@@ -9,11 +9,11 @@ const SEED_ANIMAIS = [
     paiId: null, paiNome: "Rex", paiRaca: "Labrador",
     maeId: null, maeNome: "Bella", maeRaca: "Labrador",
     avoPatNome: "Duke", avoPatRaca: "Labrador",
-    avoMatNome: "Mel",  avoMatRaca: "Golden Retriever",
+    avoMatNome: "Mel", avoMatRaca: "Golden Retriever",
     vacinas: [
       { nome: "V10 Polivalente", data: "2024-03-15", prox: "2025-03-15" },
-      { nome: "Antirrábica",     data: "2024-06-10", prox: "2025-06-10" },
-      { nome: "Gripe Canina",    data: "2023-09-01", prox: "2024-09-01" }
+      { nome: "Antirrábica", data: "2024-06-10", prox: "2025-06-10" },
+      { nome: "Gripe Canina", data: "2023-09-01", prox: "2024-09-01" }
     ],
     obs: "Alérgico a frango. Escovação semanal e banho a cada 20 dias.\nComportamento dócil com crianças, pode ser reativo com outros cães."
   },
@@ -22,10 +22,10 @@ const SEED_ANIMAIS = [
     sexo: "Fêmea", nasc: "2021-07-22", pelagem: "Branca e cinza",
     status: "Em tratamento", peso: "4,2 kg", microchip: "985112340002", foto: null,
     paiId: null, paiNome: "Sultan", paiRaca: "Persa",
-    maeId: null, maeNome: "Isis",   maeRaca: "Persa",
+    maeId: null, maeNome: "Isis", maeRaca: "Persa",
     avoPatNome: "", avoPatRaca: "", avoMatNome: "", avoMatRaca: "",
     vacinas: [
-      { nome: "V4 Felina",   data: "2024-07-22", prox: "2025-07-22" },
+      { nome: "V4 Felina", data: "2024-07-22", prox: "2025-07-22" },
       { nome: "Antirrábica", data: "2024-07-22", prox: "2025-07-22" }
     ],
     obs: "Em tratamento de otite externa. Aplicar gotas 2x ao dia por 10 dias.\nEvitar água nos ouvidos durante o banho."
@@ -35,13 +35,13 @@ const SEED_ANIMAIS = [
     sexo: "Macho", nasc: "2018-11-05", pelagem: "Castanho escuro",
     status: "Ativo", peso: "480 kg", microchip: "BRZ000000001", foto: null,
     paiId: null, paiNome: "Relâmpago", paiRaca: "Quarto de Milha",
-    maeId: null, maeNome: "Estrela",   maeRaca: "Quarto de Milha",
+    maeId: null, maeNome: "Estrela", maeRaca: "Quarto de Milha",
     avoPatNome: "Ventania", avoPatRaca: "Quarto de Milha",
-    avoMatNome: "Brisa",    avoMatRaca: "Mangalarga",
+    avoMatNome: "Brisa", avoMatRaca: "Mangalarga",
     vacinas: [
       { nome: "Influenza Equina", data: "2024-05-01", prox: "2025-05-01" },
-      { nome: "Tétano",           data: "2023-05-01", prox: "2025-05-01" },
-      { nome: "Encefalomielite",  data: "2024-05-01", prox: "2025-05-01" }
+      { nome: "Tétano", data: "2023-05-01", prox: "2025-05-01" },
+      { nome: "Encefalomielite", data: "2024-05-01", prox: "2025-05-01" }
     ],
     obs: "Treinado para vaquejada. Ferrageamento a cada 45 dias.\nNão expor à chuva forte por 24h após vacinação."
   }
@@ -50,7 +50,7 @@ const SEED_ANIMAIS = [
 function carregarAnimais() {
   try {
     const jaIniciou = localStorage.getItem(STORAGE_INIT_KEY);
-    const raw       = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(STORAGE_KEY);
     if (jaIniciou) {
       if (raw) {
         const parsed = JSON.parse(raw);
@@ -58,7 +58,7 @@ function carregarAnimais() {
       }
       return [];
     }
-  } catch (e) {}
+  } catch (e) { }
   return SEED_ANIMAIS.map(a => ({ ...a }));
 }
 
@@ -66,7 +66,7 @@ function salvarAnimais() {
   try {
     localStorage.setItem(STORAGE_INIT_KEY, "1");
     localStorage.setItem(STORAGE_KEY, JSON.stringify(animais));
-  } catch (e) {}
+  } catch (e) { }
 }
 
 
@@ -78,13 +78,13 @@ const EMOJIS = {
 };
 
 let selecionado = null;
-let editando    = false;
-let filtro      = "Todos";
-let abaAtiva    = "ficha";
-let fotoTemp    = null;
+let editando = false;
+let filtro = "Todos";
+let abaAtiva = "ficha";
+let fotoTemp = null;
 
 function toggleTheme() {
-  const html  = document.documentElement;
+  const html = document.documentElement;
   const atual = html.getAttribute("data-theme");
   html.setAttribute("data-theme", atual === "light" ? "dark" : "light");
   localStorage.setItem("plantel-theme", html.getAttribute("data-theme"));
@@ -115,7 +115,7 @@ function calcIdade(nasc) {
   if (!nasc) return "—";
   const d = new Date(nasc + "T12:00:00"), hoje = new Date();
   let anos = hoje.getFullYear() - d.getFullYear();
-  const m  = hoje.getMonth() - d.getMonth();
+  const m = hoje.getMonth() - d.getMonth();
   if (m < 0 || (m === 0 && hoje.getDate() < d.getDate())) anos--;
   if (anos < 1) {
     const meses = (hoje.getFullYear() - d.getFullYear()) * 12 + hoje.getMonth() - d.getMonth();
@@ -181,7 +181,7 @@ function renderSidebar() {
     : `<div style="padding:20px 16px;font-size:12px;color:var(--c-text-3);text-align:center">Nenhum animal encontrado</div>`;
 
   const ativos = animais.filter(a => a.status === "Ativo").length;
-  const trat   = animais.filter(a => a.status === "Em tratamento").length;
+  const trat = animais.filter(a => a.status === "Em tratamento").length;
   document.getElementById("stats-bar").innerHTML = `
     <div class="stat-item"><div class="stat-n">${animais.length}</div><div class="stat-l">Total</div></div>
     <div class="stat-item"><div class="stat-n" style="color:var(--c-accent)">${ativos}</div><div class="stat-l">Ativos</div></div>
@@ -191,10 +191,10 @@ function renderSidebar() {
 
 function renderFicha() {
   const a = animais.find(x => x.id === selecionado);
-  const empty   = document.getElementById("empty-state");
-  const topbar  = document.getElementById("topbar");
-  const tabF    = document.getElementById("tab-ficha");
-  const tabG    = document.getElementById("tab-genealogia");
+  const empty = document.getElementById("empty-state");
+  const topbar = document.getElementById("topbar");
+  const tabF = document.getElementById("tab-ficha");
+  const tabG = document.getElementById("tab-genealogia");
 
   if (!a) {
     empty.style.display = "flex";
@@ -205,12 +205,12 @@ function renderFicha() {
   }
   empty.style.display = "none";
   topbar.style.display = "block";
-  tabF.style.display   = abaAtiva === "ficha"      ? "block" : "none";
-  tabG.style.display   = abaAtiva === "genealogia" ? "block" : "none";
+  tabF.style.display = abaAtiva === "ficha" ? "block" : "none";
+  tabG.style.display = abaAtiva === "genealogia" ? "block" : "none";
 
   atualizarMobileBottombar(true);
 
-  if (abaAtiva === "ficha")      renderFichaContent(a);
+  if (abaAtiva === "ficha") renderFichaContent(a);
   if (abaAtiva === "genealogia") renderGenealogia(a);
 }
 
@@ -229,20 +229,20 @@ function renderFichaContent(a) {
     if (ed) {
       if (opts) return `<div class="form-field">
         <label>${label}</label>
-        <select id="f-${id}">${opts.map(o => `<option${val===o?" selected":""}>${o}</option>`).join("")}</select>
+        <select id="f-${id}">${opts.map(o => `<option${val === o ? " selected" : ""}>${o}</option>`).join("")}</select>
       </div>`;
       return `<div class="form-field">
         <label>${label}</label>
-        <input type="${type}" id="f-${id}" value="${val||""}" />
+        <input type="${type}" id="f-${id}" value="${val || ""}" />
       </div>`;
     }
     return `<div class="form-field">
       <label>${label}</label>
-      <div class="field-value">${val||"—"}</div>
+      <div class="field-value">${val || "—"}</div>
     </div>`;
   };
 
-  const vacRows = (a.vacinas||[]).map((v,i) => {
+  const vacRows = (a.vacinas || []).map((v, i) => {
     const st = vacStatus(v.prox);
     return `<tr>
       <td>${v.nome}</td>
@@ -263,41 +263,41 @@ function renderFichaContent(a) {
 
   document.getElementById("ficha-content").innerHTML = `
     <div class="ficha-hero">
-      <label style="${ed?"cursor:pointer":"cursor:default"}">
+      <label style="${ed ? "cursor:pointer" : "cursor:default"}">
         ${ed ? `<input type="file" id="foto-input" accept="image/*" style="display:none" onchange="carregarFoto(event)" />` : ""}
-        <div class="foto-frame" style="${ed?"cursor:pointer":"cursor:default"}" ${ed?`onclick="document.getElementById('foto-input').click()"`:""}> 
+        <div class="foto-frame" style="${ed ? "cursor:pointer" : "cursor:default"}" ${ed ? `onclick="document.getElementById('foto-input').click()"` : ""}> 
           ${a.foto
-            ? `<img src="${a.foto}" alt="${a.nome}" />`
-            : `<span class="foto-emoji">${EMOJIS[a.especie]||"🐾"}</span><span class="foto-hint">Sem foto</span>`
-          }
+      ? `<img src="${a.foto}" alt="${a.nome}" />`
+      : `<span class="foto-emoji">${EMOJIS[a.especie] || "🐾"}</span><span class="foto-hint">Sem foto</span>`
+    }
           ${ed ? `<div class="foto-overlay">
             <svg viewBox="0 0 24 24" fill="none"><path d="M12 16a4 4 0 100-8 4 4 0 000 8z" stroke="currentColor" stroke-width="1.5"/><path d="M3 9a2 2 0 012-2h1l2-2h8l2 2h1a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke="currentColor" stroke-width="1.5"/></svg>
-            <span>${a.foto?"Trocar foto":"Adicionar foto"}</span>
+            <span>${a.foto ? "Trocar foto" : "Adicionar foto"}</span>
           </div>` : ""}
         </div>
       </label>
 
       <div class="ficha-info">
         ${ed
-          ? `<input class="nome-edit-input" id="f-nome" value="${a.nome}" />`
-          : `<h1 class="ficha-nome">${a.nome}</h1>`
-        }
-        <div class="ficha-sub">${a.especie}${a.raca?" · "+a.raca:""}${a.nasc?" · "+calcIdade(a.nasc):""}</div>
+      ? `<input class="nome-edit-input" id="f-nome" value="${a.nome}" />`
+      : `<h1 class="ficha-nome">${a.nome}</h1>`
+    }
+        <div class="ficha-sub">${a.especie}${a.raca ? " · " + a.raca : ""}${a.nasc ? " · " + calcIdade(a.nasc) : ""}</div>
         <div class="badge-row">
           <span class="badge ${badgeClass(a.status)}"><span class="badge-dot"></span>${a.status}</span>
         </div>
         <div class="tag-row">
-          ${a.sexo    ?`<span class="tag-chip">${a.sexo}</span>`:""}
-          ${a.pelagem ?`<span class="tag-chip">${a.pelagem}</span>`:""}
-          ${a.peso    ?`<span class="tag-chip">⚖ ${a.peso}</span>`:""}
-          ${a.microchip?`<span class="tag-chip">🔖 ${a.microchip}</span>`:""}
+          ${a.sexo ? `<span class="tag-chip">${a.sexo}</span>` : ""}
+          ${a.pelagem ? `<span class="tag-chip">${a.pelagem}</span>` : ""}
+          ${a.peso ? `<span class="tag-chip">⚖ ${a.peso}</span>` : ""}
+          ${a.microchip ? `<span class="tag-chip">🔖 ${a.microchip}</span>` : ""}
         </div>
         <div class="ficha-actions">
           ${ed
-            ? `<button class="btn-save" onclick="salvarEdicao()">Salvar alterações</button>
+      ? `<button class="btn-save" onclick="salvarEdicao()">Salvar alterações</button>
                <button class="btn-cancel" onclick="cancelarEdicao()">Cancelar</button>`
-            : `<button class="btn-edit" onclick="iniciarEdicao()">Editar ficha</button>`
-          }
+      : `<button class="btn-edit" onclick="iniciarEdicao()">Editar ficha</button>`
+    }
           <button class="btn-delete" onclick="confirmarExclusao(${a.id})">Excluir</button>
         </div>
       </div>
@@ -309,18 +309,18 @@ function renderFichaContent(a) {
         <span class="section-title">Dados Gerais</span>
       </div>
       <div class="grid-3">
-        ${field("Espécie", a.especie, "especie","text",["Cão","Gato","Cavalo","Bovino","Suíno","Ave","Caprino","Ovino","Outro"])}
+        ${field("Espécie", a.especie, "especie", "text", ["Cão", "Gato", "Cavalo", "Bovino", "Suíno", "Ave", "Caprino", "Ovino", "Outro"])}
         ${field("Raça", a.raca, "raca")}
-        ${field("Sexo", a.sexo, "sexo","text",["","Macho","Fêmea"])}
+        ${field("Sexo", a.sexo, "sexo", "text", ["", "Macho", "Fêmea"])}
       </div>
       <div class="grid-3 mt">
-        ${field("Nascimento", a.nasc, "nasc","date")}
+        ${field("Nascimento", a.nasc, "nasc", "date")}
         ${field("Peso", a.peso, "peso")}
         ${field("Pelagem / Cor", a.pelagem, "pelagem")}
       </div>
       <div class="grid-2 mt">
         ${field("Microchip / ID", a.microchip, "microchip")}
-        ${field("Status", a.status, "status","text",["Ativo","Em tratamento","Inativo"])}
+        ${field("Status", a.status, "status", "text", ["Ativo", "Em tratamento", "Inativo"])}
       </div>
     </div>
 
@@ -333,9 +333,9 @@ function renderFichaContent(a) {
         <table class="vac-table">
           <thead><tr>
             <th>Vacina</th><th>Aplicação</th><th>Próxima dose</th><th>Situação</th>
-            ${ed?"<th></th>":""}
+            ${ed ? "<th></th>" : ""}
           </tr></thead>
-          <tbody>${vacRows || `<tr><td colspan="${ed?5:4}" style="color:var(--c-text-3);font-style:italic;text-align:center;padding:16px">Nenhuma vacina registrada</td></tr>`}</tbody>
+          <tbody>${vacRows || `<tr><td colspan="${ed ? 5 : 4}" style="color:var(--c-text-3);font-style:italic;text-align:center;padding:16px">Nenhuma vacina registrada</td></tr>`}</tbody>
         </table>
       </div>
       ${addVacForm}
@@ -347,9 +347,9 @@ function renderFichaContent(a) {
         <span class="section-title">Observações</span>
       </div>
       ${ed
-        ? `<div class="form-field"><textarea id="f-obs" placeholder="Alergias, comportamento, cuidados especiais...">${a.obs||""}</textarea></div>`
-        : `<div class="obs-text">${a.obs||"—"}</div>`
-      }
+      ? `<div class="form-field"><textarea id="f-obs" placeholder="Alergias, comportamento, cuidados especiais...">${a.obs || ""}</textarea></div>`
+      : `<div class="obs-text">${a.obs || "—"}</div>`
+    }
     </div>
   `;
 }
@@ -360,19 +360,19 @@ function renderGenealogia(a) {
   const nodeHtml = (nome, raca, role, roleLabel, foto, clickable) => {
     const hasName = nome && nome.trim();
     return `
-      <div class="gene-node${!hasName?" unknown":""}${role==="focal"?" focal":""}">
-        <div class="gene-thumb">${foto?`<img src="${foto}" />`:(hasName?emoji:"?")}</div>
+      <div class="gene-node${!hasName ? " unknown" : ""}${role === "focal" ? " focal" : ""}">
+        <div class="gene-thumb">${foto ? `<img src="${foto}" />` : (hasName ? emoji : "?")}</div>
         <div class="gene-node-role role-${role}">${roleLabel}</div>
-        <div class="gene-node-name">${hasName?nome:"Desconhecido"}</div>
-        <div class="gene-node-info">${raca||"—"}</div>
-        ${clickable?`<button class="gene-link-btn" onclick="editarGenealogiaAnimal('${role}')">↗ editar</button>`:""}
+        <div class="gene-node-name">${hasName ? nome : "Desconhecido"}</div>
+        <div class="gene-node-info">${raca || "—"}</div>
+        ${clickable ? `<button class="gene-link-btn" onclick="editarGenealogiaAnimal('${role}')">↗ editar</button>` : ""}
       </div>`;
   };
 
-  const paiNome    = a.paiNome    || "";
-  const paiRaca    = a.paiRaca    || "";
-  const maeNome    = a.maeNome    || "";
-  const maeRaca    = a.maeRaca    || "";
+  const paiNome = a.paiNome || "";
+  const paiRaca = a.paiRaca || "";
+  const maeNome = a.maeNome || "";
+  const maeRaca = a.maeRaca || "";
   const avoPatNome = a.avoPatNome || "";
   const avoPatRaca = a.avoPatRaca || "";
   const avoMatNome = a.avoMatNome || "";
@@ -405,7 +405,7 @@ function renderGenealogia(a) {
   document.getElementById("genealogia-content").innerHTML = `
     <div class="gene-header">
       <h2 class="gene-title">Árvore Genealógica — ${a.nome}</h2>
-      <p class="gene-sub">${a.especie}${a.raca?" · "+a.raca:""} · ${calcIdade(a.nasc)}</p>
+      <p class="gene-sub">${a.especie}${a.raca ? " · " + a.raca : ""} · ${calcIdade(a.nasc)}</p>
     </div>
 
     <div class="gene-tree">
@@ -446,10 +446,10 @@ function renderGenealogia(a) {
 function salvarGenealogia() {
   const a = animais.find(x => x.id === selecionado);
   if (!a) return;
-  a.paiNome    = document.getElementById("g-painome")?.value    || "";
-  a.paiRaca    = document.getElementById("g-pairaça")?.value    || "";
-  a.maeNome    = document.getElementById("g-maenome")?.value    || "";
-  a.maeRaca    = document.getElementById("g-maeraca")?.value    || "";
+  a.paiNome = document.getElementById("g-painome")?.value || "";
+  a.paiRaca = document.getElementById("g-pairaça")?.value || "";
+  a.maeNome = document.getElementById("g-maenome")?.value || "";
+  a.maeRaca = document.getElementById("g-maeraca")?.value || "";
   a.avoPatNome = document.getElementById("g-avopatnome")?.value || "";
   a.avoPatRaca = document.getElementById("g-avopatRaca")?.value || "";
   a.avoMatNome = document.getElementById("g-avomatnome")?.value || "";
@@ -484,16 +484,16 @@ function salvarEdicao() {
   const a = animais.find(x => x.id === selecionado);
   if (!a) return;
   const g = id => document.getElementById(id)?.value ?? "";
-  a.nome      = g("f-nome")      || a.nome;
-  a.especie   = g("f-especie")   || a.especie;
-  a.raca      = g("f-raca");
-  a.sexo      = g("f-sexo");
-  a.nasc      = g("f-nasc");
-  a.peso      = g("f-peso");
-  a.pelagem   = g("f-pelagem");
+  a.nome = g("f-nome") || a.nome;
+  a.especie = g("f-especie") || a.especie;
+  a.raca = g("f-raca");
+  a.sexo = g("f-sexo");
+  a.nasc = g("f-nasc");
+  a.peso = g("f-peso");
+  a.pelagem = g("f-pelagem");
   a.microchip = g("f-microchip");
-  a.status    = g("f-status")    || a.status;
-  a.obs       = g("f-obs");
+  a.status = g("f-status") || a.status;
+  a.obs = g("f-obs");
   if (fotoTemp) { a.foto = fotoTemp; fotoTemp = null; }
   editando = false;
   salvarAnimais();
@@ -501,7 +501,7 @@ function salvarEdicao() {
 }
 
 function adicionarVacina() {
-  const a    = animais.find(x => x.id === selecionado);
+  const a = animais.find(x => x.id === selecionado);
   const nome = document.getElementById("nv-nome")?.value?.trim();
   if (!nome) return;
   a.vacinas.push({
@@ -549,25 +549,25 @@ function carregarFoto(event) {
 function abrirModal() { document.getElementById("modal").style.display = "flex"; }
 function fecharModal() {
   document.getElementById("modal").style.display = "none";
-  ["m-nome","m-raca","m-id"].forEach(id => { const el = document.getElementById(id); if(el) el.value=""; });
+  ["m-nome", "m-raca", "m-id"].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
 }
 function fecharModalExterno(e) { if (e.target === document.getElementById("modal")) fecharModal(); }
 
 function salvarNovoAnimal() {
-  const nome    = document.getElementById("m-nome")?.value?.trim();
+  const nome = document.getElementById("m-nome")?.value?.trim();
   const especie = document.getElementById("m-especie")?.value;
   if (!nome || !especie) { mostrarAlerta("Preencha pelo menos o nome e a espécie."); return; }
   const novo = {
     id: Date.now(), nome, especie,
-    raca:      document.getElementById("m-raca")?.value    || "",
-    sexo:      document.getElementById("m-sexo")?.value    || "",
-    nasc:      document.getElementById("m-nasc")?.value    || "",
-    pelagem:   document.getElementById("m-pelagem")?.value || "",
-    status:    document.getElementById("m-status")?.value  || "Ativo",
+    raca: document.getElementById("m-raca")?.value || "",
+    sexo: document.getElementById("m-sexo")?.value || "",
+    nasc: document.getElementById("m-nasc")?.value || "",
+    pelagem: document.getElementById("m-pelagem")?.value || "",
+    status: document.getElementById("m-status")?.value || "Ativo",
     peso: "", microchip: document.getElementById("m-id")?.value || "",
     foto: null,
-    paiNome:"", paiRaca:"", maeNome:"", maeRaca:"",
-    avoPatNome:"", avoPatRaca:"", avoMatNome:"", avoMatRaca:"",
+    paiNome: "", paiRaca: "", maeNome: "", maeRaca: "",
+    avoPatNome: "", avoPatRaca: "", avoMatNome: "", avoMatRaca: "",
     vacinas: [], obs: ""
   };
   animais.push(novo);
@@ -594,10 +594,10 @@ function confirmarExclusao(id) {
 
 function mostrarAlerta(mensagem) {
   const overlay = document.getElementById("dialog-overlay");
-  document.getElementById("dialog-title").textContent    = mensagem;
-  document.getElementById("dialog-desc").textContent     = "";
+  document.getElementById("dialog-title").textContent = mensagem;
+  document.getElementById("dialog-desc").textContent = "";
   document.getElementById("dialog-cancel").style.display = "none";
-  document.getElementById("dialog-confirm").textContent  = "OK";
+  document.getElementById("dialog-confirm").textContent = "OK";
   document.getElementById("dialog-confirm").onclick = () => fecharDialog();
   overlay.style.display = "flex";
   requestAnimationFrame(() => overlay.classList.add("visible"));
@@ -605,10 +605,10 @@ function mostrarAlerta(mensagem) {
 
 function mostrarConfirm(titulo, desc, onConfirm) {
   const overlay = document.getElementById("dialog-overlay");
-  document.getElementById("dialog-title").textContent    = titulo;
-  document.getElementById("dialog-desc").textContent     = desc || "";
+  document.getElementById("dialog-title").textContent = titulo;
+  document.getElementById("dialog-desc").textContent = desc || "";
   document.getElementById("dialog-cancel").style.display = "";
-  document.getElementById("dialog-confirm").textContent  = "Confirmar";
+  document.getElementById("dialog-confirm").textContent = "Confirmar";
   document.getElementById("dialog-confirm").onclick = () => {
     fecharDialog();
     onConfirm();

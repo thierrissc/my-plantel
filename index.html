@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html lang="pt-BR" data-theme="light">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Plantel — Gestão de Animais</title>
   <link rel="icon" type="image/jpeg" href="img/perola.jpeg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,600;1,400&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
+
 <body>
 
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="fecharSidebar()"></div>
@@ -22,22 +26,25 @@
         <div class="brand-name">Plantel</div>
         <div class="brand-sub">Gestão de Animais</div>
       </div>
-      
+
       <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="Alternar tema">
         <svg class="icon-sun" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"/>
-          <path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8" />
+          <path
+            d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
+            stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
         </svg>
         <svg class="icon-moon" viewBox="0 0 24 24" fill="none">
-          <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </button>
     </div>
 
     <div class="sidebar-search">
       <svg class="search-icon" viewBox="0 0 20 20" fill="none">
-        <circle cx="9" cy="9" r="5.5" stroke="currentColor" stroke-width="1.5"/>
-        <path d="M14 14l2.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="9" cy="9" r="5.5" stroke="currentColor" stroke-width="1.5" />
+        <path d="M14 14l2.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
       </svg>
       <input type="text" id="search-input" placeholder="Buscar por nome ou raça..." oninput="filtrarAnimais()" />
     </div>
@@ -54,7 +61,9 @@
     <div class="sidebar-footer">
       <div class="stats-row" id="stats-bar"></div>
       <button class="btn-new-animal" onclick="abrirModal()">
-        <svg viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <svg viewBox="0 0 20 20" fill="none">
+          <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
         Novo Animal
       </button>
     </div>
@@ -64,18 +73,27 @@
     <div class="topbar" id="topbar" style="display:none">
       <button class="mobile-menu-btn" onclick="toggleSidebar()" aria-label="Menu">
         <svg viewBox="0 0 24 24" fill="none">
-          <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
         </svg>
       </button>
       <div class="topbar-tabs">
-        
+
         <button class="tab-btn active" data-tab="ficha" onclick="switchTab('ficha', this)">
-          <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="2" width="14" height="16" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M7 7h6M7 10.5h6M7 14h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <svg viewBox="0 0 20 20" fill="none">
+            <rect x="3" y="2" width="14" height="16" rx="2.5" stroke="currentColor" stroke-width="1.8" />
+            <path d="M7 7h6M7 10.5h6M7 14h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+          </svg>
           Ficha do Animal
         </button>
-        
+
         <button class="tab-btn" data-tab="genealogia" onclick="switchTab('genealogia', this)">
-          <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="16" r="2.2" stroke="currentColor" stroke-width="1.6"/><circle cx="5" cy="7" r="2.2" stroke="currentColor" stroke-width="1.6"/><circle cx="15" cy="7" r="2.2" stroke="currentColor" stroke-width="1.6"/><path d="M10 13.8V11M10 11L5 9.2M10 11L15 9.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <svg viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="16" r="2.2" stroke="currentColor" stroke-width="1.6" />
+            <circle cx="5" cy="7" r="2.2" stroke="currentColor" stroke-width="1.6" />
+            <circle cx="15" cy="7" r="2.2" stroke="currentColor" stroke-width="1.6" />
+            <path d="M10 13.8V11M10 11L5 9.2M10 11L15 9.2" stroke="currentColor" stroke-width="1.6"
+              stroke-linecap="round" />
+          </svg>
           Árvore Genealógica
         </button>
       </div>
@@ -84,32 +102,39 @@
     <div class="empty-state" id="empty-state">
       <button class="mobile-menu-btn mobile-menu-empty" onclick="toggleSidebar()" aria-label="Abrir lista">
         <svg viewBox="0 0 24 24" fill="none">
-          <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
         </svg>
       </button>
       <div class="empty-art">
         <svg viewBox="0 0 120 100" fill="none">
-          <ellipse cx="34" cy="30" rx="13" ry="16" fill="currentColor" opacity="0.10"/>
-          <ellipse cx="86" cy="30" rx="13" ry="16" fill="currentColor" opacity="0.07"/>
-          <ellipse cx="18" cy="58" rx="10" ry="13" fill="currentColor" opacity="0.06"/>
-          <ellipse cx="102" cy="58" rx="10" ry="13" fill="currentColor" opacity="0.09"/>
-          <path d="M28 72C28 60 42 50 60 58C78 50 92 60 92 72C92 84 80 92 60 92C40 92 28 84 28 72Z" fill="currentColor" opacity="0.13"/>
+          <ellipse cx="34" cy="30" rx="13" ry="16" fill="currentColor" opacity="0.10" />
+          <ellipse cx="86" cy="30" rx="13" ry="16" fill="currentColor" opacity="0.07" />
+          <ellipse cx="18" cy="58" rx="10" ry="13" fill="currentColor" opacity="0.06" />
+          <ellipse cx="102" cy="58" rx="10" ry="13" fill="currentColor" opacity="0.09" />
+          <path d="M28 72C28 60 42 50 60 58C78 50 92 60 92 72C92 84 80 92 60 92C40 92 28 84 28 72Z" fill="currentColor"
+            opacity="0.13" />
         </svg>
       </div>
       <h2 class="empty-title">Bem-vindo ao Plantel</h2>
       <p class="empty-desc">Selecione um animal na lista ou cadastre um novo para começar.</p>
       <button class="btn-cta" onclick="abrirModal()">
-        <svg viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <svg viewBox="0 0 20 20" fill="none">
+          <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
         Cadastrar animal
       </button>
     </div>
 
     <div class="tab-content" id="tab-ficha" style="display:none">
-      <div class="ficha-wrap"><div id="ficha-content"></div></div>
+      <div class="ficha-wrap">
+        <div id="ficha-content"></div>
+      </div>
     </div>
 
     <div class="tab-content" id="tab-genealogia" style="display:none">
-      <div class="ficha-wrap"><div id="genealogia-content"></div></div>
+      <div class="ficha-wrap">
+        <div id="genealogia-content"></div>
+      </div>
     </div>
   </main>
 
@@ -118,53 +143,63 @@
       <div class="modal-header">
         <span class="modal-title">Novo Animal</span>
         <button class="modal-close" onclick="fecharModal()">
-          <svg viewBox="0 0 20 20" fill="none"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <svg viewBox="0 0 20 20" fill="none">
+            <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg>
         </button>
       </div>
-      
+
       <div class="modal-body">
         <div class="form-field full">
           <label>Nome *</label>
           <input id="m-nome" type="text" placeholder="Nome do animal" />
         </div>
-        
+
         <div class="form-grid-2">
           <div class="form-field">
             <label>Espécie *</label>
             <select id="m-especie">
               <option value="">Selecione</option>
-              <option>Cão</option><option>Gato</option><option>Cavalo</option>
-              <option>Bovino</option><option>Suíno</option><option>Ave</option>
-              <option>Caprino</option><option>Ovino</option><option>Outro</option>
+              <option>Cão</option>
+              <option>Gato</option>
+              <option>Cavalo</option>
+              <option>Bovino</option>
+              <option>Suíno</option>
+              <option>Ave</option>
+              <option>Caprino</option>
+              <option>Ovino</option>
+              <option>Outro</option>
             </select>
           </div>
-          
+
           <div class="form-field">
             <label>Raça</label>
             <input id="m-raca" type="text" placeholder="Ex: Labrador" />
           </div>
         </div>
-        
+
         <div class="form-grid-2">
           <div class="form-field">
             <label>Sexo</label>
             <select id="m-sexo">
-              <option value="">—</option><option>Macho</option><option>Fêmea</option>
+              <option value="">—</option>
+              <option>Macho</option>
+              <option>Fêmea</option>
             </select>
           </div>
-          
+
           <div class="form-field">
             <label>Data de Nascimento</label>
             <input id="m-nasc" type="date" />
           </div>
         </div>
-        
+
         <div class="form-grid-2">
           <div class="form-field">
             <label>Pelagem / Cor</label>
             <input id="m-pelagem" type="text" placeholder="Ex: Branco e preto" />
           </div>
-          
+
           <div class="form-field">
             <label>Status</label>
             <select id="m-status">
@@ -174,13 +209,13 @@
             </select>
           </div>
         </div>
-        
+
         <div class="form-field full">
           <label>Nº de identificação / Microchip</label>
           <input id="m-id" type="text" placeholder="Ex: 985112345678901" />
         </div>
       </div>
-      
+
       <div class="modal-footer">
         <button class="btn-ghost" onclick="fecharModal()">Cancelar</button>
         <button class="btn-primary" onclick="salvarNovoAnimal()">Criar Ficha</button>
@@ -191,33 +226,35 @@
   <nav class="mobile-bottombar" id="mobile-bottombar">
     <button class="mobile-nav-btn" onclick="toggleSidebar()" aria-label="Lista de animais">
       <svg viewBox="0 0 24 24" fill="none">
-        <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
       </svg>
       <span>Animais</span>
     </button>
-    
+
     <button class="mobile-tab-btn active" data-tab="ficha" onclick="switchTab('ficha', this)" aria-label="Ficha">
       <svg viewBox="0 0 24 24" fill="none">
-        <rect x="4" y="3" width="16" height="18" rx="2.5" stroke="currentColor" stroke-width="1.8"/>
-        <path d="M8 8h8M8 12h8M8 16h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        <rect x="4" y="3" width="16" height="18" rx="2.5" stroke="currentColor" stroke-width="1.8" />
+        <path d="M8 8h8M8 12h8M8 16h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
       </svg>
       <span>Ficha</span>
     </button>
-    
-    <button class="mobile-tab-btn" data-tab="genealogia" onclick="switchTab('genealogia', this)" aria-label="Genealogia">
+
+    <button class="mobile-tab-btn" data-tab="genealogia" onclick="switchTab('genealogia', this)"
+      aria-label="Genealogia">
       <svg viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="19" r="2.5" stroke="currentColor" stroke-width="1.6"/>
-        <circle cx="6" cy="8" r="2.5" stroke="currentColor" stroke-width="1.6"/>
-        <circle cx="18" cy="8" r="2.5" stroke="currentColor" stroke-width="1.6"/>
-        <path d="M12 16.5V13M12 13L6 10.5M12 13L18 10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        <circle cx="12" cy="19" r="2.5" stroke="currentColor" stroke-width="1.6" />
+        <circle cx="6" cy="8" r="2.5" stroke="currentColor" stroke-width="1.6" />
+        <circle cx="18" cy="8" r="2.5" stroke="currentColor" stroke-width="1.6" />
+        <path d="M12 16.5V13M12 13L6 10.5M12 13L18 10.5" stroke="currentColor" stroke-width="1.6"
+          stroke-linecap="round" />
       </svg>
       <span>Genealogia</span>
     </button>
-    
+
     <button class="mobile-nav-btn" onclick="abrirModal()" aria-label="Novo animal">
       <svg viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>
-        <path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8" />
+        <path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
       </svg>
       <span>Novo</span>
     </button>
@@ -227,13 +264,13 @@
     <div class="dialog-box" role="alertdialog" aria-modal="true">
       <div class="dialog-icon">
         <svg viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>
-          <path d="M12 8v5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          <circle cx="12" cy="16" r="1" fill="currentColor"/>
+          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8" />
+          <path d="M12 8v5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          <circle cx="12" cy="16" r="1" fill="currentColor" />
         </svg>
       </div>
       <p class="dialog-title" id="dialog-title"></p>
-      <p class="dialog-desc"  id="dialog-desc"></p>
+      <p class="dialog-desc" id="dialog-desc"></p>
       <div class="dialog-actions">
         <button class="btn-ghost" id="dialog-cancel" onclick="fecharDialog()">Cancelar</button>
         <button class="btn-primary" id="dialog-confirm"></button>
@@ -244,4 +281,5 @@
   <input type="file" id="foto-input" accept="image/*" style="display:none" onchange="carregarFoto(event)" />
   <script src="js/app.js"></script>
 </body>
+
 </html>
