@@ -7,7 +7,6 @@
 }
 
 :root {
-
   --sidebar-w: 340px;
 
   --c-bg: #f4f6f5;
@@ -37,8 +36,8 @@
 
   --c-shadow: rgba(30, 110, 67, 0.12);
 
-  --font-body: 'Inter', system-ui, sans-serif;
-  --font-display: 'Lora', Georgia, serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-display: "Lora", Georgia, serif;
   --r-sm: 6px;
   --r-md: 10px;
   --r-lg: 16px;
@@ -55,7 +54,7 @@
 
   --c-accent: #7dd3fc;
   --c-accent-soft: #93dffe;
-  --c-accent-bg: rgba(125, 211, 252, 0.10);
+  --c-accent-bg: rgba(125, 211, 252, 0.1);
   --c-accent-text: #bae6fd;
 
   --c-border: rgba(255, 255, 255, 0.08);
@@ -66,11 +65,11 @@
   --c-text-3: #3d5466;
 
   --c-amber: #fbbf24;
-  --c-amber-bg: rgba(251, 191, 36, 0.10);
+  --c-amber-bg: rgba(251, 191, 36, 0.1);
   --c-red: #f87171;
-  --c-red-bg: rgba(248, 113, 113, 0.10);
+  --c-red-bg: rgba(248, 113, 113, 0.1);
   --c-blue: #7dd3fc;
-  --c-blue-bg: rgba(125, 211, 252, 0.10);
+  --c-blue-bg: rgba(125, 211, 252, 0.1);
 
   --c-shadow: rgba(0, 0, 0, 0.35);
 }
@@ -84,7 +83,9 @@ body {
   font-size: 14px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  transition: background var(--t), color var(--t);
+  transition:
+    background var(--t),
+    color var(--t);
 }
 
 ::-webkit-scrollbar {
@@ -107,7 +108,6 @@ body {
   overflow: hidden;
 }
 
-
 .sidebar {
   width: var(--sidebar-w);
   min-width: var(--sidebar-w);
@@ -117,9 +117,10 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: background var(--t), border-color var(--t);
+  transition:
+    background var(--t),
+    border-color var(--t);
 }
-
 
 .sidebar-brand {
   display: flex;
@@ -235,7 +236,9 @@ body {
   color: var(--c-text-1);
   font-family: var(--font-body);
   outline: none;
-  transition: border-color var(--t), background var(--t);
+  transition:
+    border-color var(--t),
+    background var(--t);
   font-weight: 500;
 }
 
@@ -318,7 +321,9 @@ body {
   border-radius: var(--r-md);
   cursor: pointer;
   position: relative;
-  transition: background var(--t), transform var(--t);
+  transition:
+    background var(--t),
+    transform var(--t);
   animation: slideIn 0.25s ease both;
 }
 
@@ -344,7 +349,7 @@ body {
 }
 
 .animal-item.active::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   top: 6px;
@@ -505,7 +510,9 @@ body {
   padding: 16px 32px 0;
   border-bottom: 1px solid var(--c-border);
   background: var(--c-bg);
-  transition: background var(--t), border-color var(--t);
+  transition:
+    background var(--t),
+    border-color var(--t);
 }
 
 .topbar-tabs {
@@ -643,19 +650,25 @@ body {
   gap: 28px;
   align-items: flex-start;
   margin-bottom: 20px;
-  transition: background var(--t), border-color var(--t);
+  transition:
+    background var(--t),
+    border-color var(--t);
   position: relative;
   overflow: hidden;
 }
 
 .ficha-hero::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   right: 0;
   width: 200px;
   height: 200px;
-  background: radial-gradient(circle at top right, var(--c-accent-bg) 0%, transparent 65%);
+  background: radial-gradient(
+    circle at top right,
+    var(--c-accent-bg) 0%,
+    transparent 65%
+  );
   pointer-events: none;
 }
 
@@ -924,7 +937,9 @@ body {
   border-radius: var(--r-lg);
   padding: 22px 24px;
   margin-bottom: 16px;
-  transition: background var(--t), border-color var(--t);
+  transition:
+    background var(--t),
+    border-color var(--t);
   animation: fadeUp 0.3s ease both;
 }
 
@@ -933,7 +948,7 @@ body {
 }
 
 .section-card:nth-child(3) {
-  animation-delay: 0.10s;
+  animation-delay: 0.1s;
 }
 
 .section-card:nth-child(4) {
@@ -1015,7 +1030,9 @@ body {
   color: var(--c-text-1);
   font-family: var(--font-body);
   outline: none;
-  transition: border-color var(--t), background var(--t);
+  transition:
+    border-color var(--t),
+    background var(--t);
 }
 
 .form-field input:focus,
@@ -1195,7 +1212,7 @@ body {
   padding: 0 0 0 0;
 }
 
-.gene-gen+.gene-gen {
+.gene-gen + .gene-gen {
   margin-top: 0;
 }
 
@@ -1301,7 +1318,7 @@ body {
 }
 
 .role-mae {
-  background: rgba(236, 72, 153, 0.10);
+  background: rgba(236, 72, 153, 0.1);
   color: #be185d;
 }
 
@@ -1548,7 +1565,6 @@ body {
 }
 
 @media (max-width: 640px) {
-
   .sidebar-overlay {
     display: block;
     pointer-events: none;
@@ -1782,7 +1798,9 @@ body {
   background: var(--c-card);
   border: 1px solid var(--c-border);
   border-radius: var(--r-xl);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18), 0 4px 16px rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.18),
+    0 4px 16px rgba(0, 0, 0, 0.1);
   padding: 32px 28px 24px;
   max-width: 380px;
   width: 100%;

@@ -3,48 +3,91 @@ const STORAGE_INIT_KEY = "plantel-iniciado";
 
 const SEED_ANIMAIS = [
   {
-    id: 1, nome: "Thor", especie: "Cão", raca: "Labrador Retriever",
-    sexo: "Macho", nasc: "2020-03-15", pelagem: "Amarelo dourado",
-    status: "Ativo", peso: "32 kg", microchip: "985112340001", foto: null,
-    paiId: null, paiNome: "Rex", paiRaca: "Labrador",
-    maeId: null, maeNome: "Bella", maeRaca: "Labrador",
-    avoPatNome: "Duke", avoPatRaca: "Labrador",
-    avoMatNome: "Mel", avoMatRaca: "Golden Retriever",
+    id: 1,
+    nome: "Thor",
+    especie: "Cão",
+    raca: "Labrador Retriever",
+    sexo: "Macho",
+    nasc: "2020-03-15",
+    pelagem: "Amarelo dourado",
+    status: "Ativo",
+    peso: "32 kg",
+    microchip: "985112340001",
+    foto: null,
+    paiId: null,
+    paiNome: "Rex",
+    paiRaca: "Labrador",
+    maeId: null,
+    maeNome: "Bella",
+    maeRaca: "Labrador",
+    avoPatNome: "Duke",
+    avoPatRaca: "Labrador",
+    avoMatNome: "Mel",
+    avoMatRaca: "Golden Retriever",
     vacinas: [
       { nome: "V10 Polivalente", data: "2024-03-15", prox: "2025-03-15" },
       { nome: "Antirrábica", data: "2024-06-10", prox: "2025-06-10" },
-      { nome: "Gripe Canina", data: "2023-09-01", prox: "2024-09-01" }
+      { nome: "Gripe Canina", data: "2023-09-01", prox: "2024-09-01" },
     ],
-    obs: "Alérgico a frango. Escovação semanal e banho a cada 20 dias.\nComportamento dócil com crianças, pode ser reativo com outros cães."
+    obs: "Alérgico a frango. Escovação semanal e banho a cada 20 dias.\nComportamento dócil com crianças, pode ser reativo com outros cães.",
   },
   {
-    id: 2, nome: "Luna", especie: "Gato", raca: "Persa",
-    sexo: "Fêmea", nasc: "2021-07-22", pelagem: "Branca e cinza",
-    status: "Em tratamento", peso: "4,2 kg", microchip: "985112340002", foto: null,
-    paiId: null, paiNome: "Sultan", paiRaca: "Persa",
-    maeId: null, maeNome: "Isis", maeRaca: "Persa",
-    avoPatNome: "", avoPatRaca: "", avoMatNome: "", avoMatRaca: "",
+    id: 2,
+    nome: "Luna",
+    especie: "Gato",
+    raca: "Persa",
+    sexo: "Fêmea",
+    nasc: "2021-07-22",
+    pelagem: "Branca e cinza",
+    status: "Em tratamento",
+    peso: "4,2 kg",
+    microchip: "985112340002",
+    foto: null,
+    paiId: null,
+    paiNome: "Sultan",
+    paiRaca: "Persa",
+    maeId: null,
+    maeNome: "Isis",
+    maeRaca: "Persa",
+    avoPatNome: "",
+    avoPatRaca: "",
+    avoMatNome: "",
+    avoMatRaca: "",
     vacinas: [
       { nome: "V4 Felina", data: "2024-07-22", prox: "2025-07-22" },
-      { nome: "Antirrábica", data: "2024-07-22", prox: "2025-07-22" }
+      { nome: "Antirrábica", data: "2024-07-22", prox: "2025-07-22" },
     ],
-    obs: "Em tratamento de otite externa. Aplicar gotas 2x ao dia por 10 dias.\nEvitar água nos ouvidos durante o banho."
+    obs: "Em tratamento de otite externa. Aplicar gotas 2x ao dia por 10 dias.\nEvitar água nos ouvidos durante o banho.",
   },
   {
-    id: 3, nome: "Trovão", especie: "Cavalo", raca: "Quarto de Milha",
-    sexo: "Macho", nasc: "2018-11-05", pelagem: "Castanho escuro",
-    status: "Ativo", peso: "480 kg", microchip: "BRZ000000001", foto: null,
-    paiId: null, paiNome: "Relâmpago", paiRaca: "Quarto de Milha",
-    maeId: null, maeNome: "Estrela", maeRaca: "Quarto de Milha",
-    avoPatNome: "Ventania", avoPatRaca: "Quarto de Milha",
-    avoMatNome: "Brisa", avoMatRaca: "Mangalarga",
+    id: 3,
+    nome: "Trovão",
+    especie: "Cavalo",
+    raca: "Quarto de Milha",
+    sexo: "Macho",
+    nasc: "2018-11-05",
+    pelagem: "Castanho escuro",
+    status: "Ativo",
+    peso: "480 kg",
+    microchip: "BRZ000000001",
+    foto: null,
+    paiId: null,
+    paiNome: "Relâmpago",
+    paiRaca: "Quarto de Milha",
+    maeId: null,
+    maeNome: "Estrela",
+    maeRaca: "Quarto de Milha",
+    avoPatNome: "Ventania",
+    avoPatRaca: "Quarto de Milha",
+    avoMatNome: "Brisa",
+    avoMatRaca: "Mangalarga",
     vacinas: [
       { nome: "Influenza Equina", data: "2024-05-01", prox: "2025-05-01" },
       { nome: "Tétano", data: "2023-05-01", prox: "2025-05-01" },
-      { nome: "Encefalomielite", data: "2024-05-01", prox: "2025-05-01" }
+      { nome: "Encefalomielite", data: "2024-05-01", prox: "2025-05-01" },
     ],
-    obs: "Treinado para vaquejada. Ferrageamento a cada 45 dias.\nNão expor à chuva forte por 24h após vacinação."
-  }
+    obs: "Treinado para vaquejada. Ferrageamento a cada 45 dias.\nNão expor à chuva forte por 24h após vacinação.",
+  },
 ];
 
 function carregarAnimais() {
@@ -58,23 +101,29 @@ function carregarAnimais() {
       }
       return [];
     }
-  } catch (e) { }
-  return SEED_ANIMAIS.map(a => ({ ...a }));
+  } catch (e) {}
+  return SEED_ANIMAIS.map((a) => ({ ...a }));
 }
 
 function salvarAnimais() {
   try {
     localStorage.setItem(STORAGE_INIT_KEY, "1");
     localStorage.setItem(STORAGE_KEY, JSON.stringify(animais));
-  } catch (e) { }
+  } catch (e) {}
 }
-
 
 let animais = carregarAnimais();
 
 const EMOJIS = {
-  "Cão": "🐕", "Gato": "🐈", "Cavalo": "🐴", "Bovino": "🐄",
-  "Suíno": "🐷", "Ave": "🐔", "Caprino": "🐐", "Ovino": "🐑", "Outro": "🐾"
+  Cão: "🐕",
+  Gato: "🐈",
+  Cavalo: "🐴",
+  Bovino: "🐄",
+  Suíno: "🐷",
+  Ave: "🐔",
+  Caprino: "🐐",
+  Ovino: "🐑",
+  Outro: "🐾",
 };
 
 let selecionado = null;
@@ -113,12 +162,16 @@ function toggleSidebar() {
 
 function calcIdade(nasc) {
   if (!nasc) return "—";
-  const d = new Date(nasc + "T12:00:00"), hoje = new Date();
+  const d = new Date(nasc + "T12:00:00"),
+    hoje = new Date();
   let anos = hoje.getFullYear() - d.getFullYear();
   const m = hoje.getMonth() - d.getMonth();
   if (m < 0 || (m === 0 && hoje.getDate() < d.getDate())) anos--;
   if (anos < 1) {
-    const meses = (hoje.getFullYear() - d.getFullYear()) * 12 + hoje.getMonth() - d.getMonth();
+    const meses =
+      (hoje.getFullYear() - d.getFullYear()) * 12 +
+      hoje.getMonth() -
+      d.getMonth();
     return meses <= 0 ? "< 1 mês" : meses + (meses === 1 ? " mês" : " meses");
   }
   return anos + (anos === 1 ? " ano" : " anos");
@@ -134,10 +187,18 @@ function vacStatus(prox) {
   return diff < 0 ? "exp" : diff < 60 ? "vence" : "ok";
 }
 function pipClass(s) {
-  return s === "Ativo" ? "pip-ativo" : s === "Em tratamento" ? "pip-trat" : "pip-inativo";
+  return s === "Ativo"
+    ? "pip-ativo"
+    : s === "Em tratamento"
+      ? "pip-trat"
+      : "pip-inativo";
 }
 function badgeClass(s) {
-  return s === "Ativo" ? "badge-ativo" : s === "Em tratamento" ? "badge-trat" : "badge-inativo";
+  return s === "Ativo"
+    ? "badge-ativo"
+    : s === "Em tratamento"
+      ? "badge-trat"
+      : "badge-inativo";
 }
 function pillClass(s) {
   return s === "ok" ? "pill-ok" : s === "vence" ? "pill-vence" : "pill-exp";
@@ -146,42 +207,54 @@ function pillLabel(s) {
   return s === "ok" ? "Em dia" : s === "vence" ? "Vencendo" : "Expirado";
 }
 function getEspecies() {
-  return ["Todos", ...new Set(animais.map(a => a.especie))];
+  return ["Todos", ...new Set(animais.map((a) => a.especie))];
 }
 
 function renderSidebar() {
-  const busca = (document.getElementById("search-input")?.value || "").toLowerCase();
+  const busca = (
+    document.getElementById("search-input")?.value || ""
+  ).toLowerCase();
 
-  document.getElementById("filter-tabs").innerHTML = getEspecies().map(e =>
-    `<span class="ftab${filtro === e ? " active" : ""}" onclick="setFiltro('${e}')">${e}</span>`
-  ).join("");
+  document.getElementById("filter-tabs").innerHTML = getEspecies()
+    .map(
+      (e) =>
+        `<span class="ftab${filtro === e ? " active" : ""}" onclick="setFiltro('${e}')">${e}</span>`,
+    )
+    .join("");
 
-  const lista = animais.filter(a => {
+  const lista = animais.filter((a) => {
     const okF = filtro === "Todos" || a.especie === filtro;
-    const okB = !busca || a.nome.toLowerCase().includes(busca) || (a.raca || "").toLowerCase().includes(busca);
+    const okB =
+      !busca ||
+      a.nome.toLowerCase().includes(busca) ||
+      (a.raca || "").toLowerCase().includes(busca);
     return okF && okB;
   });
 
   document.getElementById("animal-count").textContent = lista.length;
 
   document.getElementById("animal-list").innerHTML = lista.length
-    ? lista.map((a, i) => `
+    ? lista
+        .map(
+          (a, i) => `
         <div class="animal-item${selecionado === a.id ? " active" : ""}"
              style="animation-delay:${i * 0.04}s"
              onclick="selecionar(${a.id})">
           <div class="animal-thumb">
-            ${a.foto ? `<img src="${a.foto}" alt="${a.nome}" />` : (EMOJIS[a.especie] || "🐾")}
+            ${a.foto ? `<img src="${a.foto}" alt="${a.nome}" />` : EMOJIS[a.especie] || "🐾"}
           </div>
           <div class="animal-info">
             <div class="animal-item-name">${a.nome}</div>
             <div class="animal-item-meta">${a.especie}${a.raca ? " · " + a.raca : ""}</div>
           </div>
           <div class="status-pip ${pipClass(a.status)}"></div>
-        </div>`).join("")
+        </div>`,
+        )
+        .join("")
     : `<div style="padding:20px 16px;font-size:12px;color:var(--c-text-3);text-align:center">Nenhum animal encontrado</div>`;
 
-  const ativos = animais.filter(a => a.status === "Ativo").length;
-  const trat = animais.filter(a => a.status === "Em tratamento").length;
+  const ativos = animais.filter((a) => a.status === "Ativo").length;
+  const trat = animais.filter((a) => a.status === "Em tratamento").length;
   document.getElementById("stats-bar").innerHTML = `
     <div class="stat-item"><div class="stat-n">${animais.length}</div><div class="stat-l">Total</div></div>
     <div class="stat-item"><div class="stat-n" style="color:var(--c-accent)">${ativos}</div><div class="stat-l">Ativos</div></div>
@@ -190,7 +263,7 @@ function renderSidebar() {
 }
 
 function renderFicha() {
-  const a = animais.find(x => x.id === selecionado);
+  const a = animais.find((x) => x.id === selecionado);
   const empty = document.getElementById("empty-state");
   const topbar = document.getElementById("topbar");
   const tabF = document.getElementById("tab-ficha");
@@ -216,7 +289,7 @@ function renderFicha() {
 
 function atualizarMobileBottombar(temAnimal) {
   const btns = document.querySelectorAll(".mobile-tab-btn");
-  btns.forEach(btn => {
+  btns.forEach((btn) => {
     btn.disabled = !temAnimal;
     btn.style.opacity = temAnimal ? "1" : "0.4";
   });
@@ -227,9 +300,10 @@ function renderFichaContent(a) {
 
   const field = (label, val, id, type = "text", opts = null) => {
     if (ed) {
-      if (opts) return `<div class="form-field">
+      if (opts)
+        return `<div class="form-field">
         <label>${label}</label>
-        <select id="f-${id}">${opts.map(o => `<option${val === o ? " selected" : ""}>${o}</option>`).join("")}</select>
+        <select id="f-${id}">${opts.map((o) => `<option${val === o ? " selected" : ""}>${o}</option>`).join("")}</select>
       </div>`;
       return `<div class="form-field">
         <label>${label}</label>
@@ -242,46 +316,56 @@ function renderFichaContent(a) {
     </div>`;
   };
 
-  const vacRows = (a.vacinas || []).map((v, i) => {
-    const st = vacStatus(v.prox);
-    return `<tr>
+  const vacRows = (a.vacinas || [])
+    .map((v, i) => {
+      const st = vacStatus(v.prox);
+      return `<tr>
       <td>${v.nome}</td>
       <td>${fmtDate(v.data)}</td>
       <td>${fmtDate(v.prox)}</td>
       <td><span class="pill ${pillClass(st)}">${pillLabel(st)}</span></td>
       ${ed ? `<td><span class="vac-remove" onclick="removerVacina(${i})">remover</span></td>` : ""}
     </tr>`;
-  }).join("");
+    })
+    .join("");
 
-  const addVacForm = ed ? `
+  const addVacForm = ed
+    ? `
     <div class="add-vac-form">
       <div class="form-field"><label>Vacina</label><input id="nv-nome" type="text" placeholder="Nome da vacina" /></div>
       <div class="form-field"><label>Aplicação</label><input id="nv-data" type="date" /></div>
       <div class="form-field"><label>Próxima dose</label><input id="nv-prox" type="date" /></div>
       <button class="btn-add-vac" onclick="adicionarVacina()">+ Adicionar</button>
-    </div>` : "";
+    </div>`
+    : "";
 
   document.getElementById("ficha-content").innerHTML = `
     <div class="ficha-hero">
       <label style="${ed ? "cursor:pointer" : "cursor:default"}">
         ${ed ? `<input type="file" id="foto-input" accept="image/*" style="display:none" onchange="carregarFoto(event)" />` : ""}
         <div class="foto-frame" style="${ed ? "cursor:pointer" : "cursor:default"}" ${ed ? `onclick="document.getElementById('foto-input').click()"` : ""}> 
-          ${a.foto
-      ? `<img src="${a.foto}" alt="${a.nome}" />`
-      : `<span class="foto-emoji">${EMOJIS[a.especie] || "🐾"}</span><span class="foto-hint">Sem foto</span>`
-    }
-          ${ed ? `<div class="foto-overlay">
+          ${
+            a.foto
+              ? `<img src="${a.foto}" alt="${a.nome}" />`
+              : `<span class="foto-emoji">${EMOJIS[a.especie] || "🐾"}</span><span class="foto-hint">Sem foto</span>`
+          }
+          ${
+            ed
+              ? `<div class="foto-overlay">
             <svg viewBox="0 0 24 24" fill="none"><path d="M12 16a4 4 0 100-8 4 4 0 000 8z" stroke="currentColor" stroke-width="1.5"/><path d="M3 9a2 2 0 012-2h1l2-2h8l2 2h1a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke="currentColor" stroke-width="1.5"/></svg>
             <span>${a.foto ? "Trocar foto" : "Adicionar foto"}</span>
-          </div>` : ""}
+          </div>`
+              : ""
+          }
         </div>
       </label>
 
       <div class="ficha-info">
-        ${ed
-      ? `<input class="nome-edit-input" id="f-nome" value="${a.nome}" />`
-      : `<h1 class="ficha-nome">${a.nome}</h1>`
-    }
+        ${
+          ed
+            ? `<input class="nome-edit-input" id="f-nome" value="${a.nome}" />`
+            : `<h1 class="ficha-nome">${a.nome}</h1>`
+        }
         <div class="ficha-sub">${a.especie}${a.raca ? " · " + a.raca : ""}${a.nasc ? " · " + calcIdade(a.nasc) : ""}</div>
         <div class="badge-row">
           <span class="badge ${badgeClass(a.status)}"><span class="badge-dot"></span>${a.status}</span>
@@ -293,11 +377,12 @@ function renderFichaContent(a) {
           ${a.microchip ? `<span class="tag-chip">🔖 ${a.microchip}</span>` : ""}
         </div>
         <div class="ficha-actions">
-          ${ed
-      ? `<button class="btn-save" onclick="salvarEdicao()">Salvar alterações</button>
+          ${
+            ed
+              ? `<button class="btn-save" onclick="salvarEdicao()">Salvar alterações</button>
                <button class="btn-cancel" onclick="cancelarEdicao()">Cancelar</button>`
-      : `<button class="btn-edit" onclick="iniciarEdicao()">Editar ficha</button>`
-    }
+              : `<button class="btn-edit" onclick="iniciarEdicao()">Editar ficha</button>`
+          }
           <button class="btn-delete" onclick="confirmarExclusao(${a.id})">Excluir</button>
         </div>
       </div>
@@ -346,10 +431,11 @@ function renderFichaContent(a) {
         <div class="section-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 10h16M4 14h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
         <span class="section-title">Observações</span>
       </div>
-      ${ed
-      ? `<div class="form-field"><textarea id="f-obs" placeholder="Alergias, comportamento, cuidados especiais...">${a.obs || ""}</textarea></div>`
-      : `<div class="obs-text">${a.obs || "—"}</div>`
-    }
+      ${
+        ed
+          ? `<div class="form-field"><textarea id="f-obs" placeholder="Alergias, comportamento, cuidados especiais...">${a.obs || ""}</textarea></div>`
+          : `<div class="obs-text">${a.obs || "—"}</div>`
+      }
     </div>
   `;
 }
@@ -361,7 +447,7 @@ function renderGenealogia(a) {
     const hasName = nome && nome.trim();
     return `
       <div class="gene-node${!hasName ? " unknown" : ""}${role === "focal" ? " focal" : ""}">
-        <div class="gene-thumb">${foto ? `<img src="${foto}" />` : (hasName ? emoji : "?")}</div>
+        <div class="gene-thumb">${foto ? `<img src="${foto}" />` : hasName ? emoji : "?"}</div>
         <div class="gene-node-role role-${role}">${roleLabel}</div>
         <div class="gene-node-name">${hasName ? nome : "Desconhecido"}</div>
         <div class="gene-node-info">${raca || "—"}</div>
@@ -444,7 +530,7 @@ function renderGenealogia(a) {
 }
 
 function salvarGenealogia() {
-  const a = animais.find(x => x.id === selecionado);
+  const a = animais.find((x) => x.id === selecionado);
   if (!a) return;
   a.paiNome = document.getElementById("g-painome")?.value || "";
   a.paiRaca = document.getElementById("g-pairaça")?.value || "";
@@ -457,33 +543,53 @@ function salvarGenealogia() {
   salvarAnimais();
   renderGenealogia(a);
   const btn = document.querySelector(".gene-edit-section .btn-save");
-  if (btn) { btn.textContent = "Salvo!"; setTimeout(() => { btn.textContent = "Salvar Ancestrais"; }, 1500); }
+  if (btn) {
+    btn.textContent = "Salvo!";
+    setTimeout(() => {
+      btn.textContent = "Salvar Ancestrais";
+    }, 1500);
+  }
 }
 
 function selecionar(id) {
-  selecionado = id; editando = false; fotoTemp = null;
-  renderSidebar(); renderFicha();
+  selecionado = id;
+  editando = false;
+  fotoTemp = null;
+  renderSidebar();
+  renderFicha();
   fecharSidebar();
 }
-function setFiltro(f) { filtro = f; renderSidebar(); }
-function filtrarAnimais() { renderSidebar(); }
+function setFiltro(f) {
+  filtro = f;
+  renderSidebar();
+}
+function filtrarAnimais() {
+  renderSidebar();
+}
 
 function switchTab(tab, el) {
   abaAtiva = tab;
-  document.querySelectorAll(".tab-btn, .mobile-tab-btn").forEach(b => {
+  document.querySelectorAll(".tab-btn, .mobile-tab-btn").forEach((b) => {
     if (b.dataset.tab === tab) b.classList.add("active");
     else b.classList.remove("active");
   });
   renderFicha();
 }
 
-function iniciarEdicao() { editando = true; renderFicha(); }
-function cancelarEdicao() { editando = false; fotoTemp = null; renderFicha(); }
+function iniciarEdicao() {
+  editando = true;
+  renderFicha();
+}
+function cancelarEdicao() {
+  editando = false;
+  fotoTemp = null;
+  renderFicha();
+}
 
 function salvarEdicao() {
-  const a = animais.find(x => x.id === selecionado);
+  const a = animais.find((x) => x.id === selecionado);
   if (!a) return;
-  const g = id => document.getElementById(id)?.value ?? "";
+  const g = (id) => document.getElementById(id)?.value ?? "";
   a.nome = g("f-nome") || a.nome;
   a.especie = g("f-especie") || a.especie;
   a.raca = g("f-raca");
@@ -494,27 +600,31 @@ function salvarEdicao() {
   a.microchip = g("f-microchip");
   a.status = g("f-status") || a.status;
   a.obs = g("f-obs");
-  if (fotoTemp) { a.foto = fotoTemp; fotoTemp = null; }
+  if (fotoTemp) {
+    a.foto = fotoTemp;
+    fotoTemp = null;
+  }
   editando = false;
   salvarAnimais();
-  renderSidebar(); renderFicha();
+  renderSidebar();
+  renderFicha();
 }
 
 function adicionarVacina() {
-  const a = animais.find(x => x.id === selecionado);
+  const a = animais.find((x) => x.id === selecionado);
   const nome = document.getElementById("nv-nome")?.value?.trim();
   if (!nome) return;
   a.vacinas.push({
     nome,
     data: document.getElementById("nv-data")?.value || "",
-    prox: document.getElementById("nv-prox")?.value || ""
+    prox: document.getElementById("nv-prox")?.value || "",
   });
   salvarAnimais();
   renderFicha();
 }
 
 function removerVacina(i) {
-  const a = animais.find(x => x.id === selecionado);
+  const a = animais.find((x) => x.id === selecionado);
   if (!a) return;
   mostrarConfirm(
     `Remover a vacina "${a.vacinas[i].nome}"?`,
@@ -523,7 +633,7 @@ function removerVacina(i) {
       a.vacinas.splice(i, 1);
       salvarAnimais();
       renderFicha();
-    }
+    },
   );
 }
 
@@ -532,10 +642,11 @@ function carregarFoto(event) {
   const file = event.target.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = e => {
+  reader.onload = (e) => {
     fotoTemp = e.target.result;
     const frame = document.querySelector(".foto-frame");
-    if (frame) frame.innerHTML = `
+    if (frame)
+      frame.innerHTML = `
       <img src="${fotoTemp}" alt="foto" />
       <div class="foto-overlay">
         <svg viewBox="0 0 24 24" fill="none" style="width:20px;height:20px;color:white"><path d="M12 16a4 4 0 100-8 4 4 0 000 8z" stroke="currentColor" stroke-width="1.5"/><path d="M3 9a2 2 0 012-2h1l2-2h8l2 2h1a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke="currentColor" stroke-width="1.5"/></svg>
@@ -546,49 +657,73 @@ function carregarFoto(event) {
   event.target.value = "";
 }
 
-function abrirModal() { document.getElementById("modal").style.display = "flex"; }
+function abrirModal() {
+  document.getElementById("modal").style.display = "flex";
+}
 function fecharModal() {
   document.getElementById("modal").style.display = "none";
-  ["m-nome", "m-raca", "m-id"].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
+  ["m-nome", "m-raca", "m-id"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
 }
-function fecharModalExterno(e) { if (e.target === document.getElementById("modal")) fecharModal(); }
+function fecharModalExterno(e) {
+  if (e.target === document.getElementById("modal")) fecharModal();
+}
 
 function salvarNovoAnimal() {
   const nome = document.getElementById("m-nome")?.value?.trim();
   const especie = document.getElementById("m-especie")?.value;
-  if (!nome || !especie) { mostrarAlerta("Preencha pelo menos o nome e a espécie."); return; }
+  if (!nome || !especie) {
+    mostrarAlerta("Preencha pelo menos o nome e a espécie.");
+    return;
+  }
   const novo = {
-    id: Date.now(), nome, especie,
+    id: Date.now(),
+    nome,
+    especie,
     raca: document.getElementById("m-raca")?.value || "",
     sexo: document.getElementById("m-sexo")?.value || "",
     nasc: document.getElementById("m-nasc")?.value || "",
     pelagem: document.getElementById("m-pelagem")?.value || "",
     status: document.getElementById("m-status")?.value || "Ativo",
-    peso: "", microchip: document.getElementById("m-id")?.value || "",
+    peso: "",
+    microchip: document.getElementById("m-id")?.value || "",
     foto: null,
-    paiNome: "", paiRaca: "", maeNome: "", maeRaca: "",
-    avoPatNome: "", avoPatRaca: "", avoMatNome: "", avoMatRaca: "",
-    vacinas: [], obs: ""
+    paiNome: "",
+    paiRaca: "",
+    maeNome: "",
+    maeRaca: "",
+    avoPatNome: "",
+    avoPatRaca: "",
+    avoMatNome: "",
+    avoMatRaca: "",
+    vacinas: [],
+    obs: "",
   };
   animais.push(novo);
   salvarAnimais();
   fecharModal();
-  selecionado = novo.id; editando = false;
-  renderSidebar(); renderFicha();
+  selecionado = novo.id;
+  editando = false;
+  renderSidebar();
+  renderFicha();
 }
 
 function confirmarExclusao(id) {
-  const a = animais.find(x => x.id === id);
+  const a = animais.find((x) => x.id === id);
   if (!a) return;
   mostrarConfirm(
     `Excluir a ficha de "${a.nome}"?`,
     "Esta ação não pode ser desfeita.",
     () => {
-      animais = animais.filter(x => x.id !== id);
-      selecionado = null; editando = false;
+      animais = animais.filter((x) => x.id !== id);
+      selecionado = null;
+      editando = false;
       salvarAnimais();
-      renderSidebar(); renderFicha();
-    }
+      renderSidebar();
+      renderFicha();
+    },
   );
 }
 
@@ -624,9 +759,13 @@ function fecharDialogExterno(e) {
 function fecharDialog() {
   const overlay = document.getElementById("dialog-overlay");
   overlay.classList.remove("visible");
-  overlay.addEventListener("transitionend", () => {
-    overlay.style.display = "none";
-  }, { once: true });
+  overlay.addEventListener(
+    "transitionend",
+    () => {
+      overlay.style.display = "none";
+    },
+    { once: true },
+  );
 }
 
 renderSidebar();
