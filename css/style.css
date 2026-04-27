@@ -2467,11 +2467,6 @@ body {
     --sidebar-w: 300px;
   }
 
-  #app-screen {
-    height: 100dvh;
-    height: 100vh;
-  }
-
   .sidebar-overlay {
     display: block;
     pointer-events: none;
@@ -2504,24 +2499,27 @@ body {
 
   .main {
     width: 100%;
-    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+    padding-top: 60px;
+    padding-bottom: calc(66px + env(safe-area-inset-bottom, 0px));
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    height: 100dvh;
-    height: 100vh;
+    flex: 1;
   }
 
   .app-header {
-    padding: 0 12px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
     height: 60px;
     background: var(--c-surface);
     border-bottom: 1px solid var(--c-border);
-    position: sticky;
-    top: 0;
-    z-index: 50;
+    z-index: 200;
     pointer-events: all;
     display: flex;
+    align-items: center;
     justify-content: space-between;
+    padding: 0 12px;
     width: 100%;
   }
 

@@ -205,7 +205,7 @@ function showApp() {
   if (typeof renderFicha === "function") renderFicha();
 }
 
-(function checkSession() {
+function checkSession() {
   try {
     const s = JSON.parse(localStorage.getItem(LP_SESSION) || "null");
     if (s && Date.now() - s.loggedAt < 30 * 24 * 60 * 60 * 1000) {
@@ -215,10 +215,10 @@ function showApp() {
     } else {
       showLogin();
     }
-  } catch {
+  } catch (e) {
     showLogin();
   }
-})();
+}
 
 function toggleUserMenu(e) {
   e.stopPropagation();
@@ -1781,3 +1781,5 @@ abrirModal = function () {
   popularSelectAreas();
   atualizarRacasModal();
 };
+
+document.addEventListener("DOMContentLoaded", checkSession);
