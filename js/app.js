@@ -72,18 +72,24 @@ function lpForca() {
 
 function lpLogin() {
   lpClear("lp-login-err");
-  const email = document.getElementById("lp-email").value.trim();
+  const email = document.getElementById("lp-email").value.trim().toLowerCase();
   const senha = document.getElementById("lp-senha").value;
   const btn = document.getElementById("lp-btn-entrar");
   if (!email || !senha) {
     lpAlert("lp-login-err", "Preencha o e-mail e a senha.");
+    if (!email) document.getElementById("lp-email").focus();
+    else document.getElementById("lp-senha").focus();
     return;
   }
   btn.textContent = "Entrando…";
   btn.classList.add("loading");
   setTimeout(() => {
+    const senhaEncoded = btoa(unescape(encodeURIComponent(senha)));
+
     const u = lpGetUsers().find(
-      (u) => u.email === email && u.senha === btoa(senha),
+      (u) =>
+        u.email === email &&
+        (u.senha === senhaEncoded || u.senha === btoa(senha)),
     );
     if (u) {
       lpSaveSession(u);
@@ -91,36 +97,46 @@ function lpLogin() {
       lpAlert("lp-login-err", "E-mail ou senha incorretos.");
       btn.textContent = "Entrar";
       btn.classList.remove("loading");
+      document.getElementById("lp-senha").focus();
+      document.getElementById("lp-senha").select();
     }
   }, 500);
-}
-
-function lpDemo() {
-  lpSaveSession({ email: "demo@plantel.app", nome: "Demo", id: "DEMO-0001" });
 }
 
 function lpRegistrar() {
   lpClear("lp-reg-err");
   lpClear("lp-reg-ok");
   const nome = document.getElementById("lp-reg-nome").value.trim();
-  const email = document.getElementById("lp-reg-email").value.trim();
+  const email = document
+    .getElementById("lp-reg-email")
+    .value.trim()
+    .toLowerCase();
   const senha = document.getElementById("lp-reg-senha").value;
   const confirm = document.getElementById("lp-reg-confirm").value;
   const btn = document.getElementById("lp-btn-reg");
-  if (!nome) {
-    lpAlert("lp-reg-err", "Informe seu nome ou nome do plantel.");
+  if (!nome || nome.length < 2) {
+    lpAlert(
+      "lp-reg-err",
+      "Informe seu nome ou nome do plantel (mínimo 2 caracteres).",
+    );
+    document.getElementById("lp-reg-nome").focus();
     return;
   }
-  if (!email || !/\S+@\S+\.\S+/.test(email)) {
-    lpAlert("lp-reg-err", "Informe um e-mail válido.");
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  if (!email || !emailRegex.test(email)) {
+    lpAlert("lp-reg-err", "Informe um e-mail válido (ex: seu@email.com).");
+    document.getElementById("lp-reg-email").focus();
     return;
   }
   if (senha.length < 6) {
     lpAlert("lp-reg-err", "A senha deve ter pelo menos 6 caracteres.");
+    document.getElementById("lp-reg-senha").focus();
     return;
   }
   if (senha !== confirm) {
-    lpAlert("lp-reg-err", "As senhas não coincidem.");
+    lpAlert("lp-reg-err", "As senhas não coincidem. Verifique a confirmação.");
+    document.getElementById("lp-reg-confirm").value = "";
+    document.getElementById("lp-reg-confirm").focus();
     return;
   }
   const users = lpGetUsers();
@@ -135,7 +151,13 @@ function lpRegistrar() {
   btn.classList.add("loading");
   setTimeout(() => {
     const id = "PLT-" + Math.random().toString(36).substr(2, 6).toUpperCase();
-    const novo = { email, senha: btoa(senha), nome, id, avatar: null };
+    const novo = {
+      email,
+      senha: btoa(unescape(encodeURIComponent(senha))),
+      nome,
+      id,
+      avatar: null,
+    };
     users.push(novo);
     localStorage.setItem(LP_USERS, JSON.stringify(users));
     lpAlert("lp-reg-ok", "Conta criada com sucesso! Entrando…", "ok");
@@ -186,7 +208,9 @@ function showApp() {
 (function checkSession() {
   try {
     const s = JSON.parse(localStorage.getItem(LP_SESSION) || "null");
-    if (s && Date.now() - s.loggedAt < 7 * 24 * 60 * 60 * 1000) {
+    if (s && Date.now() - s.loggedAt < 30 * 24 * 60 * 60 * 1000) {
+      s.loggedAt = Date.now();
+      localStorage.setItem(LP_SESSION, JSON.stringify(s));
       showApp();
     } else {
       showLogin();
