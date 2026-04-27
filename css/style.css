@@ -934,32 +934,64 @@ body {
 }
 
 [data-theme="dark"] {
-  --c-bg: #0e1012;
-  --c-surface: #141618;
-  --c-card: #1a1d21;
-  --c-raised: #22262b;
-  --c-hover: #272c32;
+  --c-bg: #0d0d0d;
+  --c-surface: #141414;
+  --c-card: #1c1c1c;
+  --c-raised: #242424;
+  --c-hover: #2c2c2c;
 
-  --c-accent: #7dd3fc;
-  --c-accent-soft: #93dffe;
-  --c-accent-bg: rgba(125, 211, 252, 0.1);
-  --c-accent-text: #bae6fd;
+  --c-accent: #1e6e43;
+  --c-accent-soft: #2a8a55;
+  --c-accent-bg: rgba(30, 110, 67, 0.2);
+  --c-accent-text: #52d68a;
 
-  --c-border: rgba(255, 255, 255, 0.08);
+  --c-border: rgba(255, 255, 255, 0.09);
   --c-border-soft: rgba(255, 255, 255, 0.05);
 
-  --c-text-1: #e8edf2;
-  --c-text-2: #7a9ab0;
-  --c-text-3: #3d5466;
+  --c-text-1: #efefef;
+  --c-text-2: #8a8a8a;
+  --c-text-3: #4a4a4a;
 
-  --c-amber: #fbbf24;
-  --c-amber-bg: rgba(251, 191, 36, 0.1);
-  --c-red: #f87171;
-  --c-red-bg: rgba(248, 113, 113, 0.1);
-  --c-blue: #7dd3fc;
-  --c-blue-bg: rgba(125, 211, 252, 0.1);
+  --c-amber: #e8a020;
+  --c-amber-bg: rgba(232, 160, 32, 0.14);
+  --c-red: #e05555;
+  --c-red-bg: rgba(224, 85, 85, 0.13);
+  --c-blue: #4e9de0;
+  --c-blue-bg: rgba(78, 157, 224, 0.13);
 
-  --c-shadow: rgba(0, 0, 0, 0.35);
+  --c-shadow: rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] .btn-primary,
+[data-theme="dark"] .btn-new-animal,
+[data-theme="dark"] .lp-btn {
+  background: linear-gradient(135deg, #1e6e43 0%, #155233 100%);
+  box-shadow: 0 2px 12px rgba(30, 110, 67, 0.35);
+}
+
+[data-theme="dark"] .brand-icon {
+  background: #1e6e43;
+}
+
+[data-theme="dark"] .sidebar {
+  background: #111111;
+  border-right-color: rgba(255, 255, 255, 0.07);
+}
+
+[data-theme="dark"] .gene-node.focal {
+  border-color: #1e6e43;
+  background: rgba(30, 110, 67, 0.15);
+}
+
+[data-theme="dark"] .animal-item.active {
+  background: rgba(30, 110, 67, 0.15);
+}
+
+[data-theme="dark"] .ftab.active,
+[data-theme="dark"] .area-tab.active {
+  background: rgba(30, 110, 67, 0.2);
+  border-color: #1e6e43;
+  color: #52d68a;
 }
 
 html,
@@ -2089,6 +2121,27 @@ body {
   font-size: 22px;
   color: var(--c-text-1);
   margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.gene-title-sep {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--c-accent);
+  opacity: 0.7;
+  flex-shrink: 0;
+  align-self: center;
+  margin-bottom: 0;
+}
+
+.gene-title-name {
+  color: var(--c-accent);
+  font-weight: 700;
 }
 
 .gene-sub {
@@ -2140,9 +2193,9 @@ body {
   background: var(--c-card);
   border: 1.5px solid var(--c-border);
   border-radius: var(--r-lg);
-  padding: 14px 16px;
-  min-width: 150px;
-  max-width: 190px;
+  padding: 18px 20px;
+  min-width: 170px;
+  max-width: 220px;
   flex: 1;
   text-align: center;
   transition: all var(--t);
@@ -2179,16 +2232,16 @@ body {
 }
 
 .gene-thumb {
-  width: 48px;
-  height: 48px;
+  width: 72px;
+  height: 72px;
   border-radius: var(--r-md);
   background: var(--c-raised);
   border: 1px solid var(--c-border);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
-  margin: 0 auto 10px;
+  font-size: 36px;
+  margin: 0 auto 12px;
   overflow: hidden;
 }
 
@@ -2200,9 +2253,9 @@ body {
 
 .gene-node-name {
   font-weight: 600;
-  font-size: 13px;
+  font-size: 14px;
   color: var(--c-text-1);
-  margin-bottom: 2px;
+  margin-bottom: 3px;
 }
 
 .gene-node-info {
@@ -2240,10 +2293,24 @@ body {
   color: #f9a8d4;
 }
 
-.role-avo,
+.role-avo {
+  background: rgba(34, 197, 94, 0.12);
+  color: #16a34a;
+}
+
 .role-avomat {
-  background: var(--c-raised);
-  color: var(--c-text-2);
+  background: rgba(139, 92, 246, 0.12);
+  color: #7c3aed;
+}
+
+[data-theme="dark"] .role-avo {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+}
+
+[data-theme="dark"] .role-avomat {
+  background: rgba(167, 139, 250, 0.15);
+  color: #a78bfa;
 }
 
 .role-unknown {
@@ -2517,7 +2584,7 @@ body {
   .main {
     width: 100%;
     padding-top: 60px;
-    padding-bottom: calc(66px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     flex: 1;
@@ -2644,35 +2711,38 @@ body {
   .gene-tree {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    padding: 4px 4px 16px;
+    padding: 4px 4px 24px;
     min-width: 360px;
+    align-items: center;
+    justify-content: center;
   }
 
   .gene-gen {
     flex-wrap: nowrap;
     gap: 8px;
+    justify-content: center;
   }
 
   .gene-node {
-    min-width: 110px;
-    max-width: 140px;
-    padding: 10px 10px;
+    min-width: 120px;
+    max-width: 160px;
+    padding: 14px 12px;
     flex: 1;
   }
 
   .gene-thumb {
-    width: 36px;
-    height: 36px;
-    font-size: 18px;
-    margin-bottom: 6px;
+    width: 52px;
+    height: 52px;
+    font-size: 26px;
+    margin-bottom: 8px;
   }
 
   .gene-node-name {
-    font-size: 11px;
+    font-size: 12px;
   }
 
   .gene-node-info {
-    font-size: 10px;
+    font-size: 11px;
   }
 
   .gene-node-role {
@@ -2801,17 +2871,26 @@ body {
   input,
   select,
   textarea {
-    font-size: 16px !important; 
+    font-size: 16px !important;
   }
 }
 
-
-
 .gene-inplantel {
-  font-size: 10px;
-  color: var(--c-accent);
-  margin-top: 3px;
-  font-weight: 500;
+  font-size: 9px;
+  color: var(--c-accent-text);
+  margin-top: 5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--c-accent-bg);
+  border: 1px solid rgba(30, 110, 67, 0.35);
+  border-radius: 6px;
+  padding: 2px 7px;
+  display: inline-block;
+}
+
+[data-theme="dark"] .gene-inplantel {
+  border-color: rgba(82, 214, 138, 0.3);
 }
 
 .gene-node:not(.focal):not(.unknown):hover .gene-thumb {
@@ -2838,7 +2917,7 @@ body {
 .gene-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.45);
+  background: rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   z-index: 400;
@@ -2858,12 +2937,12 @@ body {
   background: var(--c-card);
   border: 1px solid var(--c-border);
   border-radius: var(--r-xl);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
   width: 100%;
   max-width: 460px;
   max-height: 90vh;
   overflow-y: auto;
-  animation: lp-slideUp 0.25s cubic-bezier(0.22,0.68,0,1.2) both;
+  animation: lp-slideUp 0.25s cubic-bezier(0.22, 0.68, 0, 1.2) both;
 }
 .gene-modal-header {
   display: flex;
@@ -2973,7 +3052,7 @@ body {
 }
 .gene-or-divider::before,
 .gene-or-divider::after {
-  content: '';
+  content: "";
   flex: 1;
   height: 1px;
   background: var(--c-border);

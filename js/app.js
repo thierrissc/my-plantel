@@ -404,6 +404,14 @@ function calcIdade(nasc) {
   if (!nasc) return "—";
   const d = new Date(nasc + "T12:00:00"),
     hoje = new Date();
+  const diffMs = hoje - d;
+  const diffDias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  if (diffDias < 0) return "—";
+  if (diffDias < 30) {
+    return diffDias === 0
+      ? "Hoje"
+      : diffDias + (diffDias === 1 ? " dia" : " dias");
+  }
   let anos = hoje.getFullYear() - d.getFullYear();
   const m = hoje.getMonth() - d.getMonth();
   if (m < 0 || (m === 0 && hoje.getDate() < d.getDate())) anos--;
@@ -412,7 +420,9 @@ function calcIdade(nasc) {
       (hoje.getFullYear() - d.getFullYear()) * 12 +
       hoje.getMonth() -
       d.getMonth();
-    return meses <= 0 ? "< 1 mês" : meses + (meses === 1 ? " mês" : " meses");
+    return meses <= 0
+      ? diffDias + " dias"
+      : meses + (meses === 1 ? " mês" : " meses");
   }
   return anos + (anos === 1 ? " ano" : " anos");
 }
@@ -604,7 +614,10 @@ function renderFichaContent(a) {
             ? `<input class="nome-edit-input" id="f-nome" value="${a.nome}" />`
             : `<h1 class="ficha-nome">${a.nome}</h1>`
         }
-        <div class="ficha-sub">${a.especie}${a.raca ? " · " + a.raca : ""}${a.nasc ? " · " + calcIdade(a.nasc) : ""}</div>
+        <div class="ficha-sub">${a.especie}${a.raca ? " · " + a.raca : ""}${(() => {
+          const i = a.nasc ? calcIdade(a.nasc) : "";
+          return i && i !== "—" ? " · " + i : "";
+        })()}</div>
         <div class="badge-row">
           <span class="badge ${badgeClass(a.status)}"><span class="badge-dot"></span>${a.status}</span>
         </div>
@@ -693,18 +706,16 @@ function renderGenealogia(a) {
         ? emoji
         : "?";
     const inPlantel = linkedAnimal
-      ? `<div class="gene-inplantel">● no plantel</div>`
+      ? `<div class="gene-inplantel">no plantel</div>`
       : "";
     const clickAttr =
-      role !== "focal"
-        ? `onclick="abrirGeneModal('${role}',${a.id})" title="Clique para editar"`
-        : "";
+      role !== "focal" ? `onclick="abrirGeneModal('${role}',${a.id})"` : "";
     return `
       <div class="gene-node${!hasName ? " unknown" : ""}${role === "focal" ? " focal" : ""}" ${clickAttr}>
         <div class="gene-thumb">${thumbContent}</div>
         <div class="gene-node-role role-${role}">${roleLabel}</div>
         <div class="gene-node-name">${hasName ? nome : "Desconhecido"}</div>
-        <div class="gene-node-info">${raca || "—"}</div>
+        <div class="gene-node-info">${raca || ""}</div>
         ${inPlantel}
       </div>`;
   };
@@ -720,34 +731,37 @@ function renderGenealogia(a) {
 
   document.getElementById("genealogia-content").innerHTML = `
     <div class="gene-header">
-      <h2 class="gene-title">Árvore Genealógica — ${a.nome}</h2>
-      <p class="gene-sub">${a.especie}${a.raca ? " · " + a.raca : ""} · ${calcIdade(a.nasc)}</p>
+      <h2 class="gene-title">Árvore Genealógica <span class="gene-title-sep"></span> <span class="gene-title-name">${a.nome}</span></h2>
+      <p class="gene-sub">${a.especie}${a.raca ? " · " + a.raca : ""}${(() => {
+        const i = a.nasc ? calcIdade(a.nasc) : "";
+        return i && i !== "—" ? " · " + i : "";
+      })()}</p>
       <p class="gene-sub" style="margin-top:4px;font-size:12px;color:var(--c-text-3)">Clique em um parente para editar</p>
     </div>
 
     <div class="gene-tree">
-      <div class="gene-gen" style="gap:16px">
+      <div class="gene-gen" style="gap:24px">
         ${nodeHtml(avoPatNome, avoPatRaca, "avo", "Avô paterno")}
-        <div style="min-width:8px;flex:0.3"></div>
+        <div style="min-width:16px;flex:0.3"></div>
         ${nodeHtml(avoMatNome, avoMatRaca, "avomat", "Avó materna")}
       </div>
 
-      <div style="width:100%;height:32px;position:relative">
-        <svg viewBox="0 0 700 32" preserveAspectRatio="none" style="width:100%;height:100%;overflow:visible">
-          <path d="M175 0 L175 16 L350 16 L350 32" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
-          <path d="M525 0 L525 16 L350 16" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
+      <div style="width:100%;height:40px;position:relative">
+        <svg viewBox="0 0 700 40" preserveAspectRatio="none" style="width:100%;height:100%;overflow:visible">
+          <path d="M175 0 L175 20 L350 20 L350 40" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
+          <path d="M525 0 L525 20 L350 20" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
         </svg>
       </div>
 
-      <div class="gene-gen" style="gap:40px">
+      <div class="gene-gen" style="gap:56px">
         ${nodeHtml(paiNome, paiRaca, "pai", "Pai")}
         ${nodeHtml(maeNome, maeRaca, "mae", "Mãe")}
       </div>
 
-      <div style="width:100%;height:36px;position:relative">
-        <svg viewBox="0 0 700 36" preserveAspectRatio="none" style="width:100%;height:100%;overflow:visible">
-          <path d="M245 0 L245 18 L350 18 L350 36" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
-          <path d="M455 0 L455 18 L350 18" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
+      <div style="width:100%;height:44px;position:relative">
+        <svg viewBox="0 0 700 44" preserveAspectRatio="none" style="width:100%;height:100%;overflow:visible">
+          <path d="M245 0 L245 22 L350 22 L350 44" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
+          <path d="M455 0 L455 22 L350 22" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
         </svg>
       </div>
 
@@ -762,22 +776,22 @@ const GENE_ROLES = {
   pai: {
     label: "Pai",
     sexo: "Macho",
-    field: { nome: "paiNome", raca: "paiRaca" },
+    field: { nome: "paiNome", raca: "paiRaca", idade: "paiIdade" },
   },
   mae: {
     label: "Mãe",
     sexo: "Fêmea",
-    field: { nome: "maeNome", raca: "maeRaca" },
+    field: { nome: "maeNome", raca: "maeRaca", idade: "maeIdade" },
   },
   avo: {
     label: "Avô Paterno",
     sexo: "Macho",
-    field: { nome: "avoPatNome", raca: "avoPatRaca" },
+    field: { nome: "avoPatNome", raca: "avoPatRaca", idade: "avoPatIdade" },
   },
   avomat: {
     label: "Avó Materna",
     sexo: "Fêmea",
-    field: { nome: "avoMatNome", raca: "avoMatRaca" },
+    field: { nome: "avoMatNome", raca: "avoMatRaca", idade: "avoMatIdade" },
   },
 };
 
@@ -799,6 +813,18 @@ function abrirGeneModal(role, animalId) {
   );
 
   const nomeAtual = a[cfg.field.nome] || "";
+  const racaExemplo =
+    {
+      Cão: "Ex: Labrador Retriever",
+      Gato: "Ex: Persa",
+      Ave: "Ex: Calopsita",
+      Bovino: "Ex: Nelore",
+      Equino: "Ex: Quarto de Milha",
+      Suíno: "Ex: Landrace",
+      Caprino: "Ex: Saanen",
+      Ovino: "Ex: Santa Inês",
+    }[a.especie] || "Ex: raça do animal";
+
   const racaAtual = a[cfg.field.raca] || "";
 
   const currentLinked = nomeAtual
@@ -809,7 +835,12 @@ function abrirGeneModal(role, animalId) {
   if (currentLinked) geneModalSelectedId = currentLinked.id;
 
   const roleBadgeClass =
-    role === "pai" || role === "avo" ? "role-pai" : "role-mae";
+    {
+      pai: "role-pai",
+      mae: "role-mae",
+      avo: "role-avo",
+      avomat: "role-avomat",
+    }[role] || "role-pai";
 
   const plantelItems = compatíveis.length
     ? compatíveis
@@ -829,7 +860,9 @@ function abrirGeneModal(role, animalId) {
         </div>`;
         })
         .join("")
-    : `<p class="gene-no-plantel">Nenhum ${cfg.sexo === "Macho" ? "macho" : "fêmea"} de ${a.especie} no plantel</p>`;
+    : "";
+
+  const idadeAtual = a[cfg.field.nome] ? a[cfg.field.idade] || "" : "";
 
   const html = `
     <div class="gene-modal-overlay" id="gene-modal-overlay" onclick="fecharGeneModalExterno(event)">
@@ -846,18 +879,29 @@ function abrirGeneModal(role, animalId) {
           </button>
         </div>
         <div class="gene-modal-body">
-          ${compatíveis.length ? `<div style="font-size:11px;font-weight:600;color:var(--c-text-3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">Do plantel — ${cfg.sexo === "Macho" ? "machos" : "fêmeas"} de ${a.especie}</div>` : ""}
-          <div class="gene-plantel-list" id="gene-plantel-list">${plantelItems}</div>
-          <div class="gene-or-divider">ou preencha manualmente</div>
+          ${
+            compatíveis.length
+              ? `
+            <div style="font-size:11px;font-weight:600;color:var(--c-text-3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">Do plantel · ${cfg.sexo === "Macho" ? "machos" : "fêmeas"} de ${a.especie}</div>
+            <div class="gene-plantel-list" id="gene-plantel-list">${plantelItems}</div>
+            <div class="gene-or-divider">ou preencha manualmente</div>
+          `
+              : ""
+          }
           <div class="form-field" style="margin-bottom:12px">
             <label>Nome</label>
             <input id="gene-modal-nome" type="text" placeholder="Nome do ${cfg.label.toLowerCase()}"
                    value="${nomeAtual}" oninput="deselecionarGeneAnimal()" />
           </div>
-          <div class="form-field" style="margin-bottom:4px">
-            <label>Raça</label>
-            <input id="gene-modal-raca" type="text" placeholder="Raça (opcional)"
+          <div class="form-field" style="margin-bottom:12px">
+            <label>Raça <span style="font-weight:400;font-size:10px;text-transform:none;letter-spacing:0;opacity:.65">(opcional)</span></label>
+            <input id="gene-modal-raca" type="text" placeholder="${racaExemplo}"
                    value="${racaAtual}" />
+          </div>
+          <div class="form-field" style="margin-bottom:4px">
+            <label>Idade <span style="font-weight:400;font-size:10px;text-transform:none;letter-spacing:0;opacity:.65">(opcional)</span></label>
+            <input id="gene-modal-idade" type="text" placeholder="Ex: 3 anos"
+                   value="${idadeAtual}" />
           </div>
         </div>
         <div class="gene-modal-footer">
@@ -923,9 +967,13 @@ function salvarGeneModal() {
 
   const nome = (document.getElementById("gene-modal-nome")?.value || "").trim();
   const raca = (document.getElementById("gene-modal-raca")?.value || "").trim();
+  const idade = (
+    document.getElementById("gene-modal-idade")?.value || ""
+  ).trim();
 
   a[cfg.field.nome] = nome;
   a[cfg.field.raca] = raca;
+  a[cfg.field.idade] = idade;
   salvarAnimais();
   fecharGeneModal();
   renderGenealogia(a);
@@ -937,6 +985,7 @@ function limparGeneModal() {
   if (!a || !cfg) return;
   a[cfg.field.nome] = "";
   a[cfg.field.raca] = "";
+  a[cfg.field.idade] = "";
   salvarAnimais();
   fecharGeneModal();
   renderGenealogia(a);
