@@ -351,15 +351,15 @@ function salvarAnimais() {
 let animais = carregarAnimais();
 
 const EMOJIS = {
-  Cão: "🐕",
-  Gato: "🐈",
-  Cavalo: "🐴",
-  Bovino: "🐄",
-  Suíno: "🐷",
-  Ave: "🐔",
-  Caprino: "🐐",
-  Ovino: "🐑",
-  Outro: "🐾",
+  Cão:     `<span class="noto-emoji">🐕</span>`,
+  Gato:    `<span class="noto-emoji">🐈</span>`,
+  Cavalo:  `<span class="noto-emoji">🐴</span>`,
+  Bovino:  `<span class="noto-emoji">🐄</span>`,
+  Suíno:   `<span class="noto-emoji">🐷</span>`,
+  Ave:     `<span class="noto-emoji">🐔</span>`,
+  Caprino: `<span class="noto-emoji">🐐</span>`,
+  Ovino:   `<span class="noto-emoji">🐑</span>`,
+  Outro:   `<span class="noto-emoji">🐾</span>`,
 };
 
 let selecionado = null;
@@ -491,7 +491,7 @@ function renderSidebar() {
              style="animation-delay:${i * 0.04}s"
              onclick="selecionar(${a.id})">
           <div class="animal-thumb">
-            ${a.foto ? `<img src="${a.foto}" alt="${a.nome}" />` : EMOJIS[a.especie] || "🐾"}
+            ${a.foto ? `<img src="${a.foto}" alt="${a.nome}" />` : EMOJIS[a.especie] || `<span class="noto-emoji">🐾</span>`}
           </div>
           <div class="animal-info">
             <div class="animal-item-name">${a.nome}</div>
@@ -596,7 +596,7 @@ function renderFichaContent(a) {
           ${
             a.foto
               ? `<img src="${a.foto}" alt="${a.nome}" style="width:100%;height:100%;object-fit:cover;" />`
-              : `<span class="foto-emoji">${EMOJIS[a.especie] || "🐾"}</span><span class="foto-hint">Sem foto</span>`
+              : `<span class="foto-emoji">${EMOJIS[a.especie] || `<span class="noto-emoji">🐾</span>`}</span><span class="foto-hint">Sem foto</span>`
           }
           ${
             ed
@@ -624,8 +624,8 @@ function renderFichaContent(a) {
         <div class="tag-row">
           ${a.sexo ? `<span class="tag-chip">${a.sexo}</span>` : ""}
           ${a.pelagem ? `<span class="tag-chip">${a.pelagem}</span>` : ""}
-          ${a.peso ? `<span class="tag-chip">⚖ ${a.peso}</span>` : ""}
-          ${a.microchip ? `<span class="tag-chip">🔖 ${a.microchip}</span>` : ""}
+          ${a.peso ? `<span class="tag-chip"><span class="noto-emoji noto-emoji-inline">⚖</span> ${a.peso}</span>` : ""}
+          ${a.microchip ? `<span class="tag-chip"><span class="noto-emoji noto-emoji-inline">🔖</span> ${a.microchip}</span>` : ""}
         </div>
         <div class="ficha-actions">
           ${
@@ -692,7 +692,7 @@ function renderFichaContent(a) {
 }
 
 function renderGenealogia(a) {
-  const emoji = EMOJIS[a.especie] || "🐾";
+  const emoji = EMOJIS[a.especie] || `<span class="noto-emoji">🐾</span>`;
 
   const nodeHtml = (nome, raca, role, roleLabel) => {
     const hasName = nome && nome.trim();
@@ -847,7 +847,7 @@ function abrirGeneModal(role, animalId) {
         .map((x) => {
           const thumbContent = x.foto
             ? `<img src="${x.foto}" />`
-            : EMOJIS[x.especie] || "🐾";
+            : EMOJIS[x.especie] || `<span class="noto-emoji">🐾</span>`;
           const isSelected = geneModalSelectedId === x.id;
           return `<div class="gene-plantel-item${isSelected ? " selected" : ""}"
                      onclick="selecionarGeneAnimal(${x.id})"
@@ -1659,7 +1659,7 @@ renderSidebar = function () {
            style="animation-delay:${i * 0.04}s"
            onclick="selecionar(${a.id})">
         <div class="animal-thumb">
-          ${a.foto ? `<img src="${a.foto}" alt="${a.nome}" />` : EMOJIS[a.especie] || "🐾"}
+          ${a.foto ? `<img src="${a.foto}" alt="${a.nome}" />` : EMOJIS[a.especie] || `<span class="noto-emoji">🐾</span>`}
         </div>
         <div class="animal-info">
           <div class="animal-item-name">${a.nome}</div>
