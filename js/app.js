@@ -681,25 +681,31 @@ function renderFichaContent(a) {
 function renderGenealogia(a) {
   const emoji = EMOJIS[a.especie] || "🐾";
 
-  const nodeHtml = (nome, raca, role, roleLabel, foto, clickable) => {
+  const nodeHtml = (nome, raca, role, roleLabel) => {
     const hasName = nome && nome.trim();
-
     const linkedAnimal = hasName
       ? animais.find((x) => x.nome.trim() === nome.trim())
       : null;
-    const photoSrc = foto || (linkedAnimal && linkedAnimal.foto) || null;
+    const photoSrc = (linkedAnimal && linkedAnimal.foto) || null;
     const thumbContent = photoSrc
       ? `<img src="${photoSrc}" style="width:100%;height:100%;object-fit:cover;" />`
       : hasName
         ? emoji
         : "?";
+    const inPlantel = linkedAnimal
+      ? `<div class="gene-inplantel">● no plantel</div>`
+      : "";
+    const clickAttr =
+      role !== "focal"
+        ? `onclick="abrirGeneModal('${role}',${a.id})" title="Clique para editar"`
+        : "";
     return `
-      <div class="gene-node${!hasName ? " unknown" : ""}${role === "focal" ? " focal" : ""}">
+      <div class="gene-node${!hasName ? " unknown" : ""}${role === "focal" ? " focal" : ""}" ${clickAttr}>
         <div class="gene-thumb">${thumbContent}</div>
         <div class="gene-node-role role-${role}">${roleLabel}</div>
         <div class="gene-node-name">${hasName ? nome : "Desconhecido"}</div>
         <div class="gene-node-info">${raca || "—"}</div>
-        ${linkedAnimal ? `<div style="font-size:10px;color:var(--c-accent);margin-top:2px">● no plantel</div>` : ""}
+        ${inPlantel}
       </div>`;
   };
 
@@ -712,91 +718,228 @@ function renderGenealogia(a) {
   const avoMatNome = a.avoMatNome || "";
   const avoMatRaca = a.avoMatRaca || "";
 
-  const editSection = `
-    <div class="gene-edit-section">
-      <div class="gene-edit-title">Editar Ancestrais</div>
-      <div class="grid-2">
-        <div class="form-field"><label>Nome do Pai</label><input id="g-painome" type="text" value="${paiNome}" placeholder="Nome do pai" /></div>
-        <div class="form-field"><label>Raça do Pai</label><input id="g-pairaça" type="text" value="${paiRaca}" placeholder="Raça do pai" /></div>
-      </div>
-      <div class="grid-2 mt">
-        <div class="form-field"><label>Nome da Mãe</label><input id="g-maenome" type="text" value="${maeNome}" placeholder="Nome da mãe" /></div>
-        <div class="form-field"><label>Raça da Mãe</label><input id="g-maeraca" type="text" value="${maeRaca}" placeholder="Raça da mãe" /></div>
-      </div>
-      <div class="grid-2 mt">
-        <div class="form-field"><label>Avô Paterno</label><input id="g-avopatnome" type="text" value="${avoPatNome}" placeholder="Nome do avô paterno" /></div>
-        <div class="form-field"><label>Raça do Avô Paterno</label><input id="g-avopatRaca" type="text" value="${avoPatRaca}" placeholder="Raça" /></div>
-      </div>
-      <div class="grid-2 mt">
-        <div class="form-field"><label>Avó Materna</label><input id="g-avomatnome" type="text" value="${avoMatNome}" placeholder="Nome da avó materna" /></div>
-        <div class="form-field"><label>Raça da Avó Materna</label><input id="g-avomatraca" type="text" value="${avoMatRaca}" placeholder="Raça" /></div>
-      </div>
-      <div style="margin-top:18px;display:flex;gap:10px">
-        <button class="btn-save" onclick="salvarGenealogia()">Salvar Ancestrais</button>
-      </div>
-    </div>`;
-
   document.getElementById("genealogia-content").innerHTML = `
     <div class="gene-header">
       <h2 class="gene-title">Árvore Genealógica — ${a.nome}</h2>
       <p class="gene-sub">${a.especie}${a.raca ? " · " + a.raca : ""} · ${calcIdade(a.nasc)}</p>
+      <p class="gene-sub" style="margin-top:4px;font-size:12px;color:var(--c-text-3)">Clique em um parente para editar</p>
     </div>
 
     <div class="gene-tree">
+      <div class="gene-gen" style="gap:16px">
+        ${nodeHtml(avoPatNome, avoPatRaca, "avo", "Avô paterno")}
+        <div style="min-width:8px;flex:0.3"></div>
+        ${nodeHtml(avoMatNome, avoMatRaca, "avomat", "Avó materna")}
+      </div>
+
+      <div style="width:100%;height:32px;position:relative">
+        <svg viewBox="0 0 700 32" preserveAspectRatio="none" style="width:100%;height:100%;overflow:visible">
+          <path d="M175 0 L175 16 L350 16 L350 32" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
+          <path d="M525 0 L525 16 L350 16" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
+        </svg>
+      </div>
+
       <div class="gene-gen" style="gap:40px">
-        ${nodeHtml(avoPatNome, avoPatRaca, "avo", "Avô paterno", null, false)}
-        <div style="min-width:160px"></div>
-        ${nodeHtml(avoMatNome, avoMatRaca, "avo", "Avó materna", null, false)}
+        ${nodeHtml(paiNome, paiRaca, "pai", "Pai")}
+        ${nodeHtml(maeNome, maeRaca, "mae", "Mãe")}
       </div>
 
       <div style="width:100%;height:36px;position:relative">
         <svg viewBox="0 0 700 36" preserveAspectRatio="none" style="width:100%;height:100%;overflow:visible">
-          <path d="M175 0 L175 18 L350 18 L350 36" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
-          <path d="M525 0 L525 18 L350 18" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
-        </svg>
-      </div>
-
-      <div class="gene-gen" style="gap:60px">
-        ${nodeHtml(paiNome, paiRaca, "pai", "Pai", null, false)}
-        ${nodeHtml(maeNome, maeRaca, "mae", "Mãe", null, false)}
-      </div>
-
-      <div style="width:100%;height:40px;position:relative">
-        <svg viewBox="0 0 700 40" preserveAspectRatio="none" style="width:100%;height:100%;overflow:visible">
-          <path d="M245 0 L245 20 L350 20 L350 40" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
-          <path d="M455 0 L455 20 L350 20" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
+          <path d="M245 0 L245 18 L350 18 L350 36" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
+          <path d="M455 0 L455 18 L350 18" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
         </svg>
       </div>
 
       <div class="gene-gen">
-        ${nodeHtml(a.nome, a.raca, "focal", "Animal", a.foto, false)}
+        ${nodeHtml(a.nome, a.raca, "focal", "Animal")}
       </div>
     </div>
-
-    ${editSection}
   `;
 }
 
-function salvarGenealogia() {
-  const a = animais.find((x) => x.id === selecionado);
-  if (!a) return;
-  a.paiNome = document.getElementById("g-painome")?.value || "";
-  a.paiRaca = document.getElementById("g-pairaça")?.value || "";
-  a.maeNome = document.getElementById("g-maenome")?.value || "";
-  a.maeRaca = document.getElementById("g-maeraca")?.value || "";
-  a.avoPatNome = document.getElementById("g-avopatnome")?.value || "";
-  a.avoPatRaca = document.getElementById("g-avopatRaca")?.value || "";
-  a.avoMatNome = document.getElementById("g-avomatnome")?.value || "";
-  a.avoMatRaca = document.getElementById("g-avomatraca")?.value || "";
+const GENE_ROLES = {
+  pai: {
+    label: "Pai",
+    sexo: "Macho",
+    field: { nome: "paiNome", raca: "paiRaca" },
+  },
+  mae: {
+    label: "Mãe",
+    sexo: "Fêmea",
+    field: { nome: "maeNome", raca: "maeRaca" },
+  },
+  avo: {
+    label: "Avô Paterno",
+    sexo: "Macho",
+    field: { nome: "avoPatNome", raca: "avoPatRaca" },
+  },
+  avomat: {
+    label: "Avó Materna",
+    sexo: "Fêmea",
+    field: { nome: "avoMatNome", raca: "avoMatRaca" },
+  },
+};
+
+let geneModalRole = null;
+let geneModalAnimalId = null;
+let geneModalSelectedId = null;
+
+function abrirGeneModal(role, animalId) {
+  geneModalRole = role;
+  geneModalAnimalId = animalId;
+  geneModalSelectedId = null;
+
+  const cfg = GENE_ROLES[role];
+  const a = animais.find((x) => x.id === animalId);
+  if (!a || !cfg) return;
+
+  const compatíveis = animais.filter(
+    (x) => x.id !== animalId && x.especie === a.especie && x.sexo === cfg.sexo,
+  );
+
+  const nomeAtual = a[cfg.field.nome] || "";
+  const racaAtual = a[cfg.field.raca] || "";
+
+  const currentLinked = nomeAtual
+    ? animais.find(
+        (x) => x.nome.trim() === nomeAtual.trim() && x.id !== animalId,
+      )
+    : null;
+  if (currentLinked) geneModalSelectedId = currentLinked.id;
+
+  const roleBadgeClass =
+    role === "pai" || role === "avo" ? "role-pai" : "role-mae";
+
+  const plantelItems = compatíveis.length
+    ? compatíveis
+        .map((x) => {
+          const thumbContent = x.foto
+            ? `<img src="${x.foto}" />`
+            : EMOJIS[x.especie] || "🐾";
+          const isSelected = geneModalSelectedId === x.id;
+          return `<div class="gene-plantel-item${isSelected ? " selected" : ""}"
+                     onclick="selecionarGeneAnimal(${x.id})"
+                     data-gene-id="${x.id}">
+          <div class="gene-plantel-thumb">${thumbContent}</div>
+          <div class="gene-plantel-info">
+            <div class="gene-plantel-name">${x.nome}</div>
+            <div class="gene-plantel-meta">${x.raca || x.especie}${x.nasc ? " · " + calcIdade(x.nasc) : ""}</div>
+          </div>
+        </div>`;
+        })
+        .join("")
+    : `<p class="gene-no-plantel">Nenhum ${cfg.sexo === "Macho" ? "macho" : "fêmea"} de ${a.especie} no plantel</p>`;
+
+  const html = `
+    <div class="gene-modal-overlay" id="gene-modal-overlay" onclick="fecharGeneModalExterno(event)">
+      <div class="gene-modal-box">
+        <div class="gene-modal-header">
+          <div class="gene-modal-title">
+            <span class="gene-modal-role-badge ${roleBadgeClass}">${cfg.label}</span>
+            de ${a.nome}
+          </div>
+          <button class="modal-close" onclick="fecharGeneModal()">
+            <svg viewBox="0 0 20 20" fill="none">
+              <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        <div class="gene-modal-body">
+          ${compatíveis.length ? `<div style="font-size:11px;font-weight:600;color:var(--c-text-3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">Do plantel — ${cfg.sexo === "Macho" ? "machos" : "fêmeas"} de ${a.especie}</div>` : ""}
+          <div class="gene-plantel-list" id="gene-plantel-list">${plantelItems}</div>
+          <div class="gene-or-divider">ou preencha manualmente</div>
+          <div class="form-field" style="margin-bottom:12px">
+            <label>Nome</label>
+            <input id="gene-modal-nome" type="text" placeholder="Nome do ${cfg.label.toLowerCase()}"
+                   value="${nomeAtual}" oninput="deselecionarGeneAnimal()" />
+          </div>
+          <div class="form-field" style="margin-bottom:4px">
+            <label>Raça</label>
+            <input id="gene-modal-raca" type="text" placeholder="Raça (opcional)"
+                   value="${racaAtual}" />
+          </div>
+        </div>
+        <div class="gene-modal-footer">
+          <button class="btn-ghost" onclick="limparGeneModal()">Remover</button>
+          <button class="btn-primary" onclick="salvarGeneModal()">Salvar</button>
+        </div>
+      </div>
+    </div>`;
+
+  const existing = document.getElementById("gene-modal-overlay");
+  if (existing) existing.remove();
+
+  document.body.insertAdjacentHTML("beforeend", html);
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      const overlay = document.getElementById("gene-modal-overlay");
+      if (overlay) overlay.classList.add("visible");
+    });
+  });
+}
+
+function selecionarGeneAnimal(id) {
+  geneModalSelectedId = id;
+  const animal = animais.find((x) => x.id === id);
+  if (!animal) return;
+
+  document.querySelectorAll(".gene-plantel-item").forEach((el) => {
+    el.classList.toggle("selected", parseInt(el.dataset.geneId) === id);
+  });
+
+  const nomeInput = document.getElementById("gene-modal-nome");
+  const racaInput = document.getElementById("gene-modal-raca");
+  if (nomeInput) nomeInput.value = animal.nome;
+  if (racaInput) racaInput.value = animal.raca || "";
+}
+
+function deselecionarGeneAnimal() {
+  geneModalSelectedId = null;
+  document.querySelectorAll(".gene-plantel-item").forEach((el) => {
+    el.classList.remove("selected");
+  });
+}
+
+function fecharGeneModal() {
+  const overlay = document.getElementById("gene-modal-overlay");
+  if (!overlay) return;
+  overlay.classList.remove("visible");
+  setTimeout(() => {
+    overlay.remove();
+  }, 220);
+}
+
+function fecharGeneModalExterno(e) {
+  if (e.target === document.getElementById("gene-modal-overlay"))
+    fecharGeneModal();
+}
+
+function salvarGeneModal() {
+  const a = animais.find((x) => x.id === geneModalAnimalId);
+  const cfg = GENE_ROLES[geneModalRole];
+  if (!a || !cfg) return;
+
+  const nome = (document.getElementById("gene-modal-nome")?.value || "").trim();
+  const raca = (document.getElementById("gene-modal-raca")?.value || "").trim();
+
+  a[cfg.field.nome] = nome;
+  a[cfg.field.raca] = raca;
   salvarAnimais();
+  fecharGeneModal();
   renderGenealogia(a);
-  const btn = document.querySelector(".gene-edit-section .btn-save");
-  if (btn) {
-    btn.textContent = "Salvo!";
-    setTimeout(() => {
-      btn.textContent = "Salvar Ancestrais";
-    }, 1500);
-  }
+}
+
+function limparGeneModal() {
+  const a = animais.find((x) => x.id === geneModalAnimalId);
+  const cfg = GENE_ROLES[geneModalRole];
+  if (!a || !cfg) return;
+  a[cfg.field.nome] = "";
+  a[cfg.field.raca] = "";
+  salvarAnimais();
+  fecharGeneModal();
+  renderGenealogia(a);
 }
 
 function selecionar(id) {

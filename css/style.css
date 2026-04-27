@@ -1917,9 +1917,9 @@ body {
 .form-field input,
 .form-field select,
 .form-field textarea {
-  background: var(--c-raised);
-  border: 1px solid var(--c-border);
-  border-radius: var(--r-sm);
+  background: var(--c-card);
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--r-md);
   padding: 9px 12px;
   font-size: 13px;
   color: var(--c-text-1);
@@ -1927,14 +1927,17 @@ body {
   outline: none;
   transition:
     border-color var(--t),
+    box-shadow var(--t),
     background var(--t);
+  width: 100%;
 }
 
 .form-field input:focus,
 .form-field select:focus,
 .form-field textarea:focus {
   border-color: var(--c-accent);
-  background: var(--c-bg);
+  background: var(--c-card);
+  box-shadow: 0 0 0 3px var(--c-accent-bg);
 }
 
 .form-field textarea {
@@ -2099,6 +2102,9 @@ body {
   align-items: center;
   gap: 0;
   position: relative;
+  width: 100%;
+  flex: 1;
+  padding: 8px 0 24px;
 }
 
 .gene-gen {
@@ -2135,13 +2141,23 @@ body {
   border: 1.5px solid var(--c-border);
   border-radius: var(--r-lg);
   padding: 14px 16px;
-  min-width: 160px;
-  max-width: 200px;
+  min-width: 150px;
+  max-width: 190px;
+  flex: 1;
   text-align: center;
   transition: all var(--t);
-  cursor: default;
+  cursor: pointer;
   position: relative;
   animation: fadeUp 0.3s ease both;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.gene-node:not(.focal) {
+  cursor: pointer;
+}
+
+.gene-node:not(.focal):active {
+  transform: scale(0.97);
 }
 
 .gene-node:hover {
@@ -2224,7 +2240,8 @@ body {
   color: #f9a8d4;
 }
 
-.role-avo {
+.role-avo,
+.role-avomat {
   background: var(--c-raised);
   color: var(--c-text-2);
 }
@@ -2626,18 +2643,42 @@ body {
 
   .gene-tree {
     overflow-x: auto;
-    padding-bottom: 8px;
     -webkit-overflow-scrolling: touch;
+    padding: 4px 4px 16px;
+    min-width: 360px;
   }
 
   .gene-gen {
     flex-wrap: nowrap;
-    gap: 12px;
+    gap: 8px;
   }
 
   .gene-node {
-    min-width: 130px;
-    padding: 10px 12px;
+    min-width: 110px;
+    max-width: 140px;
+    padding: 10px 10px;
+    flex: 1;
+  }
+
+  .gene-thumb {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+
+  .gene-node-name {
+    font-size: 11px;
+  }
+
+  .gene-node-info {
+    font-size: 10px;
+  }
+
+  .gene-node-role {
+    font-size: 9px;
+    padding: 1px 6px;
+    margin-bottom: 5px;
   }
 
   .modal-overlay {
@@ -2760,7 +2801,204 @@ body {
   input,
   select,
   textarea {
-    font-size: 16px !important;
+    font-size: 16px !important; 
+  }
+}
+
+
+
+.gene-inplantel {
+  font-size: 10px;
+  color: var(--c-accent);
+  margin-top: 3px;
+  font-weight: 500;
+}
+
+.gene-node:not(.focal):not(.unknown):hover .gene-thumb {
+  border-color: var(--c-accent);
+}
+
+#tab-genealogia {
+  display: flex;
+  flex-direction: column;
+}
+#tab-genealogia .ficha-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+  padding: 20px 24px 24px;
+}
+#genealogia-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.gene-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+.gene-modal-overlay.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+.gene-modal-box {
+  background: var(--c-card);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-xl);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  width: 100%;
+  max-width: 460px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: lp-slideUp 0.25s cubic-bezier(0.22,0.68,0,1.2) both;
+}
+.gene-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 22px 16px;
+  border-bottom: 1px solid var(--c-border);
+}
+.gene-modal-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--c-text-1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.gene-modal-role-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.gene-modal-body {
+  padding: 20px 22px 8px;
+}
+.gene-modal-footer {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding: 14px 22px 20px;
+  border-top: 1px solid var(--c-border);
+}
+.gene-plantel-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.gene-plantel-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--r-md);
+  border: 1.5px solid var(--c-border);
+  cursor: pointer;
+  transition: all var(--t);
+  background: var(--c-surface);
+  -webkit-tap-highlight-color: transparent;
+}
+.gene-plantel-item:hover,
+.gene-plantel-item.selected {
+  border-color: var(--c-accent);
+  background: var(--c-accent-bg);
+}
+.gene-plantel-item.selected {
+  box-shadow: 0 0 0 3px var(--c-accent-bg);
+}
+.gene-plantel-thumb {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-sm);
+  background: var(--c-raised);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.gene-plantel-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.gene-plantel-info {
+  flex: 1;
+  min-width: 0;
+}
+.gene-plantel-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--c-text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gene-plantel-meta {
+  font-size: 10px;
+  color: var(--c-text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gene-or-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0 12px;
+  font-size: 11px;
+  color: var(--c-text-3);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.gene-or-divider::before,
+.gene-or-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--c-border);
+}
+.gene-no-plantel {
+  font-size: 12px;
+  color: var(--c-text-3);
+  text-align: center;
+  padding: 8px 0 14px;
+  font-style: italic;
+}
+
+@media (max-width: 640px) {
+  .gene-modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+  .gene-modal-box {
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
+    max-height: 88dvh;
+    max-height: 88vh;
+    max-width: 100%;
+  }
+  .gene-plantel-list {
+    grid-template-columns: 1fr;
   }
 }
 
