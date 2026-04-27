@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Noto+Emoji:wght@400&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Noto+Emoji:wght@400&display=swap');
 
 #login-screen {
   display: none;
@@ -23,7 +23,7 @@ body {
   height: 100vh;
   overflow: hidden;
   position: relative;
-  font-family: "Noto Sans", sans-serif;
+  font-family: 'Noto Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -220,7 +220,7 @@ body {
   z-index: 3;
 }
 .lp-brand-name {
-  font-family: "Noto Sans", sans-serif;
+  font-family: 'Noto Sans', sans-serif;
   font-size: 46px;
   font-weight: 600;
   color: #fff;
@@ -312,7 +312,7 @@ body {
   border: 2px solid rgba(22, 163, 147, 0.35);
 }
 .lp-panel-brand-name {
-  font-family: "Noto Sans", sans-serif;
+  font-family: 'Noto Sans', sans-serif;
   font-size: 24px;
   font-weight: 600;
   color: #0e2e2a;
@@ -926,8 +926,8 @@ body {
 
   --c-shadow: rgba(30, 110, 67, 0.12);
 
-  --font-body: "Noto Sans", sans-serif;
-  --font-display: "Noto Sans", sans-serif;
+  --font-body: 'Noto Sans', sans-serif;
+  --font-display: 'Noto Sans', sans-serif;
   --r-sm: 6px;
   --r-md: 10px;
   --r-lg: 16px;
@@ -3178,7 +3178,7 @@ body {
 }
 
 :root {
-  --font-body: "Noto Sans", sans-serif;
+  --font-body: 'Noto Sans', sans-serif;
 }
 
 .sidebar-area-bar {
@@ -3493,7 +3493,7 @@ body {
 }
 
 .noto-emoji {
-  font-family: "Noto Emoji", sans-serif;
+  font-family: 'Noto Emoji', sans-serif;
   font-variant-emoji: text;
   font-style: normal;
   line-height: 1;
@@ -3504,6 +3504,10 @@ body {
   color: currentColor;
   -webkit-text-stroke: 0;
   filter: grayscale(1) contrast(10) brightness(0);
+}
+
+[data-theme="dark"] .noto-emoji {
+  filter: grayscale(1) contrast(10) brightness(0) invert(1);
 }
 
 .animal-thumb .noto-emoji {
