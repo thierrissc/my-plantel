@@ -351,15 +351,16 @@ function salvarAnimais() {
 let animais = carregarAnimais();
 
 const EMOJIS = {
-  Cão:     `<span class="noto-emoji">🐕</span>`,
-  Gato:    `<span class="noto-emoji">🐈</span>`,
-  Cavalo:  `<span class="noto-emoji">🐴</span>`,
-  Bovino:  `<span class="noto-emoji">🐄</span>`,
-  Suíno:   `<span class="noto-emoji">🐷</span>`,
-  Ave:     `<span class="noto-emoji">🐔</span>`,
+  Cão: `<span class="noto-emoji">🐕</span>`,
+  Gato: `<span class="noto-emoji">🐈</span>`,
+  Cavalo: `<span class="noto-emoji">🐴</span>`,
+  Bovino: `<span class="noto-emoji">🐄</span>`,
+  Suíno: `<span class="noto-emoji">🐷</span>`,
+  Ave: `<span class="noto-emoji">🐔</span>`,
   Caprino: `<span class="noto-emoji">🐐</span>`,
-  Ovino:   `<span class="noto-emoji">🐑</span>`,
-  Outro:   `<span class="noto-emoji">🐾</span>`,
+  Ovino: `<span class="noto-emoji">🐑</span>`,
+  Roedor: `<span class="noto-emoji">🐹</span>`,
+  Outro: `<span class="noto-emoji">🐾</span>`,
 };
 
 let selecionado = null;
@@ -367,6 +368,18 @@ let editando = false;
 let filtro = "Todos";
 let abaAtiva = "ficha";
 let fotoTemp = null;
+let viewMode = "lista";
+
+function setViewMode(modo) {
+  viewMode = modo;
+  document
+    .getElementById("btn-view-lista")
+    .classList.toggle("active", modo === "lista");
+  document
+    .getElementById("btn-view-grade")
+    .classList.toggle("active", modo === "grade");
+  renderSidebar();
+}
 
 function toggleTheme() {
   const html = document.documentElement;
@@ -645,7 +658,7 @@ function renderFichaContent(a) {
         <span class="section-title">Dados Gerais</span>
       </div>
       <div class="grid-3">
-        ${field("Espécie", a.especie, "especie", "text", ["Cão", "Gato", "Cavalo", "Bovino", "Suíno", "Ave", "Caprino", "Ovino", "Outro"])}
+        ${field("Espécie", a.especie, "especie", "text", ["Cão", "Gato", "Cavalo", "Bovino", "Suíno", "Ave", "Caprino", "Ovino", "Roedor", "Outro"])}
         ${field("Raça", a.raca, "raca")}
         ${field("Sexo", a.sexo, "sexo", "text", ["", "Macho", "Fêmea"])}
       </div>
@@ -1592,20 +1605,41 @@ function salvarAreas(areas) {
 let areaFiltro = "Todos";
 
 function renderAreaBar() {
+  const sel = document.getElementById("area-select");
+  if (!sel) return;
   const areas = getAreas();
-  const tabs = document.getElementById("area-tabs");
-  if (!tabs) return;
-  tabs.innerHTML = areas
+  sel.innerHTML = areas
     .map(
       (a) =>
-        `<button class="area-tab${areaFiltro === a ? " active" : ""}" onclick="setAreaFiltro('${a.replace(/'/g, "\\'")}')">${a}</button>`,
+        `<option value="${a}"${areaFiltro === a ? " selected" : ""}>${a === "Todos" ? "Todas as áreas" : a}</option>`,
     )
     .join("");
 }
 
+function setAreaFiltroSelect() {
+  const sel = document.getElementById("area-select");
+  areaFiltro = sel ? sel.value : "Todos";
+  const especiesNaArea =
+    areaFiltro === "Todos"
+      ? animais.map((a) => a.especie)
+      : animais
+          .filter((a) => (a.area || "") === areaFiltro)
+          .map((a) => a.especie);
+  if (filtro !== "Todos" && !especiesNaArea.includes(filtro)) {
+    filtro = "Todos";
+  }
+  renderAreaBar();
+  renderSidebar();
+}
+
+function setFiltroSelect() {
+  const sel = document.getElementById("especie-select");
+  filtro = sel ? sel.value : "Todos";
+  renderSidebar();
+}
+
 function setAreaFiltro(area) {
   areaFiltro = area;
-
   const especiesNaArea =
     areaFiltro === "Todos"
       ? animais.map((a) => a.especie)
@@ -1632,12 +1666,17 @@ renderSidebar = function () {
           .filter((a) => (a.area || "") === areaFiltro)
           .map((a) => a.especie);
   const _especiesTabs = ["Todos", ...new Set(_especiesNaArea)];
-  document.getElementById("filter-tabs").innerHTML = _especiesTabs
-    .map(
-      (e) =>
-        `<span class="ftab${filtro === e ? " active" : ""}" onclick="setFiltro('${e}')">${e}</span>`,
-    )
-    .join("");
+  const especieSel = document.getElementById("especie-select");
+  if (especieSel) {
+    especieSel.innerHTML = _especiesTabs
+      .map(
+        (e) =>
+          `<option value="${e}"${filtro === e ? " selected" : ""}>${e === "Todos" ? "Todas espécies" : e}</option>`,
+      )
+      .join("");
+  }
+  const filterTabsEl = document.getElementById("filter-tabs");
+  if (filterTabsEl) filterTabsEl.innerHTML = "";
 
   let lista = animais.filter((a) => {
     const okF = filtro === "Todos" || a.especie === filtro;
@@ -1649,12 +1688,48 @@ renderSidebar = function () {
     return okF && okA && okB;
   });
 
+  const sortKey = document.getElementById("sort-select")?.value || "nome";
+  lista.sort((a, b) => {
+    if (sortKey === "nome") return (a.nome || "").localeCompare(b.nome || "");
+    if (sortKey === "especie")
+      return (a.especie || "").localeCompare(b.especie || "");
+    if (sortKey === "sexo") return (a.sexo || "").localeCompare(b.sexo || "");
+    if (sortKey === "id") return a.id - b.id;
+    if (sortKey === "idade") {
+      const da = a.nasc ? new Date(a.nasc) : new Date(0);
+      const db = b.nasc ? new Date(b.nasc) : new Date(0);
+      return db - da;
+    }
+    return 0;
+  });
+
   document.getElementById("animal-count").textContent = lista.length;
 
-  document.getElementById("animal-list").innerHTML = lista.length
-    ? lista
-        .map(
-          (a, i) => `
+  const animalListEl = document.getElementById("animal-list");
+  animalListEl.className =
+    viewMode === "grade" ? "animal-list animal-grade" : "animal-list";
+
+  if (!lista.length) {
+    animalListEl.innerHTML = `<div style="padding:20px 16px;font-size:12px;color:var(--c-text-3);text-align:center">Nenhum animal encontrado</div>`;
+  } else if (viewMode === "grade") {
+    animalListEl.innerHTML = lista
+      .map(
+        (a, i) => `
+      <div class="animal-grade-item${selecionado === a.id ? " active" : ""}"
+           style="animation-delay:${i * 0.04}s"
+           onclick="selecionar(${a.id})"
+           title="${a.nome}">
+        <div class="animal-grade-thumb">
+          ${a.foto ? `<img src="${a.foto}" alt="${a.nome}" />` : EMOJIS[a.especie] || `<span class="noto-emoji" style="font-size:28px">🐾</span>`}
+        </div>
+        <div class="grade-pip-wrap"><div class="status-pip ${pipClass(a.status)}"></div></div>
+      </div>`,
+      )
+      .join("");
+  } else {
+    animalListEl.innerHTML = lista
+      .map(
+        (a, i) => `
       <div class="animal-item${selecionado === a.id ? " active" : ""}"
            style="animation-delay:${i * 0.04}s"
            onclick="selecionar(${a.id})">
@@ -1668,9 +1743,9 @@ renderSidebar = function () {
         </div>
         <div class="status-pip ${pipClass(a.status)}"></div>
       </div>`,
-        )
-        .join("")
-    : `<div style="padding:20px 16px;font-size:12px;color:var(--c-text-3);text-align:center">Nenhum animal encontrado</div>`;
+      )
+      .join("");
+  }
 
   const ativos = animais.filter((a) => a.status === "Ativo").length;
   const trat = animais.filter((a) => a.status === "Em tratamento").length;

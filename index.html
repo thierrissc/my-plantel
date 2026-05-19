@@ -241,9 +241,16 @@
         <input type="text" id="search-input" placeholder="Buscar por nome ou raça..." oninput="filtrarAnimais()" />
       </div>
 
-      <div class="sidebar-area-bar" id="area-bar-wrap">
-        <span class="area-label">ÁREA</span>
-        <div class="area-tabs" id="area-tabs"></div>
+      <!-- ÁREA: dropdown selector -->
+      <div class="sidebar-control-row" id="area-bar-wrap">
+        <div class="ctrl-dropdown-wrap">
+          <svg class="ctrl-icon" viewBox="0 0 16 16" fill="none" width="13" height="13">
+            <path d="M2 3h12M4 8h8M7 13h2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+          </svg>
+          <select id="area-select" class="ctrl-select" onchange="setAreaFiltroSelect()">
+            <option value="Todos">Todas as áreas</option>
+          </select>
+        </div>
         <button class="area-add-btn" onclick="abrirGerenciarAreas()" title="Gerenciar áreas">
           <svg viewBox="0 0 20 20" fill="none" width="13" height="13">
             <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
@@ -251,11 +258,57 @@
         </button>
       </div>
 
-      <div class="sidebar-filters" id="filter-tabs"></div>
+      <!-- ESPÉCIE + ORDENAR: dois dropdowns lado a lado -->
+      <div class="sidebar-control-row">
+        <div class="ctrl-dropdown-wrap">
+          <svg class="ctrl-icon" viewBox="0 0 16 16" fill="none" width="13" height="13">
+            <circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.5" />
+            <path d="M8 5v3l2 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+          </svg>
+          <select id="especie-select" class="ctrl-select" onchange="setFiltroSelect()">
+            <option value="Todos">Todas espécies</option>
+          </select>
+        </div>
+        <div class="ctrl-dropdown-wrap">
+          <svg class="ctrl-icon" viewBox="0 0 16 16" fill="none" width="13" height="13">
+            <path d="M2 4h12M4 8h8M6 12h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+          </svg>
+          <select id="sort-select" onchange="renderSidebar()" class="ctrl-select">
+            <option value="nome">Nome</option>
+            <option value="especie">Espécie</option>
+            <option value="idade">Idade</option>
+            <option value="sexo">Sexo</option>
+            <option value="id">ID</option>
+          </select>
+        </div>
+      </div>
 
+      <!-- hidden, kept for compatibility -->
+      <div class="sidebar-filters" id="filter-tabs" style="display:none"></div>
+
+      <!-- ANIMAIS label com contador e toggle de visualização -->
       <div class="sidebar-section-label">
         <span>ANIMAIS</span>
-        <span id="animal-count" class="count-badge">0</span>
+        <div class="label-right-group">
+          <span id="animal-count" class="count-badge">0</span>
+          <div class="view-toggle-wrap">
+            <button class="view-btn active" id="btn-view-lista" onclick="setViewMode('lista')" title="Lista">
+              <svg viewBox="0 0 16 16" fill="none" width="13" height="13">
+                <rect x="1" y="2" width="14" height="3" rx="1" fill="currentColor" />
+                <rect x="1" y="7" width="14" height="3" rx="1" fill="currentColor" />
+                <rect x="1" y="12" width="14" height="3" rx="1" fill="currentColor" />
+              </svg>
+            </button>
+            <button class="view-btn" id="btn-view-grade" onclick="setViewMode('grade')" title="Grade">
+              <svg viewBox="0 0 16 16" fill="none" width="13" height="13">
+                <rect x="1" y="1" width="6" height="6" rx="1.2" fill="currentColor" />
+                <rect x="9" y="1" width="6" height="6" rx="1.2" fill="currentColor" />
+                <rect x="1" y="9" width="6" height="6" rx="1.2" fill="currentColor" />
+                <rect x="9" y="9" width="6" height="6" rx="1.2" fill="currentColor" />
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
 
       <nav class="animal-list" id="animal-list"></nav>
@@ -361,6 +414,7 @@
                 <option>Ave</option>
                 <option>Caprino</option>
                 <option>Ovino</option>
+                <option>Roedor</option>
                 <option>Outro</option>
               </select>
             </div>
