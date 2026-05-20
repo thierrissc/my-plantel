@@ -1633,22 +1633,75 @@ const SORT_OPTIONS = [
   { value: "id", label: "ID" },
 ];
 
-function renderCtrlCombo(id, items, selectedValue, onSelect) {
-  const dd = document.getElementById(id + "-dropdown");
-  const label = document.getElementById(id + "-label");
-  if (!dd || !label) return;
-  const selected = items.find((i) => i.value === selectedValue) || items[0];
-  label.textContent = selected ? selected.label : "";
+let _openComboId = null;
+const _comboItemsCache = {};
+
+function _getOrCreateDropdown(id) {
+  let dd = document.getElementById(id + "-dropdown");
+  if (!dd) {
+    dd = document.createElement("div");
+    dd.id = id + "-dropdown";
+    dd.className = "ctrl-combo-dropdown";
+    document.body.appendChild(dd);
+  }
+  return dd;
+}
+
+function _populateDropdown(id, items, selectedValue) {
+  const dd = _getOrCreateDropdown(id);
   dd.innerHTML = items
     .map(
       (item) =>
-        `<div class="ctrl-combo-item${item.value === selectedValue ? " active" : ""}" onmousedown="selectCtrlCombo('${id}',${JSON.stringify(item.value)},event)">${item.label}</div>`,
+        `<div class="ctrl-combo-item${item.value === selectedValue ? " active" : ""}"
+          onclick="selectCtrlCombo('${id}','${item.value.replace(/\\/g, "\\\\").replace(/'/g, "\\'")}')"
+        >${item.label}</div>`,
     )
     .join("");
 }
 
-function selectCtrlCombo(id, value, e) {
-  if (e) e.preventDefault();
+function renderCtrlCombo(id, items, selectedValue) {
+  _comboItemsCache[id] = { items, selectedValue };
+  const label = document.getElementById(id + "-label");
+  if (label) {
+    const sel = items.find((i) => i.value === selectedValue) || items[0];
+    label.textContent = sel ? sel.label : "";
+  }
+
+  if (_openComboId === id) {
+    _populateDropdown(id, items, selectedValue);
+  }
+}
+
+function _openCombo(id) {
+  closeAllCtrlDropdowns();
+  const wrap = document.getElementById(id + "-wrap");
+  if (!wrap) return;
+
+  const cached = _comboItemsCache[id];
+  if (!cached) return;
+
+  const dd = _getOrCreateDropdown(id);
+  _populateDropdown(id, cached.items, cached.selectedValue);
+
+  const rect = wrap.getBoundingClientRect();
+  dd.style.top = rect.bottom + 4 + "px";
+  dd.style.left = rect.left + "px";
+  dd.style.width = rect.width + "px";
+  dd.classList.add("open");
+  wrap.classList.add("open");
+  _openComboId = id;
+}
+
+function toggleCtrlDropdown(id, e) {
+  e.stopPropagation();
+  if (_openComboId === id) {
+    closeAllCtrlDropdowns();
+  } else {
+    _openCombo(id);
+  }
+}
+
+function selectCtrlCombo(id, value) {
   closeAllCtrlDropdowns();
   if (id === "area-combo") {
     areaFiltro = value;
@@ -1670,20 +1723,24 @@ function selectCtrlCombo(id, value, e) {
   }
 }
 
-function toggleCtrlDropdown(id, e) {
-  e.preventDefault();
-  e.stopPropagation();
-  if (e.target.closest(".ctrl-combo-dropdown")) return;
-  const dd = document.getElementById(id + "-dropdown");
-  const wrap = document.getElementById(id + "-wrap");
-  if (!dd) return;
-  const isOpen = dd.classList.contains("open");
-  closeAllCtrlDropdowns();
-  if (!isOpen) {
-    dd.classList.add("open");
-    if (wrap) wrap.classList.add("open");
-  }
+function closeAllCtrlDropdowns() {
+  document
+    .querySelectorAll(".ctrl-combo-dropdown.open")
+    .forEach((el) => el.classList.remove("open"));
+  document
+    .querySelectorAll(".ctrl-combo-wrap.open")
+    .forEach((el) => el.classList.remove("open"));
+  _openComboId = null;
 }
+
+document.addEventListener("click", (e) => {
+  if (
+    !e.target.closest(".ctrl-combo-wrap") &&
+    !e.target.closest(".ctrl-combo-dropdown")
+  ) {
+    closeAllCtrlDropdowns();
+  }
+});
 
 const ESPECIES_MODAL = [
   "Cão",
@@ -1711,7 +1768,7 @@ function renderEspecieDropdown() {
 function toggleEspecieDropdown(e) {
   e.preventDefault();
   e.stopPropagation();
-  if (e.target.closest(".raca-dropdown")) return;
+  if (e.target.closest(".raca-dropdown-item")) return;
   const dd = document.getElementById("especie-modal-dropdown");
   if (!dd) return;
   if (dd.classList.contains("open")) {
@@ -1736,19 +1793,6 @@ document.addEventListener("click", (e) => {
   if (!e.target.closest("#especie-modal-wrap")) {
     document.getElementById("especie-modal-dropdown")?.classList.remove("open");
   }
-});
-
-function closeAllCtrlDropdowns() {
-  document
-    .querySelectorAll(".ctrl-combo-dropdown.open")
-    .forEach((el) => el.classList.remove("open"));
-  document
-    .querySelectorAll(".ctrl-combo-wrap.open")
-    .forEach((el) => el.classList.remove("open"));
-}
-
-document.addEventListener("click", (e) => {
-  if (!e.target.closest(".ctrl-combo-wrap")) closeAllCtrlDropdowns();
 });
 
 function renderAreaBar() {

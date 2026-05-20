@@ -1038,7 +1038,7 @@ body {
   border-right: 1px solid var(--c-border);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
   transition:
     background var(--t),
     border-color var(--t);
@@ -3603,17 +3603,15 @@ body {
 
 .ctrl-combo-dropdown {
   display: none;
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  right: 0;
+  position: fixed;
   background: var(--c-card);
   border: 1.5px solid var(--c-accent);
   border-radius: var(--r-md);
   box-shadow: 0 8px 24px var(--c-shadow);
-  z-index: 600;
+  z-index: 9999;
   max-height: 200px;
   overflow-y: auto;
+  min-width: 120px;
 }
 
 .ctrl-combo-dropdown.open {
