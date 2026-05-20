@@ -1589,6 +1589,18 @@ const RACAS_PRESET = {
     "Texel",
     "Hampshire Down",
   ],
+  Roedor: [
+    "Porquinho da Índia",
+    "Hamster Sírio",
+    "Hamster Anão",
+    "Gerbil",
+    "Rato Doméstico",
+    "Camundongo",
+    "Chinchila",
+    "Ouriço",
+    "Degus",
+    "Esquilo",
+  ],
 };
 
 function getAreas() {
@@ -1604,37 +1616,94 @@ function salvarAreas(areas) {
 
 let areaFiltro = "Todos";
 
-function renderAreaBar() {
-  const sel = document.getElementById("area-select");
-  if (!sel) return;
-  const areas = getAreas();
-  sel.innerHTML = areas
+let _sortKey = "nome";
+
+const SORT_OPTIONS = [
+  { value: "nome", label: "Nome" },
+  { value: "especie", label: "Espécie" },
+  { value: "raca", label: "Raça" },
+  { value: "idade", label: "Idade" },
+  { value: "sexo", label: "Sexo" },
+  { value: "id", label: "ID" },
+];
+
+function renderCtrlCombo(id, items, selectedValue, onSelect) {
+  const dd = document.getElementById(id + "-dropdown");
+  const label = document.getElementById(id + "-label");
+  if (!dd || !label) return;
+  const selected = items.find((i) => i.value === selectedValue) || items[0];
+  label.textContent = selected ? selected.label : "";
+  dd.innerHTML = items
     .map(
-      (a) =>
-        `<option value="${a}"${areaFiltro === a ? " selected" : ""}>${a === "Todos" ? "Todas as áreas" : a}</option>`,
+      (item) =>
+        `<div class="ctrl-combo-item${item.value === selectedValue ? " active" : ""}" onmousedown="selectCtrlCombo('${id}',${JSON.stringify(item.value)},event)">${item.label}</div>`,
     )
     .join("");
 }
 
-function setAreaFiltroSelect() {
-  const sel = document.getElementById("area-select");
-  areaFiltro = sel ? sel.value : "Todos";
-  const especiesNaArea =
-    areaFiltro === "Todos"
-      ? animais.map((a) => a.especie)
-      : animais
-          .filter((a) => (a.area || "") === areaFiltro)
-          .map((a) => a.especie);
-  if (filtro !== "Todos" && !especiesNaArea.includes(filtro)) {
-    filtro = "Todos";
+function selectCtrlCombo(id, value, e) {
+  if (e) e.preventDefault();
+  closeAllCtrlDropdowns();
+  if (id === "area-combo") {
+    areaFiltro = value;
+    const especiesNaArea =
+      areaFiltro === "Todos"
+        ? animais.map((a) => a.especie)
+        : animais
+            .filter((a) => (a.area || "") === areaFiltro)
+            .map((a) => a.especie);
+    if (filtro !== "Todos" && !especiesNaArea.includes(filtro))
+      filtro = "Todos";
+    renderSidebar();
+  } else if (id === "especie-combo") {
+    filtro = value;
+    renderSidebar();
+  } else if (id === "sort-combo") {
+    _sortKey = value;
+    renderSidebar();
   }
-  renderAreaBar();
+}
+
+function toggleCtrlDropdown(id, e) {
+  e.preventDefault();
+  const dd = document.getElementById(id + "-dropdown");
+  const wrap = document.getElementById(id + "-wrap");
+  if (!dd) return;
+  const isOpen = dd.classList.contains("open");
+  closeAllCtrlDropdowns();
+  if (!isOpen) {
+    dd.classList.add("open");
+    if (wrap) wrap.classList.add("open");
+  }
+}
+
+function closeAllCtrlDropdowns() {
+  document
+    .querySelectorAll(".ctrl-combo-dropdown.open")
+    .forEach((el) => el.classList.remove("open"));
+  document
+    .querySelectorAll(".ctrl-combo-wrap.open")
+    .forEach((el) => el.classList.remove("open"));
+}
+
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".ctrl-combo-wrap")) closeAllCtrlDropdowns();
+});
+
+function renderAreaBar() {
+  const areas = getAreas();
+  const items = areas.map((a) => ({
+    value: a,
+    label: a === "Todos" ? "Todas as áreas" : a,
+  }));
+  renderCtrlCombo("area-combo", items, areaFiltro, null);
+}
+
+function setAreaFiltroSelect() {
   renderSidebar();
 }
 
 function setFiltroSelect() {
-  const sel = document.getElementById("especie-select");
-  filtro = sel ? sel.value : "Todos";
   renderSidebar();
 }
 
@@ -1646,10 +1715,7 @@ function setAreaFiltro(area) {
       : animais
           .filter((a) => (a.area || "") === areaFiltro)
           .map((a) => a.especie);
-  if (filtro !== "Todos" && !especiesNaArea.includes(filtro)) {
-    filtro = "Todos";
-  }
-  renderAreaBar();
+  if (filtro !== "Todos" && !especiesNaArea.includes(filtro)) filtro = "Todos";
   renderSidebar();
 }
 
@@ -1666,15 +1732,15 @@ renderSidebar = function () {
           .filter((a) => (a.area || "") === areaFiltro)
           .map((a) => a.especie);
   const _especiesTabs = ["Todos", ...new Set(_especiesNaArea)];
-  const especieSel = document.getElementById("especie-select");
-  if (especieSel) {
-    especieSel.innerHTML = _especiesTabs
-      .map(
-        (e) =>
-          `<option value="${e}"${filtro === e ? " selected" : ""}>${e === "Todos" ? "Espécies" : e}</option>`,
-      )
-      .join("");
-  }
+
+  const especieItems = _especiesTabs.map((e) => ({
+    value: e,
+    label: e === "Todos" ? "Espécies" : e,
+  }));
+  renderCtrlCombo("especie-combo", especieItems, filtro, null);
+  renderCtrlCombo("sort-combo", SORT_OPTIONS, _sortKey, null);
+  renderAreaBar();
+
   const filterTabsEl = document.getElementById("filter-tabs");
   if (filterTabsEl) filterTabsEl.innerHTML = "";
 
@@ -1688,14 +1754,25 @@ renderSidebar = function () {
     return okF && okA && okB;
   });
 
-  const sortKey = document.getElementById("sort-select")?.value || "nome";
   lista.sort((a, b) => {
-    if (sortKey === "nome") return (a.nome || "").localeCompare(b.nome || "");
-    if (sortKey === "especie")
+    if (_sortKey === "nome") return (a.nome || "").localeCompare(b.nome || "");
+    if (_sortKey === "especie") {
+      const cmpEsp = (a.especie || "").localeCompare(b.especie || "");
+      if (cmpEsp !== 0) return cmpEsp;
+      return (a.raca || "").localeCompare(b.raca || "");
+    }
+    if (_sortKey === "raca") {
+      const cmpRaca = (a.raca || "").localeCompare(b.raca || "");
+      if (cmpRaca !== 0) return cmpRaca;
       return (a.especie || "").localeCompare(b.especie || "");
-    if (sortKey === "sexo") return (a.sexo || "").localeCompare(b.sexo || "");
-    if (sortKey === "id") return a.id - b.id;
-    if (sortKey === "idade") {
+    }
+    if (_sortKey === "sexo") return (a.sexo || "").localeCompare(b.sexo || "");
+    if (_sortKey === "id") {
+      const na = typeof a.id === "number" ? a.id : parseInt(a.id) || 0;
+      const nb = typeof b.id === "number" ? b.id : parseInt(b.id) || 0;
+      return na - nb;
+    }
+    if (_sortKey === "idade") {
       const da = a.nasc ? new Date(a.nasc) : new Date(0);
       const db = b.nasc ? new Date(b.nasc) : new Date(0);
       return db - da;
@@ -1753,8 +1830,6 @@ renderSidebar = function () {
     <div class="stat-item"><div class="stat-n">${animais.length}</div><div class="stat-l">Total</div></div>
     <div class="stat-item"><div class="stat-n" style="color:var(--c-accent)">${ativos}</div><div class="stat-l">Ativos</div></div>
     <div class="stat-item"><div class="stat-n" style="color:var(--c-amber)">${trat}</div><div class="stat-l">Tratamento</div></div>`;
-
-  renderAreaBar();
 };
 
 function abrirGerenciarAreas() {
@@ -1824,10 +1899,27 @@ function popularSelectAreas() {
     areas.map((a) => `<option>${a}</option>`).join("");
 }
 
+const RACA_PLACEHOLDERS = {
+  Cão: "Ex: Labrador Retriever",
+  Gato: "Ex: Persa",
+  Cavalo: "Ex: Quarto de Milha",
+  Bovino: "Ex: Nelore",
+  Suíno: "Ex: Landrace",
+  Ave: "Ex: Calopsita",
+  Caprino: "Ex: Saanen",
+  Ovino: "Ex: Santa Inês",
+  Roedor: "Ex: Porquinho da Índia",
+  Outro: "Ex: raça do animal",
+};
+
 function atualizarRacasModal() {
   const esp = document.getElementById("m-especie")?.value;
   const racas = RACAS_PRESET[esp] || [];
-
+  const inp = document.getElementById("m-raca");
+  if (inp) {
+    inp.placeholder = RACA_PLACEHOLDERS[esp] || "Ex: raça do animal";
+    inp.value = "";
+  }
   window._racasAtual = racas;
   renderRacaDropdown(racas);
 }

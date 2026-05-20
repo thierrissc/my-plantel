@@ -241,15 +241,19 @@
         <input type="text" id="search-input" placeholder="Buscar por nome ou raça..." oninput="filtrarAnimais()" />
       </div>
 
-      <!-- ÁREA: dropdown selector -->
       <div class="sidebar-control-row" id="area-bar-wrap">
-        <div class="ctrl-dropdown-wrap">
+        <div class="ctrl-combo-wrap" id="area-combo-wrap">
           <svg class="ctrl-icon" viewBox="0 0 16 16" fill="none" width="13" height="13">
             <path d="M2 3h12M4 8h8M7 13h2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
           </svg>
-          <select id="area-select" class="ctrl-select" onchange="setAreaFiltroSelect()">
-            <option value="Todos">Todas as áreas</option>
-          </select>
+          <span class="ctrl-combo-label" id="area-combo-label">Todas as áreas</span>
+          <button type="button" class="ctrl-combo-arrow" onmousedown="toggleCtrlDropdown('area-combo',event)"
+            tabindex="-1">
+            <svg width="10" height="7" viewBox="0 0 12 8">
+              <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
+            </svg>
+          </button>
+          <div class="ctrl-combo-dropdown" id="area-combo-dropdown"></div>
         </div>
         <button class="area-add-btn" onclick="abrirGerenciarAreas()" title="Gerenciar áreas">
           <svg viewBox="0 0 20 20" fill="none" width="13" height="13">
@@ -258,35 +262,37 @@
         </button>
       </div>
 
-      <!-- ESPÉCIE + ORDENAR: dois dropdowns lado a lado -->
       <div class="sidebar-control-row">
-        <div class="ctrl-dropdown-wrap">
+        <div class="ctrl-combo-wrap" id="especie-combo-wrap">
           <svg class="ctrl-icon" viewBox="0 0 16 16" fill="none" width="13" height="13">
-            <circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.5" />
-            <path d="M8 5v3l2 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+            <path d="M2 3h12M4 8h8M7 13h2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
           </svg>
-          <select id="especie-select" class="ctrl-select" onchange="setFiltroSelect()">
-            <option value="Todos">Todas espécies</option>
-          </select>
+          <span class="ctrl-combo-label" id="especie-combo-label">Todas espécies</span>
+          <button type="button" class="ctrl-combo-arrow" onmousedown="toggleCtrlDropdown('especie-combo',event)"
+            tabindex="-1">
+            <svg width="10" height="7" viewBox="0 0 12 8">
+              <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
+            </svg>
+          </button>
+          <div class="ctrl-combo-dropdown" id="especie-combo-dropdown"></div>
         </div>
-        <div class="ctrl-dropdown-wrap">
+        <div class="ctrl-combo-wrap" id="sort-combo-wrap">
           <svg class="ctrl-icon" viewBox="0 0 16 16" fill="none" width="13" height="13">
             <path d="M2 4h12M4 8h8M6 12h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
           </svg>
-          <select id="sort-select" onchange="renderSidebar()" class="ctrl-select">
-            <option value="nome">Nome</option>
-            <option value="especie">Espécie</option>
-            <option value="idade">Idade</option>
-            <option value="sexo">Sexo</option>
-            <option value="id">ID</option>
-          </select>
+          <span class="ctrl-combo-label" id="sort-combo-label">Nome</span>
+          <button type="button" class="ctrl-combo-arrow" onmousedown="toggleCtrlDropdown('sort-combo',event)"
+            tabindex="-1">
+            <svg width="10" height="7" viewBox="0 0 12 8">
+              <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
+            </svg>
+          </button>
+          <div class="ctrl-combo-dropdown" id="sort-combo-dropdown"></div>
         </div>
       </div>
 
-      <!-- hidden, kept for compatibility -->
       <div class="sidebar-filters" id="filter-tabs" style="display:none"></div>
 
-      <!-- ANIMAIS label com contador e toggle de visualização -->
       <div class="sidebar-section-label">
         <span>ANIMAIS</span>
         <div class="label-right-group">
@@ -349,11 +355,6 @@
       </div>
 
       <div class="empty-state" id="empty-state">
-        <button class="mobile-menu-btn mobile-menu-empty" onclick="toggleSidebar()" aria-label="Abrir lista">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-          </svg>
-        </button>
         <div class="empty-art">
           <svg viewBox="0 0 120 100" fill="none">
             <ellipse cx="34" cy="30" rx="13" ry="16" fill="currentColor" opacity="0.10" />
@@ -491,12 +492,13 @@
         </div>
         <div class="modal-body">
           <p class="areas-modal-desc">Crie áreas personalizadas como viveiros, haras, baias, canis, etc.</p>
-          <div class="form-field full area-add-row">
-            <div class="area-add-input-wrap">
-              <label>Nome da Área</label>
-              <input id="area-nome-input" type="text" placeholder="Ex: Viveiro Norte, Haras 1..." />
+          <div class="area-add-row-centered">
+            <label class="area-add-label">Nome da Área</label>
+            <div class="area-add-input-row">
+              <input id="area-nome-input" type="text" placeholder="Ex: Viveiro Norte, Haras 1..."
+                class="area-add-input" />
+              <button class="btn-primary area-add-submit" onclick="adicionarArea()">+ Adicionar</button>
             </div>
-            <button class="btn-primary area-add-submit" onclick="adicionarArea()">+ Adicionar</button>
           </div>
           <div id="areas-list" class="areas-list"></div>
         </div>
