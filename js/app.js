@@ -1365,6 +1365,12 @@ function fecharModal() {
     const el = document.getElementById(id);
     if (el) el.value = "";
   });
+
+  const especieLbl = document.getElementById("especie-modal-label");
+  if (especieLbl) especieLbl.textContent = "Selecione";
+  const especieHid = document.getElementById("m-especie");
+  if (especieHid) especieHid.value = "";
+  document.getElementById("especie-modal-dropdown")?.classList.remove("open");
 }
 function fecharModalExterno(e) {
   if (e.target === document.getElementById("modal")) fecharModal();
@@ -1666,6 +1672,8 @@ function selectCtrlCombo(id, value, e) {
 
 function toggleCtrlDropdown(id, e) {
   e.preventDefault();
+  e.stopPropagation();
+  if (e.target.closest(".ctrl-combo-dropdown")) return;
   const dd = document.getElementById(id + "-dropdown");
   const wrap = document.getElementById(id + "-wrap");
   if (!dd) return;
@@ -1676,6 +1684,59 @@ function toggleCtrlDropdown(id, e) {
     if (wrap) wrap.classList.add("open");
   }
 }
+
+const ESPECIES_MODAL = [
+  "Cão",
+  "Gato",
+  "Cavalo",
+  "Bovino",
+  "Suíno",
+  "Ave",
+  "Caprino",
+  "Ovino",
+  "Roedor",
+  "Outro",
+];
+
+function renderEspecieDropdown() {
+  const dd = document.getElementById("especie-modal-dropdown");
+  if (!dd) return;
+  const cur = document.getElementById("m-especie")?.value;
+  dd.innerHTML = ESPECIES_MODAL.map(
+    (e) =>
+      `<div class="raca-dropdown-item${e === cur ? " active" : ""}" onmousedown="selecionarEspecie('${e}',event)">${e}</div>`,
+  ).join("");
+}
+
+function toggleEspecieDropdown(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  if (e.target.closest(".raca-dropdown")) return;
+  const dd = document.getElementById("especie-modal-dropdown");
+  if (!dd) return;
+  if (dd.classList.contains("open")) {
+    dd.classList.remove("open");
+  } else {
+    renderEspecieDropdown();
+    dd.classList.add("open");
+  }
+}
+
+function selecionarEspecie(esp, e) {
+  if (e) e.preventDefault();
+  const hidden = document.getElementById("m-especie");
+  const label = document.getElementById("especie-modal-label");
+  if (hidden) hidden.value = esp;
+  if (label) label.textContent = esp;
+  document.getElementById("especie-modal-dropdown")?.classList.remove("open");
+  atualizarRacasModal();
+}
+
+document.addEventListener("click", (e) => {
+  if (!e.target.closest("#especie-modal-wrap")) {
+    document.getElementById("especie-modal-dropdown")?.classList.remove("open");
+  }
+});
 
 function closeAllCtrlDropdowns() {
   document

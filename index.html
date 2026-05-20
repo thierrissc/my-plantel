@@ -242,13 +242,12 @@
       </div>
 
       <div class="sidebar-control-row" id="area-bar-wrap">
-        <div class="ctrl-combo-wrap" id="area-combo-wrap">
+        <div class="ctrl-combo-wrap" id="area-combo-wrap" onmousedown="toggleCtrlDropdown('area-combo',event)">
           <svg class="ctrl-icon" viewBox="0 0 16 16" fill="none" width="13" height="13">
             <path d="M2 3h12M4 8h8M7 13h2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
           </svg>
           <span class="ctrl-combo-label" id="area-combo-label">Todas as áreas</span>
-          <button type="button" class="ctrl-combo-arrow" onmousedown="toggleCtrlDropdown('area-combo',event)"
-            tabindex="-1">
+          <button type="button" class="ctrl-combo-arrow" tabindex="-1">
             <svg width="10" height="7" viewBox="0 0 12 8">
               <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
             </svg>
@@ -263,26 +262,24 @@
       </div>
 
       <div class="sidebar-control-row">
-        <div class="ctrl-combo-wrap" id="especie-combo-wrap">
+        <div class="ctrl-combo-wrap" id="especie-combo-wrap" onmousedown="toggleCtrlDropdown('especie-combo',event)">
           <svg class="ctrl-icon" viewBox="0 0 16 16" fill="none" width="13" height="13">
             <path d="M2 3h12M4 8h8M7 13h2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
           </svg>
           <span class="ctrl-combo-label" id="especie-combo-label">Todas espécies</span>
-          <button type="button" class="ctrl-combo-arrow" onmousedown="toggleCtrlDropdown('especie-combo',event)"
-            tabindex="-1">
+          <button type="button" class="ctrl-combo-arrow" tabindex="-1">
             <svg width="10" height="7" viewBox="0 0 12 8">
               <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
             </svg>
           </button>
           <div class="ctrl-combo-dropdown" id="especie-combo-dropdown"></div>
         </div>
-        <div class="ctrl-combo-wrap" id="sort-combo-wrap">
+        <div class="ctrl-combo-wrap" id="sort-combo-wrap" onmousedown="toggleCtrlDropdown('sort-combo',event)">
           <svg class="ctrl-icon" viewBox="0 0 16 16" fill="none" width="13" height="13">
             <path d="M2 4h12M4 8h8M6 12h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
           </svg>
           <span class="ctrl-combo-label" id="sort-combo-label">Nome</span>
-          <button type="button" class="ctrl-combo-arrow" onmousedown="toggleCtrlDropdown('sort-combo',event)"
-            tabindex="-1">
+          <button type="button" class="ctrl-combo-arrow" tabindex="-1">
             <svg width="10" height="7" viewBox="0 0 12 8">
               <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
             </svg>
@@ -405,19 +402,19 @@
           <div class="form-grid-2">
             <div class="form-field">
               <label>Espécie *</label>
-              <select id="m-especie" onchange="atualizarRacasModal()">
-                <option value="">Selecione</option>
-                <option>Cão</option>
-                <option>Gato</option>
-                <option>Cavalo</option>
-                <option>Bovino</option>
-                <option>Suíno</option>
-                <option>Ave</option>
-                <option>Caprino</option>
-                <option>Ovino</option>
-                <option>Roedor</option>
-                <option>Outro</option>
-              </select>
+              <div class="raca-combo-wrap" id="especie-modal-wrap" onmousedown="toggleEspecieDropdown(event)">
+                <span class="especie-combo-label" id="especie-modal-label"
+                  style="flex:1;padding:0 10px;font-size:14px;color:var(--c-text-1,#1a2e1a);line-height:1;pointer-events:none;">Selecione</span>
+                <button type="button" class="raca-arrow-btn" tabindex="-1" style="pointer-events:none;">
+                  <svg width="12" height="8" viewBox="0 0 12 8">
+                    <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" fill="none"
+                      stroke-linecap="round" />
+                  </svg>
+                </button>
+                <div class="raca-dropdown" id="especie-modal-dropdown"></div>
+              </div>
+              <!-- hidden value holder for JS compatibility -->
+              <input type="hidden" id="m-especie" />
             </div>
             <div class="form-field">
               <label>Raça</label>
