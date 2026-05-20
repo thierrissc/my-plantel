@@ -3322,6 +3322,23 @@ body {
 
 .raca-combo-wrap {
   position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--c-card);
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--r-md);
+  min-height: 38px;
+  cursor: pointer;
+  transition:
+    border-color var(--t),
+    box-shadow var(--t);
+}
+.raca-combo-wrap:hover {
+  border-color: var(--c-accent);
+}
+.raca-combo-wrap.raca-combo-open {
+  border-color: var(--c-accent);
+  box-shadow: 0 0 0 3px var(--c-accent-bg);
 }
 
 .raca-combo-wrap input {

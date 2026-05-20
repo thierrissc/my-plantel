@@ -1371,6 +1371,23 @@ function fecharModal() {
   const especieHid = document.getElementById("m-especie");
   if (especieHid) especieHid.value = "";
   document.getElementById("especie-modal-dropdown")?.classList.remove("open");
+
+  const sexoHid = document.getElementById("m-sexo");
+  if (sexoHid) sexoHid.value = "";
+  const sexoLbl = document.getElementById("sexo-modal-label");
+  if (sexoLbl) sexoLbl.textContent = "—";
+
+  const statusHid = document.getElementById("m-status");
+  if (statusHid) statusHid.value = "Ativo";
+  const statusLbl = document.getElementById("status-modal-label");
+  if (statusLbl) statusLbl.textContent = "Ativo";
+
+  const areaHid = document.getElementById("m-area");
+  if (areaHid) areaHid.value = "";
+  const areaLbl = document.getElementById("area-modal-label");
+  if (areaLbl) areaLbl.textContent = "— Sem área —";
+
+  closeAllModalCombos();
 }
 function fecharModalExterno(e) {
   if (e.target === document.getElementById("modal")) fecharModal();
@@ -1770,12 +1787,15 @@ function toggleEspecieDropdown(e) {
   e.stopPropagation();
   if (e.target.closest(".raca-dropdown-item")) return;
   const dd = document.getElementById("especie-modal-dropdown");
+  const wrap = document.getElementById("especie-modal-wrap");
   if (!dd) return;
   if (dd.classList.contains("open")) {
     dd.classList.remove("open");
+    wrap?.classList.remove("raca-combo-open");
   } else {
     renderEspecieDropdown();
     dd.classList.add("open");
+    wrap?.classList.add("raca-combo-open");
   }
 }
 
@@ -1786,12 +1806,18 @@ function selecionarEspecie(esp, e) {
   if (hidden) hidden.value = esp;
   if (label) label.textContent = esp;
   document.getElementById("especie-modal-dropdown")?.classList.remove("open");
+  document
+    .getElementById("especie-modal-wrap")
+    ?.classList.remove("raca-combo-open");
   atualizarRacasModal();
 }
 
 document.addEventListener("click", (e) => {
   if (!e.target.closest("#especie-modal-wrap")) {
     document.getElementById("especie-modal-dropdown")?.classList.remove("open");
+    document
+      .getElementById("especie-modal-wrap")
+      ?.classList.remove("raca-combo-open");
   }
 });
 
@@ -1995,13 +2021,107 @@ function removerArea(idx) {
   popularSelectAreas();
 }
 
+const _MODAL_COMBO_OPTIONS = {
+  sexo: [
+    { value: "", label: "—" },
+    { value: "Macho", label: "Macho" },
+    { value: "Fêmea", label: "Fêmea" },
+  ],
+  status: [
+    { value: "Ativo", label: "Ativo" },
+    { value: "Em tratamento", label: "Em tratamento" },
+    { value: "Inativo", label: "Inativo" },
+  ],
+  area: [],
+};
+
+let _openModalComboId = null;
+
+function _getOrCreateModalDropdown(id) {
+  let dd = document.getElementById("modal-combo-dd-" + id);
+  if (!dd) {
+    dd = document.createElement("div");
+    dd.id = "modal-combo-dd-" + id;
+    dd.className = "raca-dropdown modal-combo-dropdown";
+    document.body.appendChild(dd);
+  }
+  return dd;
+}
+
+function toggleModalCombo(id, e) {
+  e.stopPropagation();
+  if (_openModalComboId === id) {
+    closeAllModalCombos();
+    return;
+  }
+  closeAllModalCombos();
+  const wrap = document.getElementById(id + "-modal-wrap");
+  if (!wrap) return;
+
+  const opts = _MODAL_COMBO_OPTIONS[id] || [];
+  const currentVal = document.getElementById("m-" + id)?.value || "";
+
+  const dd = _getOrCreateModalDropdown(id);
+  dd.innerHTML = opts
+    .map(
+      (o) =>
+        `<div class="raca-dropdown-item${o.value === currentVal ? " active" : ""}"
+      onclick="selectModalCombo('${id}','${o.value.replace(/'/g, "\\'")}','${o.label.replace(/'/g, "\\'")}')"
+    >${o.label}</div>`,
+    )
+    .join("");
+
+  const rect = wrap.getBoundingClientRect();
+  dd.style.position = "fixed";
+  dd.style.top = rect.bottom + 4 + "px";
+  dd.style.left = rect.left + "px";
+  dd.style.width = rect.width + "px";
+  dd.style.zIndex = "9999";
+  dd.classList.add("open");
+  wrap.classList.add("raca-combo-open");
+  _openModalComboId = id;
+}
+
+function selectModalCombo(id, value, label) {
+  const hidden = document.getElementById("m-" + id);
+  const lbl = document.getElementById(id + "-modal-label");
+  if (hidden) hidden.value = value;
+  if (lbl) lbl.textContent = label;
+  closeAllModalCombos();
+}
+
+function closeAllModalCombos() {
+  document
+    .querySelectorAll(".modal-combo-dropdown.open")
+    .forEach((el) => el.classList.remove("open"));
+  document
+    .querySelectorAll(".raca-combo-wrap.raca-combo-open")
+    .forEach((el) => el.classList.remove("raca-combo-open"));
+  _openModalComboId = null;
+}
+
+document.addEventListener("click", (e) => {
+  if (
+    !e.target.closest(".raca-combo-wrap") &&
+    !e.target.closest(".modal-combo-dropdown")
+  ) {
+    closeAllModalCombos();
+  }
+});
+
 function popularSelectAreas() {
-  const sel = document.getElementById("m-area");
-  if (!sel) return;
   const areas = getAreas().filter((a) => a !== "Todos");
-  sel.innerHTML =
-    `<option value=""> — </option>` +
-    areas.map((a) => `<option>${a}</option>`).join("");
+  _MODAL_COMBO_OPTIONS.area = [
+    { value: "", label: "— Sem área —" },
+    ...areas.map((a) => ({ value: a, label: a })),
+  ];
+  const currentArea = document.getElementById("m-area")?.value || "";
+  if (currentArea && !areas.includes(currentArea)) {
+    const hidden = document.getElementById("m-area");
+    const lbl = document.getElementById("area-modal-label");
+    if (hidden) hidden.value = "";
+    if (lbl) lbl.textContent = "— Sem área —";
+  }
 }
 
 const RACA_PLACEHOLDERS = {

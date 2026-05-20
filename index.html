@@ -431,11 +431,17 @@
           <div class="form-grid-2">
             <div class="form-field">
               <label>Sexo</label>
-              <select id="m-sexo">
-                <option value="">—</option>
-                <option>Macho</option>
-                <option>Fêmea</option>
-              </select>
+              <div class="raca-combo-wrap" id="sexo-modal-wrap" onclick="toggleModalCombo('sexo',event)">
+                <span class="modal-combo-label" id="sexo-modal-label"
+                  style="flex:1;padding:0 10px;font-size:13px;color:var(--c-text-1);line-height:1;pointer-events:none;">—</span>
+                <button type="button" class="raca-arrow-btn" tabindex="-1" style="pointer-events:none;">
+                  <svg width="12" height="8" viewBox="0 0 12 8">
+                    <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" fill="none"
+                      stroke-linecap="round" />
+                  </svg>
+                </button>
+              </div>
+              <input type="hidden" id="m-sexo" value="" />
             </div>
             <div class="form-field">
               <label>Data de Nascimento</label>
@@ -449,18 +455,32 @@
             </div>
             <div class="form-field">
               <label>Status</label>
-              <select id="m-status">
-                <option value="Ativo">Ativo</option>
-                <option value="Em tratamento">Em tratamento</option>
-                <option value="Inativo">Inativo</option>
-              </select>
+              <div class="raca-combo-wrap" id="status-modal-wrap" onclick="toggleModalCombo('status',event)">
+                <span class="modal-combo-label" id="status-modal-label"
+                  style="flex:1;padding:0 10px;font-size:13px;color:var(--c-text-1);line-height:1;pointer-events:none;">Ativo</span>
+                <button type="button" class="raca-arrow-btn" tabindex="-1" style="pointer-events:none;">
+                  <svg width="12" height="8" viewBox="0 0 12 8">
+                    <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" fill="none"
+                      stroke-linecap="round" />
+                  </svg>
+                </button>
+              </div>
+              <input type="hidden" id="m-status" value="Ativo" />
             </div>
           </div>
           <div class="form-field full">
             <label>Área / Viveiro / Haras</label>
-            <select id="m-area">
-              <option value="">— Sem área —</option>
-            </select>
+            <div class="raca-combo-wrap" id="area-modal-wrap" onclick="toggleModalCombo('area',event)">
+              <span class="modal-combo-label" id="area-modal-label"
+                style="flex:1;padding:0 10px;font-size:13px;color:var(--c-text-1);line-height:1;pointer-events:none;">—
+                Sem área —</span>
+              <button type="button" class="raca-arrow-btn" tabindex="-1" style="pointer-events:none;">
+                <svg width="12" height="8" viewBox="0 0 12 8">
+                  <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
+                </svg>
+              </button>
+            </div>
+            <input type="hidden" id="m-area" value="" />
           </div>
           <div class="form-field full">
             <label>Nº de identificação / Microchip</label>
