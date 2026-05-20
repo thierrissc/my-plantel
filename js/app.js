@@ -1671,7 +1671,7 @@ renderSidebar = function () {
     especieSel.innerHTML = _especiesTabs
       .map(
         (e) =>
-          `<option value="${e}"${filtro === e ? " selected" : ""}>${e === "Todos" ? "Todas espécies" : e}</option>`,
+          `<option value="${e}"${filtro === e ? " selected" : ""}>${e === "Todos" ? "Espécies" : e}</option>`,
       )
       .join("");
   }
@@ -1820,7 +1820,7 @@ function popularSelectAreas() {
   if (!sel) return;
   const areas = getAreas().filter((a) => a !== "Todos");
   sel.innerHTML =
-    `<option value="">— Sem área —</option>` +
+    `<option value=""> — </option>` +
     areas.map((a) => `<option>${a}</option>`).join("");
 }
 
