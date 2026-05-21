@@ -1586,6 +1586,7 @@ const RACAS_PRESET = {
     "Periquito Australiano",
     "Papagaio Verdadeiro",
     "Cacatua",
+    "Diamante de Gould",
     "Arara Canindé",
     "Fringilo",
     "Coleiro",
