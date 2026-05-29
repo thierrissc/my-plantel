@@ -365,7 +365,7 @@ const EMOJIS = {
 
 let selecionado = null;
 let editando = false;
-let filtro = "Todos";
+let filtro = localStorage.getItem("plantel-filtro-especie") || "Todos";
 let abaAtiva = "ficha";
 let fotoTemp = null;
 let viewMode = "lista";
@@ -1014,6 +1014,7 @@ function selecionar(id) {
 }
 function setFiltro(f) {
   filtro = f;
+  localStorage.setItem("plantel-filtro-especie", f);
   renderSidebar();
 }
 function filtrarAnimais() {
@@ -1640,7 +1641,7 @@ function salvarAreas(areas) {
 
 let areaFiltro = "Todos";
 
-let _sortKey = "nome";
+let _sortKey = localStorage.getItem("plantel-sort-key") || "nome";
 
 const SORT_OPTIONS = [
   { value: "nome", label: "Nome" },
@@ -1731,12 +1732,15 @@ function selectCtrlCombo(id, value) {
             .map((a) => a.especie);
     if (filtro !== "Todos" && !especiesNaArea.includes(filtro))
       filtro = "Todos";
+    localStorage.setItem("plantel-filtro-especie", filtro);
     renderSidebar();
   } else if (id === "especie-combo") {
     filtro = value;
+    localStorage.setItem("plantel-filtro-especie", filtro);
     renderSidebar();
   } else if (id === "sort-combo") {
     _sortKey = value;
+    localStorage.setItem("plantel-sort-key", _sortKey);
     renderSidebar();
   }
 }
@@ -1847,7 +1851,10 @@ function setAreaFiltro(area) {
       : animais
           .filter((a) => (a.area || "") === areaFiltro)
           .map((a) => a.especie);
-  if (filtro !== "Todos" && !especiesNaArea.includes(filtro)) filtro = "Todos";
+  if (filtro !== "Todos" && !especiesNaArea.includes(filtro)) {
+    filtro = "Todos";
+    localStorage.setItem("plantel-filtro-especie", filtro);
+  }
   renderSidebar();
 }
 
