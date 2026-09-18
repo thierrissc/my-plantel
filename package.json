@@ -1,0 +1,17 @@
+{
+  "name": "my-plantel",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "obfuscate": "node build.js"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "javascript-obfuscator": "^4.1.1",
+    "pg": "^8.13.3"
+  }
+}
