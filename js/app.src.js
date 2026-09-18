@@ -514,12 +514,12 @@ function toggleSidebar() {
 }
 
 function calcIdade(nasc) {
-  if (!nasc) return "—";
+  if (!nasc) return "Não informada";
   const d = new Date(nasc + "T12:00:00"),
     hoje = new Date();
   const diffMs = hoje - d;
   const diffDias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  if (diffDias < 0) return "—";
+  if (diffDias < 0) return "Não informada";
   if (diffDias < 30) {
     return diffDias === 0
       ? "Hoje"
@@ -540,7 +540,7 @@ function calcIdade(nasc) {
   return anos + (anos === 1 ? " ano" : " anos");
 }
 function fmtDate(s) {
-  if (!s) return "—";
+  if (!s) return "Não informada";
   const [a, m, d] = s.split("-");
   return `${d}/${m}/${a}`;
 }
@@ -678,7 +678,7 @@ function renderFichaContent(a) {
     }
     return `<div class="form-field">
       <label>${label}</label>
-      <div class="field-value">${val || "—"}</div>
+      <div class="field-value">${val || "Não informado"}</div>
     </div>`;
   };
 
@@ -732,7 +732,7 @@ function renderFichaContent(a) {
         }
         <div class="ficha-sub">${a.especie}${a.raca ? " · " + a.raca : ""}${(() => {
           const i = a.nasc ? calcIdade(a.nasc) : "";
-          return i && i !== "—" ? " · " + i : "";
+          return i && i !== "Não informada" ? " · " + i : "";
         })()}</div>
         <div class="badge-row">
           <span class="badge ${badgeClass(a.status)}"><span class="badge-dot"></span>${a.status}</span>
@@ -801,37 +801,47 @@ function renderFichaContent(a) {
       ${
         ed
           ? `<div class="form-field"><textarea id="f-obs" placeholder="Alergias, comportamento, cuidados especiais...">${a.obs || ""}</textarea></div>`
-          : `<div class="obs-text">${a.obs || "—"}</div>`
+          : `<div class="obs-text">${a.obs || "Nenhuma observação registrada."}</div>`
       }
     </div>
   `;
 }
 
+let _geneGeracoes = localStorage.getItem("plantel-gene-geracoes") || "4";
+
+function setGeneGeracoes(g) {
+  _geneGeracoes = String(g);
+  localStorage.setItem("plantel-gene-geracoes", _geneGeracoes);
+  const a = animais.find((x) => x.id === selecionado);
+  if (a) renderGenealogia(a);
+}
+
 function renderGenealogia(a) {
   const emoji = EMOJIS[a.especie] || `<span class="noto-emoji">🐾</span>`;
 
-  const nodeHtml = (nome, raca, role, roleLabel) => {
+  const nodeHtml = (nome, raca, role, roleLabel, sexo, extraClass = "") => {
     const hasName = nome && nome.trim();
     const linkedAnimal = hasName
-      ? animais.find((x) => x.nome.trim() === nome.trim())
+      ? animais.find((x) => x.nome.trim().toLowerCase() === nome.trim().toLowerCase())
       : null;
     const photoSrc = (linkedAnimal && linkedAnimal.foto) || null;
     const thumbContent = photoSrc
-      ? `<img src="${photoSrc}" style="width:100%;height:100%;object-fit:cover;" />`
+      ? `<img src="${photoSrc}" alt="${nome}" />`
       : hasName
         ? emoji
-        : "?";
+        : "+";
     const inPlantel = linkedAnimal
       ? `<div class="gene-inplantel">no plantel</div>`
       : "";
     const clickAttr =
       role !== "focal" ? `onclick="abrirGeneModal('${role}',${a.id})"` : "";
+    const genderClass = sexo === "Macho" ? "macho" : sexo === "Fêmea" ? "femea" : "";
     return `
-      <div class="gene-node${!hasName ? " unknown" : ""}${role === "focal" ? " focal" : ""}" ${clickAttr}>
+      <div class="gene-node ${genderClass} ${extraClass}${!hasName ? " unknown" : ""}${role === "focal" ? " focal" : ""}" ${clickAttr} title="${hasName ? nome : 'Clique para adicionar ' + roleLabel}">
         <div class="gene-thumb">${thumbContent}</div>
-        <div class="gene-node-role role-${role}">${roleLabel}</div>
-        <div class="gene-node-name">${hasName ? nome : "Desconhecido"}</div>
-        <div class="gene-node-info">${raca || ""}</div>
+        <div class="gene-node-role">${roleLabel}</div>
+        <div class="gene-node-name">${hasName ? nome : "Não informado"}</div>
+        <div class="gene-node-info">${raca || (hasName ? "" : "Clique para editar")}</div>
         ${inPlantel}
       </div>`;
   };
@@ -840,49 +850,102 @@ function renderGenealogia(a) {
   const paiRaca = a.paiRaca || "";
   const maeNome = a.maeNome || "";
   const maeRaca = a.maeRaca || "";
+
   const avoPatNome = a.avoPatNome || "";
   const avoPatRaca = a.avoPatRaca || "";
+  const avPatMaeNome = a.avPatMaeNome || "";
+  const avPatMaeRaca = a.avPatMaeRaca || "";
+  const avMatPaiNome = a.avMatPaiNome || "";
+  const avMatPaiRaca = a.avMatPaiRaca || "";
   const avoMatNome = a.avoMatNome || "";
   const avoMatRaca = a.avoMatRaca || "";
+
+  const b_pp_m_n = a.bis_pp_m_nome || "";
+  const b_pp_m_r = a.bis_pp_m_raca || "";
+  const b_pp_f_n = a.bis_pp_f_nome || "";
+  const b_pp_f_r = a.bis_pp_f_raca || "";
+  const b_pm_m_n = a.bis_pm_m_nome || "";
+  const b_pm_m_r = a.bis_pm_m_raca || "";
+  const b_pm_f_n = a.bis_pm_f_nome || "";
+  const b_pm_f_r = a.bis_pm_f_raca || "";
+
+  const b_mp_m_n = a.bis_mp_m_nome || "";
+  const b_mp_m_r = a.bis_mp_m_raca || "";
+  const b_mp_f_n = a.bis_mp_f_nome || "";
+  const b_mp_f_r = a.bis_mp_f_raca || "";
+  const b_mm_m_n = a.bis_mm_m_nome || "";
+  const b_mm_m_r = a.bis_mm_m_raca || "";
+  const b_mm_f_n = a.bis_mm_f_nome || "";
+  const b_mm_f_r = a.bis_mm_f_raca || "";
+
+  const bisavosHtml = _geneGeracoes === "4" ? `
+    <div class="gene-gen gene-gen-bis">
+      ${nodeHtml(b_pp_m_n, b_pp_m_r, "bis_pp_m", "Bisavô (Pat.)", "Macho", "gene-bis")}
+      ${nodeHtml(b_pp_f_n, b_pp_f_r, "bis_pp_f", "Bisavó (Pat.)", "Fêmea", "gene-bis")}
+      ${nodeHtml(b_pm_m_n, b_pm_m_r, "bis_pm_m", "Bisavô (Pat.)", "Macho", "gene-bis")}
+      ${nodeHtml(b_pm_f_n, b_pm_f_r, "bis_pm_f", "Bisavó (Pat.)", "Fêmea", "gene-bis")}
+      ${nodeHtml(b_mp_m_n, b_mp_m_r, "bis_mp_m", "Bisavô (Mat.)", "Macho", "gene-bis")}
+      ${nodeHtml(b_mp_f_n, b_mp_f_r, "bis_mp_f", "Bisavó (Mat.)", "Fêmea", "gene-bis")}
+      ${nodeHtml(b_mm_m_n, b_mm_m_r, "bis_mm_m", "Bisavô (Mat.)", "Macho", "gene-bis")}
+      ${nodeHtml(b_mm_f_n, b_mm_f_r, "bis_mm_f", "Bisavó (Mat.)", "Fêmea", "gene-bis")}
+    </div>
+    <div class="gene-connector">
+      <svg viewBox="0 0 1000 38" preserveAspectRatio="none" style="width:100%;height:100%">
+        <path d="M62 0 V19 H187 V38 M187 19 H312 V0" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
+        <path d="M312 0 V19 H437 V38 M437 19 H562 V0" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
+        <path d="M562 0 V19 H687 V38 M687 19 H812 V0" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
+        <path d="M812 0 V19 H937 V38 M937 19 H1000 V0" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
+      </svg>
+    </div>` : "";
 
   document.getElementById("genealogia-content").innerHTML = `
     <div class="gene-header">
       <h2 class="gene-title">Árvore Genealógica <span class="gene-title-sep"></span> <span class="gene-title-name">${a.nome}</span></h2>
       <p class="gene-sub">${a.especie}${a.raca ? " · " + a.raca : ""}${(() => {
         const i = a.nasc ? calcIdade(a.nasc) : "";
-        return i && i !== "—" ? " · " + i : "";
+        return i && i !== "Não informada" ? " · " + i : "";
       })()}</p>
-      <p class="gene-sub" style="margin-top:4px;font-size:12px;color:var(--c-text-3)">Clique em um parente para editar</p>
+      <div class="gene-toolbar">
+        <span style="font-size:12px;color:var(--c-text-3)">Clique em qualquer parente para definir ou editar</span>
+        <div class="gene-level-toggle">
+          <button class="gene-level-btn ${_geneGeracoes === '3' ? 'active' : ''}" onclick="setGeneGeracoes(3)" type="button">3 Gerações</button>
+          <button class="gene-level-btn ${_geneGeracoes === '4' ? 'active' : ''}" onclick="setGeneGeracoes(4)" type="button">4 Gerações (Bisavós)</button>
+        </div>
+      </div>
     </div>
 
-    <div class="gene-tree">
-      <div class="gene-gen" style="gap:24px">
-        ${nodeHtml(avoPatNome, avoPatRaca, "avo", "Avô paterno")}
-        <div style="min-width:16px;flex:0.3"></div>
-        ${nodeHtml(avoMatNome, avoMatRaca, "avomat", "Avó materna")}
-      </div>
+    <div class="gene-viewport">
+      <div class="gene-tree">
+        ${bisavosHtml}
 
-      <div style="width:100%;height:40px;position:relative">
-        <svg viewBox="0 0 700 40" preserveAspectRatio="none" style="width:100%;height:100%;overflow:visible">
-          <path d="M175 0 L175 20 L350 20 L350 40" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
-          <path d="M525 0 L525 20 L350 20" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
-        </svg>
-      </div>
+        <div class="gene-gen">
+          ${nodeHtml(avoPatNome, avoPatRaca, "avo", "Avô paterno", "Macho")}
+          ${nodeHtml(avPatMaeNome, avPatMaeRaca, "avopat_f", "Avó paterna", "Fêmea")}
+          ${nodeHtml(avMatPaiNome, avMatPaiRaca, "avomat_m", "Avô materno", "Macho")}
+          ${nodeHtml(avoMatNome, avoMatRaca, "avomat", "Avó materna", "Fêmea")}
+        </div>
 
-      <div class="gene-gen" style="gap:56px">
-        ${nodeHtml(paiNome, paiRaca, "pai", "Pai")}
-        ${nodeHtml(maeNome, maeRaca, "mae", "Mãe")}
-      </div>
+        <div class="gene-connector">
+          <svg viewBox="0 0 1000 38" preserveAspectRatio="none" style="width:100%;height:100%">
+            <path d="M187 0 V19 H375 V38 M375 19 H562 V0" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
+            <path d="M562 0 V19 H750 V38 M750 19 H937 V0" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
+          </svg>
+        </div>
 
-      <div style="width:100%;height:44px;position:relative">
-        <svg viewBox="0 0 700 44" preserveAspectRatio="none" style="width:100%;height:100%;overflow:visible">
-          <path d="M245 0 L245 22 L350 22 L350 44" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
-          <path d="M455 0 L455 22 L350 22" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
-        </svg>
-      </div>
+        <div class="gene-gen">
+          ${nodeHtml(paiNome, paiRaca, "pai", "Pai", "Macho")}
+          ${nodeHtml(maeNome, maeRaca, "mae", "Mãe", "Fêmea")}
+        </div>
 
-      <div class="gene-gen">
-        ${nodeHtml(a.nome, a.raca, "focal", "Animal")}
+        <div class="gene-connector">
+          <svg viewBox="0 0 1000 38" preserveAspectRatio="none" style="width:100%;height:100%">
+            <path d="M375 0 V19 H500 V38 M500 19 H750 V0" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
+          </svg>
+        </div>
+
+        <div class="gene-gen">
+          ${nodeHtml(a.nome, a.raca, "focal", "Animal", a.sexo)}
+        </div>
       </div>
     </div>
   `;
@@ -904,10 +967,60 @@ const GENE_ROLES = {
     sexo: "Macho",
     field: { nome: "avoPatNome", raca: "avoPatRaca", idade: "avoPatIdade" },
   },
+  avopat_f: {
+    label: "Avó Paterna",
+    sexo: "Fêmea",
+    field: { nome: "avPatMaeNome", raca: "avPatMaeRaca", idade: "avPatMaeIdade" },
+  },
+  avomat_m: {
+    label: "Avô Materno",
+    sexo: "Macho",
+    field: { nome: "avMatPaiNome", raca: "avMatPaiRaca", idade: "avMatPaiIdade" },
+  },
   avomat: {
     label: "Avó Materna",
     sexo: "Fêmea",
     field: { nome: "avoMatNome", raca: "avoMatRaca", idade: "avoMatIdade" },
+  },
+  bis_pp_m: {
+    label: "Bisavô (Pai do Avô Paterno)",
+    sexo: "Macho",
+    field: { nome: "bis_pp_m_nome", raca: "bis_pp_m_raca", idade: "bis_pp_m_idade" },
+  },
+  bis_pp_f: {
+    label: "Bisavó (Mãe do Avô Paterno)",
+    sexo: "Fêmea",
+    field: { nome: "bis_pp_f_nome", raca: "bis_pp_f_raca", idade: "bis_pp_f_idade" },
+  },
+  bis_pm_m: {
+    label: "Bisavô (Pai da Avó Paterna)",
+    sexo: "Macho",
+    field: { nome: "bis_pm_m_nome", raca: "bis_pm_m_raca", idade: "bis_pm_m_idade" },
+  },
+  bis_pm_f: {
+    label: "Bisavó (Mãe da Avó Paterna)",
+    sexo: "Fêmea",
+    field: { nome: "bis_pm_f_nome", raca: "bis_pm_f_raca", idade: "bis_pm_f_idade" },
+  },
+  bis_mp_m: {
+    label: "Bisavô (Pai do Avô Materno)",
+    sexo: "Macho",
+    field: { nome: "bis_mp_m_nome", raca: "bis_mp_m_raca", idade: "bis_mp_m_idade" },
+  },
+  bis_mp_f: {
+    label: "Bisavó (Mãe do Avô Materno)",
+    sexo: "Fêmea",
+    field: { nome: "bis_mp_f_nome", raca: "bis_mp_f_raca", idade: "bis_mp_f_idade" },
+  },
+  bis_mm_m: {
+    label: "Bisavô (Pai da Avó Materna)",
+    sexo: "Macho",
+    field: { nome: "bis_mm_m_nome", raca: "bis_mm_m_raca", idade: "bis_mm_m_idade" },
+  },
+  bis_mm_f: {
+    label: "Bisavó (Mãe da Avó Materna)",
+    sexo: "Fêmea",
+    field: { nome: "bis_mm_f_nome", raca: "bis_mm_f_raca", idade: "bis_mm_f_idade" },
   },
 };
 
@@ -1477,7 +1590,7 @@ function fecharModal() {
   const sexoHid = document.getElementById("m-sexo");
   if (sexoHid) sexoHid.value = "";
   const sexoLbl = document.getElementById("sexo-modal-label");
-  if (sexoLbl) sexoLbl.textContent = "—";
+  if (sexoLbl) sexoLbl.textContent = "Não definido";
 
   const statusHid = document.getElementById("m-status");
   if (statusHid) statusHid.value = "Ativo";
@@ -1487,7 +1600,7 @@ function fecharModal() {
   const areaHid = document.getElementById("m-area");
   if (areaHid) areaHid.value = "";
   const areaLbl = document.getElementById("area-modal-label");
-  if (areaLbl) areaLbl.textContent = "— Sem área —";
+  if (areaLbl) areaLbl.textContent = "Sem área definida";
 
   closeAllModalCombos();
 }
@@ -2137,7 +2250,7 @@ function removerArea(idx) {
 
 const _MODAL_COMBO_OPTIONS = {
   sexo: [
-    { value: "", label: "—" },
+    { value: "", label: "Não definido" },
     { value: "Macho", label: "Macho" },
     { value: "Fêmea", label: "Fêmea" },
   ],
@@ -2226,7 +2339,7 @@ document.addEventListener("click", (e) => {
 function popularSelectAreas() {
   const areas = getAreas().filter((a) => a !== "Todos");
   _MODAL_COMBO_OPTIONS.area = [
-    { value: "", label: "— Sem área —" },
+    { value: "", label: "Sem área definida" },
     ...areas.map((a) => ({ value: a, label: a })),
   ];
   const currentArea = document.getElementById("m-area")?.value || "";
@@ -2234,7 +2347,7 @@ function popularSelectAreas() {
     const hidden = document.getElementById("m-area");
     const lbl = document.getElementById("area-modal-label");
     if (hidden) hidden.value = "";
-    if (lbl) lbl.textContent = "— Sem área —";
+    if (lbl) lbl.textContent = "Sem área definida";
   }
 }
 
@@ -2380,7 +2493,7 @@ function salvarProfileStorage(p) {
 function initProfile() {
   try {
     const nome = currentUser?.name || "Usuário";
-    const id = currentUser?.id || "—";
+    const id = currentUser?.id || "Não definido";
     const avatar = currentUser?.avatar || null;
 
     const nameEl = document.getElementById("um-name");
@@ -2400,7 +2513,7 @@ function abrirPerfil() {
   try {
     const nome = currentUser?.name || "";
     const email = currentUser?.email || "";
-    const id = currentUser?.id || "—";
+    const id = currentUser?.id || "Não definido";
     const avatar = currentUser?.avatar || null;
 
     document.getElementById("perfil-nome").value = nome;
