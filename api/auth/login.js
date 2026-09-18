@@ -56,8 +56,17 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: "E-mail ou senha incorretos." });
     }
 
+    let finalId = user.id;
+    if (finalId && finalId.length > 8) {
+      finalId = (finalId.toLowerCase().startsWith("usr_") ? finalId.slice(4, 12) : finalId.slice(0, 8)).toUpperCase();
+      try {
+        await query("UPDATE plantel_users SET id = $1 WHERE id = $2", [finalId, user.id]);
+        await query("UPDATE plantel_workspaces SET user_id = $1 WHERE user_id = $2", [finalId, user.id]);
+      } catch (e) {}
+    }
+
     const userPayload = {
-      id: user.id,
+      id: finalId,
       name: user.name,
       email: user.email,
       avatar: user.avatar || null,
