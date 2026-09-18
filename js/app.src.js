@@ -29,9 +29,11 @@ function updateAuthUI() {
     if (authActions) authActions.style.display = "none";
     if (umWrap) umWrap.style.display = "flex";
     initProfile();
+    startRealtimeSync();
   } else {
     if (authActions) authActions.style.display = "flex";
     if (umWrap) umWrap.style.display = "none";
+    stopRealtimeSync();
   }
 }
 
@@ -339,29 +341,78 @@ const SEED_ANIMAIS = [
   },
 ];
 
+let _realtimeTimer = null;
+
+function startRealtimeSync() {
+  if (_realtimeTimer) clearInterval(_realtimeTimer);
+  _realtimeTimer = setInterval(() => {
+    if (currentUser && document.visibilityState !== "hidden") {
+      syncFromCloud();
+    }
+  }, 2500);
+}
+
+function stopRealtimeSync() {
+  if (_realtimeTimer) {
+    clearInterval(_realtimeTimer);
+    _realtimeTimer = null;
+  }
+}
+
 async function syncFromCloud() {
   if (!currentUser) return;
   try {
     const res = await fetch("/api/plantel/data");
     if (res.ok) {
       const data = await res.json();
+      let mudou = false;
       if (Array.isArray(data.animais)) {
-        animais = data.animais;
+        const strNovos = JSON.stringify(data.animais);
+        const strAtuais = JSON.stringify(animais);
+        if (strNovos !== strAtuais) {
+          animais = data.animais;
+          localStorage.setItem(STORAGE_KEY, strNovos);
+          mudou = true;
+        }
       }
       if (Array.isArray(data.areas)) {
-        localStorage.setItem("plantel-areas", JSON.stringify(data.areas));
+        const strNovasAreas = JSON.stringify(data.areas);
+        const strAtuaisAreas = localStorage.getItem("plantel-areas");
+        if (strNovasAreas !== strAtuaisAreas) {
+          localStorage.setItem("plantel-areas", strNovasAreas);
+          mudou = true;
+        }
       }
       if (data.theme) {
-        document.documentElement.setAttribute("data-theme", data.theme);
-        localStorage.setItem("plantel-theme", data.theme);
+        const temaAtual = document.documentElement.getAttribute("data-theme");
+        if (data.theme !== temaAtual) {
+          document.documentElement.setAttribute("data-theme", data.theme);
+          localStorage.setItem("plantel-theme", data.theme);
+        }
       }
-      if (typeof renderSidebar === "function") renderSidebar();
-      if (typeof renderFicha === "function") renderFicha();
-      if (typeof renderAreaBar === "function") renderAreaBar();
-      if (typeof popularSelectAreas === "function") popularSelectAreas();
+      if (mudou) {
+        if (selecionado && !animais.find((x) => x.id === selecionado)) {
+          selecionado = null;
+        }
+        if (typeof renderSidebar === "function") renderSidebar();
+        if (typeof renderFicha === "function") renderFicha();
+        if (typeof renderAreaBar === "function") renderAreaBar();
+        if (typeof popularSelectAreas === "function") popularSelectAreas();
+      }
     }
   } catch (e) {}
 }
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && currentUser) {
+    syncFromCloud();
+  }
+});
+window.addEventListener("focus", () => {
+  if (currentUser) {
+    syncFromCloud();
+  }
+});
 
 async function syncToCloud() {
   if (!currentUser) return;
@@ -563,7 +614,7 @@ function renderSidebar() {
         </div>`,
         )
         .join("")
-    : `<div style="padding:20px 16px;font-size:12px;color:var(--c-text-3);text-align:center">Nenhum animal encontrado</div>`;
+    : `<div class="animal-empty-state">Nenhum animal encontrado</div>`;
 
   const ativos = animais.filter((a) => a.status === "Ativo").length;
   const trat = animais.filter((a) => a.status === "Em tratamento").length;
@@ -1981,7 +2032,7 @@ renderSidebar = function () {
     viewMode === "grade" ? "animal-list animal-grade" : "animal-list";
 
   if (!lista.length) {
-    animalListEl.innerHTML = `<div style="padding:20px 16px;font-size:12px;color:var(--c-text-3);text-align:center">Nenhum animal encontrado</div>`;
+    animalListEl.innerHTML = `<div class="animal-empty-state">Nenhum animal encontrado</div>`;
   } else if (viewMode === "grade") {
     animalListEl.innerHTML = lista
       .map(
