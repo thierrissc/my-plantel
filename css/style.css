@@ -2179,53 +2179,89 @@ body {
   color: var(--c-text-2);
 }
 
+.gene-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto 16px;
+  padding: 0 4px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.gene-level-toggle {
+  display: inline-flex;
+  background: var(--c-card);
+  border: 1.5px solid var(--c-border);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 4px;
+}
+.gene-level-btn {
+  background: transparent;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--c-text-2);
+  padding: 6px 14px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all var(--t);
+  font-family: inherit;
+}
+.gene-level-btn.active {
+  background: var(--c-accent);
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(22, 163, 147, 0.25);
+}
+.gene-viewport {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 24px;
+}
 .gene-tree {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0;
   position: relative;
-  width: 100%;
-  flex: 1;
-  padding: 8px 0 24px;
+  min-width: max-content;
+  margin: 0 auto;
+  padding: 8px 16px 24px;
 }
-
 .gene-gen {
   display: flex;
-  gap: 20px;
+  gap: 16px;
   justify-content: center;
   position: relative;
   width: 100%;
-  padding: 0 0 0 0;
 }
-
-.gene-gen + .gene-gen {
-  margin-top: 0;
+.gene-gen-bis {
+  gap: 8px;
 }
-
 .gene-connector {
   width: 100%;
-  height: 40px;
+  height: 38px;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-
 .gene-connector svg {
   position: absolute;
   width: 100%;
   height: 100%;
   overflow: visible;
 }
-
 .gene-node {
   background: var(--c-card);
   border: 1.5px solid var(--c-border);
   border-radius: var(--r-lg);
-  padding: 18px 20px;
-  min-width: 170px;
-  max-width: 220px;
+  padding: 14px 16px;
+  min-width: 155px;
+  max-width: 200px;
   flex: 1;
   text-align: center;
   transition: all var(--t);
@@ -2233,26 +2269,59 @@ body {
   position: relative;
   animation: fadeUp 0.3s ease both;
   -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
 }
-
-.gene-node:not(.focal) {
-  cursor: pointer;
+.gene-node.gene-bis {
+  min-width: 112px;
+  max-width: 130px;
+  padding: 10px 6px;
 }
-
+.gene-node.gene-bis .gene-thumb {
+  width: 44px;
+  height: 44px;
+  font-size: 22px;
+  margin-bottom: 6px;
+}
+.gene-node.gene-bis .gene-node-name {
+  font-size: 11.5px;
+  margin-bottom: 2px;
+}
+.gene-node.gene-bis .gene-node-role {
+  font-size: 8px;
+  padding: 1px 4px;
+}
+.gene-node.macho {
+  border-color: rgba(37, 99, 235, 0.35);
+  background: linear-gradient(180deg, rgba(37, 99, 235, 0.03) 0%, var(--c-card) 100%);
+}
+.gene-node.macho .gene-node-role {
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
+}
+.gene-node.femea {
+  border-color: rgba(219, 39, 119, 0.35);
+  background: linear-gradient(180deg, rgba(219, 39, 119, 0.03) 0%, var(--c-card) 100%);
+}
+.gene-node.femea .gene-node-role {
+  background: rgba(219, 39, 119, 0.12);
+  color: #be185d;
+}
 .gene-node:not(.focal):active {
   transform: scale(0.97);
 }
-
 .gene-node:hover {
   border-color: var(--c-accent);
   box-shadow: 0 4px 16px var(--c-shadow);
   transform: translateY(-2px);
 }
-
 .gene-node.focal {
   border-color: var(--c-accent);
   background: var(--c-accent-bg);
   box-shadow: 0 4px 20px var(--c-shadow);
+}
+.gene-node.focal .gene-node-role {
+  background: var(--c-accent);
+  color: #ffffff;
 }
 
 .gene-node.unknown {
@@ -2613,11 +2682,14 @@ body {
 
   .main {
     width: 100%;
+    max-width: 100vw;
     padding-top: 60px;
     padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
     overflow-y: auto;
+    overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     flex: 1;
+    box-sizing: border-box;
   }
 
   .app-header {
@@ -2738,13 +2810,20 @@ body {
     overflow-x: auto;
   }
 
-  .gene-tree {
+  .gene-viewport {
+    width: 100%;
+    max-width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    padding: 4px 4px 24px;
-    min-width: 360px;
-    align-items: center;
-    justify-content: center;
+    padding: 4px 0 20px;
+    box-sizing: border-box;
+  }
+
+  .gene-tree {
+    min-width: unset;
+    width: max-content;
+    margin: 0 auto;
+    padding: 4px 8px 20px;
   }
 
   .gene-gen {
@@ -3791,7 +3870,6 @@ body {
 
 #area-bar-wrap {
   padding-top: 10px;
-  border-top: 1px solid var(--c-border);
 }
 
 #area-bar-wrap + .sidebar-control-row {
