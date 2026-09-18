@@ -233,6 +233,31 @@
           </button>
         </div>
       </div>
+      <script>
+        (function () {
+          try {
+            var raw = localStorage.getItem("plantel_user");
+            if (raw) {
+              var u = JSON.parse(raw);
+              if (u && u.id) {
+                var auth = document.getElementById("header-auth-actions");
+                var um = document.getElementById("um-wrap");
+                if (auth) auth.style.display = "none";
+                if (um) um.style.display = "flex";
+                var nameEl = document.getElementById("um-name");
+                var hName = document.getElementById("um-header-name");
+                var hId = document.getElementById("um-header-id");
+                var img = document.getElementById("um-avatar-img");
+                var cleanId = (u.id.toLowerCase().indexOf("usr_") === 0 ? u.id.slice(4) : u.id).slice(0, 8).toUpperCase();
+                if (nameEl) nameEl.textContent = u.name || "Usuário";
+                if (hName) hName.textContent = u.name || "Usuário";
+                if (hId) hId.textContent = "ID: " + cleanId;
+                if (img && u.avatar) img.src = u.avatar;
+              }
+            }
+          } catch (e) {}
+        })();
+      </script>
     </header>
 
     <aside class="sidebar" id="sidebar">
