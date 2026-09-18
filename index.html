@@ -16,7 +16,7 @@
 
 <body>
 
-  <div id="login-screen">
+  <div id="login-screen" style="display: none;">
     <div class="lp">
       <div class="lp-bg"></div>
       <div class="lp-bokeh"><span></span><span></span><span></span><span></span><span></span></div>
@@ -36,6 +36,11 @@
       </div>
 
       <div class="lp-right">
+        <button class="lp-modal-close" onclick="fecharLoginModal()" aria-label="Fechar" type="button" title="Voltar para a demonstração">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
         <div class="lp-view active" id="lp-login">
           <div class="lp-panel-brand">
             <img src="img/favicon.png" alt="Plantel" />
@@ -169,7 +174,12 @@
           </svg>
         </button>
       </div>
-      <div class="um-wrap" id="um-wrap">
+      <div class="header-auth-actions" id="header-auth-actions">
+        <span class="demo-tag" id="demo-tag">Modo Demonstração</span>
+        <button class="btn-header-login" id="btn-header-login" onclick="abrirLoginModal('lp-login')">Entrar</button>
+        <button class="btn-header-register" id="btn-header-register" onclick="abrirLoginModal('lp-registro')">Criar Conta</button>
+      </div>
+      <div class="um-wrap" id="um-wrap" style="display: none;">
         <div class="um-btn" onclick="toggleUserMenu(event)">
           <img class="um-avatar" src="img/favicon.png" alt="Avatar" id="um-avatar-img" />
           <span class="um-name" id="um-name">Usuário</span>
@@ -410,7 +420,6 @@
                 </button>
                 <div class="raca-dropdown" id="especie-modal-dropdown"></div>
               </div>
-              <!-- hidden value holder for JS compatibility -->
               <input type="hidden" id="m-especie" />
             </div>
             <div class="form-field">
