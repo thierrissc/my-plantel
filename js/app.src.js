@@ -1,4 +1,11 @@
 const USER_CACHE_KEY = "plantel_user";
+const TOKEN_CACHE_KEY = "plantel_token";
+
+function getAuthHeaders() {
+  const token = localStorage.getItem(TOKEN_CACHE_KEY);
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 function getCachedUser() {
   try {
     const raw = localStorage.getItem(USER_CACHE_KEY);
@@ -161,6 +168,9 @@ async function lpLogin() {
       return;
     }
 
+    if (data.token) {
+      localStorage.setItem(TOKEN_CACHE_KEY, data.token);
+    }
     currentUser = data.user;
     setCachedUser(currentUser);
     updateAuthUI();
@@ -229,6 +239,9 @@ async function lpRegistrar() {
     }
 
     lpAlert("lp-reg-ok", "Conta criada com sucesso! Entrando…", "ok");
+    if (data.token) {
+      localStorage.setItem(TOKEN_CACHE_KEY, data.token);
+    }
     currentUser = data.user;
     setCachedUser(currentUser);
     setTimeout(async () => {
@@ -284,7 +297,9 @@ function showApp() {
 
 async function checkSession() {
   try {
-    const res = await fetch("/api/auth/me");
+    const res = await fetch("/api/auth/me", {
+      headers: getAuthHeaders(),
+    });
     if (res.ok) {
       const data = await res.json();
       if (data.authenticated && data.user) {
@@ -294,14 +309,19 @@ async function checkSession() {
         await syncFromCloud();
         return;
       }
+    } else if (res.status === 401) {
+      currentUser = null;
+      setCachedUser(null);
+      localStorage.removeItem(TOKEN_CACHE_KEY);
+      updateAuthUI();
+      animais = SEED_ANIMAIS.map((a) => ({ ...a }));
+      salvarAnimais();
+      showApp();
+      return;
     }
-  } catch (e) {}
-
-  currentUser = null;
-  setCachedUser(null);
-  updateAuthUI();
-  animais = SEED_ANIMAIS.map((a) => ({ ...a }));
-  showApp();
+  } catch (e) {
+    return;
+  }
 }
 
 function toggleUserMenu(e) {
@@ -405,7 +425,9 @@ function stopRealtimeSync() {
 async function syncFromCloud() {
   if (!currentUser) return;
   try {
-    const res = await fetch("/api/plantel/data");
+    const res = await fetch("/api/plantel/data", {
+      headers: getAuthHeaders(),
+    });
     if (res.ok) {
       const data = await res.json();
       let mudou = false;
@@ -464,7 +486,7 @@ async function syncToCloud() {
     const theme = document.documentElement.getAttribute("data-theme") || "light";
     await fetch("/api/plantel/data", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...getAuthHeaders() },
       body: JSON.stringify({ animais, areas, theme }),
     });
   } catch (e) {}
@@ -1867,13 +1889,27 @@ function abrirFilePicker() {
 
 async function logout() {
   try {
-    await fetch("/api/auth/logout", { method: "POST" });
+    await fetch("/api/auth/logout", {
+      method: "POST",
+      headers: getAuthHeaders(),
+    });
   } catch (e) {}
   currentUser = null;
   setCachedUser(null);
+  localStorage.removeItem(TOKEN_CACHE_KEY);
+  fecharUserMenu();
   updateAuthUI();
+
   animais = SEED_ANIMAIS.map((a) => ({ ...a }));
-  selecionadoId = animais[0]?.id || null;
+  salvarAnimais();
+  salvarAreas(["Todos"]);
+
+  selecionado = null;
+  editando = false;
+  fotoTemp = null;
+
+  renderSidebar();
+  renderFicha();
   showApp();
 }
 
@@ -2734,7 +2770,7 @@ async function salvarPerfil() {
     try {
       await fetch("/api/plantel/profile", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getAuthHeaders() },
         body: JSON.stringify({ name: nome, avatar: avatarToSend }),
       });
     } catch (e) {}
