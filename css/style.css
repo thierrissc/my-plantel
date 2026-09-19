@@ -1875,6 +1875,21 @@ body {
 
 .vac-table-wrap {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.vac-table-wrap::-webkit-scrollbar {
+  display: none;
+}
+
+.vac-empty-state {
+  padding: 20px 14px;
+  text-align: center;
+  color: var(--c-text-3);
+  font-size: 13.5px;
+  font-style: italic;
 }
 
 .vac-table {
@@ -2105,7 +2120,13 @@ body {
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   padding: 6px 4px 32px;
+}
+
+.gene-viewport::-webkit-scrollbar {
+  display: none;
 }
 
 .gene-tree {
@@ -2691,7 +2712,18 @@ body {
   }
 
   .ficha-wrap {
-    padding: 14px 14px 80px;
+    padding: 12px 12px 80px;
+  }
+
+  .section-card {
+    padding: 16px 14px;
+    margin-bottom: 12px;
+    border-radius: 14px;
+  }
+
+  .section-header {
+    margin-bottom: 14px;
+    padding-bottom: 10px;
   }
 
   .ficha-hero {
@@ -2721,7 +2753,8 @@ body {
 
   .grid-2,
   .grid-3 {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 14px;
   }
 
   .form-grid-2 {
@@ -2733,8 +2766,76 @@ body {
   }
 
   .vac-table-wrap {
-    -webkit-overflow-scrolling: touch;
-    overflow-x: auto;
+    overflow-x: visible;
+  }
+
+  .vac-table thead {
+    display: none;
+  }
+
+  .vac-table,
+  .vac-table tbody,
+  .vac-table tr,
+  .vac-table td {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .vac-table tr {
+    background: var(--c-surface-2, rgba(0, 0, 0, 0.02));
+    border: 1px solid var(--c-border-soft);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    position: relative;
+  }
+
+  .vac-table td {
+    padding: 3px 0;
+    border: none;
+    font-size: 13px;
+  }
+
+  .vac-table td:first-child {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--c-text-1);
+    padding-right: 90px;
+    margin-bottom: 4px;
+  }
+
+  .vac-table td:nth-child(2)::before {
+    content: "Aplicação: ";
+    font-weight: 600;
+    color: var(--c-text-3);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .vac-table td:nth-child(3)::before {
+    content: "Próxima dose: ";
+    font-weight: 600;
+    color: var(--c-text-3);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .vac-table td:nth-child(4) {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    width: auto;
+    padding: 0;
+  }
+
+  .vac-table td:last-child:not(:nth-child(4)) {
+    margin-top: 8px;
+    padding-top: 6px;
+    border-top: 1px solid var(--c-border-soft);
+    text-align: right;
   }
 
   .gene-viewport {
@@ -2742,8 +2843,14 @@ body {
     max-width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     padding: 4px 0 20px;
     box-sizing: border-box;
+  }
+
+  .gene-viewport::-webkit-scrollbar {
+    display: none;
   }
 
   .gene-tree {
