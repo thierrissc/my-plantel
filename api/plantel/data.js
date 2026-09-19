@@ -21,19 +21,33 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: "Acesso não autorizado. Faça login para continuar." });
   }
 
-  const userId = session.id;
+  const rawId = session.id || "";
+  const cleanId = rawId.replace(/^(usr_|user_)/i, "").slice(0, 8).toUpperCase();
+  const formattedId = "User_" + cleanId;
+
+  let canonicalUserId = rawId;
+  try {
+    const uRows = await query(
+      "SELECT id FROM plantel_users WHERE id = $1 OR id = $2 OR id = $3 OR email = $4 LIMIT 1",
+      [rawId, cleanId, formattedId, session.email || ""]
+    );
+    if (uRows.length > 0) {
+      canonicalUserId = uRows[0].id;
+    }
+  } catch (e) {}
 
   if (req.method === "GET") {
     try {
       const rows = await query(
-        "SELECT animais, areas, theme, version, updated_at FROM plantel_workspaces WHERE user_id = $1 LIMIT 1",
-        [userId]
+        `SELECT animais, areas, theme, version, updated_at FROM plantel_workspaces 
+         WHERE user_id = $1 OR user_id = $2 OR user_id = $3 OR user_id = $4 LIMIT 1`,
+        [canonicalUserId, rawId, cleanId, formattedId]
       );
 
       if (rows.length === 0) {
         await query(
           "INSERT INTO plantel_workspaces (user_id, animais, areas, theme, version, updated_at) VALUES ($1, $2, $3, $4, 1, CURRENT_TIMESTAMP) ON CONFLICT (user_id) DO NOTHING",
-          [userId, "[]", '["Todos"]', "light"]
+          [canonicalUserId, "[]", '["Todos"]', "light"]
         );
         return res.status(200).json({
           animais: [],
@@ -76,7 +90,7 @@ export default async function handler(req, res) {
              version = plantel_workspaces.version + 1,
              updated_at = CURRENT_TIMESTAMP
          RETURNING version, updated_at`,
-        [userId, safeAnimais, safeAreas, safeTheme]
+        [canonicalUserId, safeAnimais, safeAreas, safeTheme]
       );
 
       return res.status(200).json({
