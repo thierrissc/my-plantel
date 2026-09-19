@@ -54,7 +54,7 @@ export default async function handler(req, res) {
       return res.status(409).json({ error: "Este e-mail já está cadastrado." });
     }
 
-    const userId = crypto.randomBytes(4).toString("hex").toUpperCase();
+    const userId = "User_" + crypto.randomBytes(4).toString("hex").toUpperCase();
     const passwordHash = hashPassword(senha);
 
     await query(
