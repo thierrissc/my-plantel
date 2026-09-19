@@ -174,6 +174,12 @@ async function lpLogin() {
     currentUser = data.user;
     setCachedUser(currentUser);
     updateAuthUI();
+    animais = carregarAnimais();
+    if (animais.length > 0 && !selecionado) {
+      selecionado = animais[0].id;
+    }
+    renderSidebar();
+    renderFicha();
     await syncFromCloud();
     fecharLoginModal();
   } catch (err) {
@@ -244,8 +250,14 @@ async function lpRegistrar() {
     }
     currentUser = data.user;
     setCachedUser(currentUser);
+    animais = carregarAnimais();
+    if (animais.length > 0 && !selecionado) {
+      selecionado = animais[0].id;
+    }
     setTimeout(async () => {
       updateAuthUI();
+      renderSidebar();
+      renderFicha();
       await syncFromCloud();
       fecharLoginModal();
     }, 800);
@@ -315,7 +327,11 @@ async function checkSession() {
       localStorage.removeItem(TOKEN_CACHE_KEY);
       updateAuthUI();
       animais = SEED_ANIMAIS.map((a) => ({ ...a }));
-      salvarAnimais();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(animais));
+      localStorage.removeItem(STORAGE_INIT_KEY);
+      selecionado = null;
+      renderSidebar();
+      renderFicha();
       showApp();
       return;
     }
@@ -436,6 +452,8 @@ async function syncFromCloud() {
         const strAtuais = JSON.stringify(animais);
         if (strNovos !== strAtuais) {
           animais = data.animais;
+          localStorage.setItem(STORAGE_INIT_KEY, "1");
+          localStorage.setItem(getAnimaisStorageKey(), strNovos);
           localStorage.setItem(STORAGE_KEY, strNovos);
           mudou = true;
         }
@@ -492,8 +510,30 @@ async function syncToCloud() {
   } catch (e) {}
 }
 
+function getAnimaisStorageKey() {
+  if (currentUser && currentUser.id) {
+    return `plantel-animais-${currentUser.id}`;
+  }
+  return STORAGE_KEY;
+}
+
 function carregarAnimais() {
   try {
+    if (currentUser && currentUser.id) {
+      const userKey = `plantel-animais-${currentUser.id}`;
+      const rawUser = localStorage.getItem(userKey);
+      if (rawUser) {
+        const parsed = JSON.parse(rawUser);
+        if (Array.isArray(parsed)) return parsed;
+      }
+      const rawFallback = localStorage.getItem(STORAGE_KEY);
+      if (rawFallback) {
+        const parsed = JSON.parse(rawFallback);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+      return [];
+    }
+
     const jaIniciou = localStorage.getItem(STORAGE_INIT_KEY);
     const raw = localStorage.getItem(STORAGE_KEY);
     if (jaIniciou) {
@@ -510,7 +550,9 @@ function carregarAnimais() {
 function salvarAnimais() {
   try {
     localStorage.setItem(STORAGE_INIT_KEY, "1");
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(animais));
+    const serialized = JSON.stringify(animais);
+    localStorage.setItem(getAnimaisStorageKey(), serialized);
+    localStorage.setItem(STORAGE_KEY, serialized);
   } catch (e) {}
   if (currentUser) {
     syncToCloud();
@@ -1901,7 +1943,8 @@ async function logout() {
   updateAuthUI();
 
   animais = SEED_ANIMAIS.map((a) => ({ ...a }));
-  salvarAnimais();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(animais));
+  localStorage.removeItem(STORAGE_INIT_KEY);
   salvarAreas(["Todos"]);
 
   selecionado = null;
@@ -2802,13 +2845,10 @@ setInterval(() => {
 }, 20000);
 
 document.addEventListener("DOMContentLoaded", () => {
-  if (currentUser) {
-    updateAuthUI();
-    animais = carregarAnimais();
-    if (animais.length > 0 && !selecionado) {
-      selecionado = animais[0].id;
-    }
-    showApp();
+  animais = carregarAnimais();
+  if (animais.length > 0 && !selecionado) {
+    selecionado = animais[0].id;
   }
+  showApp();
   checkSession();
 });
