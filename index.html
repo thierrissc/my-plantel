@@ -248,10 +248,11 @@
                 var hName = document.getElementById("um-header-name");
                 var hId = document.getElementById("um-header-id");
                 var img = document.getElementById("um-avatar-img");
-                var cleanId = (u.id.toLowerCase().indexOf("usr_") === 0 ? u.id.slice(4) : u.id).slice(0, 8).toUpperCase();
+                var cleanId = (u.id.replace(/^(usr_|user_)/i, "")).slice(0, 8).toUpperCase();
+                var formattedId = "User_" + cleanId;
                 if (nameEl) nameEl.textContent = u.name || "Usuário";
                 if (hName) hName.textContent = u.name || "Usuário";
-                if (hId) hId.textContent = "ID: " + cleanId;
+                if (hId) hId.textContent = "ID: " + formattedId;
                 if (img && u.avatar) img.src = u.avatar;
               }
             }
@@ -491,6 +492,18 @@
               <input id="m-pelagem" type="text" placeholder="Ex: Branco e preto" />
             </div>
             <div class="form-field">
+              <label>Peso</label>
+              <div class="peso-input-wrap">
+                <input id="m-peso-val" type="number" step="0.01" min="0" placeholder="0.00" />
+                <select id="m-peso-unit">
+                  <option value="kg" selected>kg</option>
+                  <option value="g">g</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-field">
               <label>Status</label>
               <div class="raca-combo-wrap" id="status-modal-wrap" onclick="toggleModalCombo('status',event)">
                 <span class="modal-combo-label" id="status-modal-label"
@@ -503,6 +516,10 @@
                 </button>
               </div>
               <input type="hidden" id="m-status" value="Ativo" />
+            </div>
+            <div class="form-field">
+              <label>Nº de identificação / Microchip</label>
+              <input id="m-id" type="text" placeholder="Ex: 985112345678901" />
             </div>
           </div>
           <div class="form-field full">
@@ -517,10 +534,6 @@
               </button>
             </div>
             <input type="hidden" id="m-area" value="" />
-          </div>
-          <div class="form-field full">
-            <label>Nº de identificação / Microchip</label>
-            <input id="m-id" type="text" placeholder="Ex: 985112345678901" />
           </div>
         </div>
         <div class="modal-footer">
