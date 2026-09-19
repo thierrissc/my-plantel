@@ -57,12 +57,15 @@ export default async function handler(req, res) {
     }
 
     let finalId = user.id;
-    if (finalId && finalId.length > 8) {
-      finalId = (finalId.toLowerCase().startsWith("usr_") ? finalId.slice(4, 12) : finalId.slice(0, 8)).toUpperCase();
-      try {
-        await query("UPDATE plantel_users SET id = $1 WHERE id = $2", [finalId, user.id]);
-        await query("UPDATE plantel_workspaces SET user_id = $1 WHERE user_id = $2", [finalId, user.id]);
-      } catch (e) {}
+    if (finalId) {
+      let clean = finalId.replace(/^(usr_|user_)/i, "").slice(0, 8).toUpperCase();
+      finalId = "User_" + clean;
+      if (finalId !== user.id) {
+        try {
+          await query("UPDATE plantel_users SET id = $1 WHERE id = $2", [finalId, user.id]);
+          await query("UPDATE plantel_workspaces SET user_id = $1 WHERE user_id = $2", [finalId, user.id]);
+        } catch (e) {}
+      }
     }
 
     const userPayload = {
