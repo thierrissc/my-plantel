@@ -16,9 +16,25 @@ function setCachedUser(u) {
 
 function formatPlantelId(id) {
   if (!id) return "Não definido";
-  let clean = String(id).trim();
-  if (clean.toLowerCase().startsWith("usr_")) clean = clean.slice(4);
-  return clean.slice(0, 8).toUpperCase();
+  let clean = String(id).trim().replace(/^(usr_|user_)/i, "");
+  return "User_" + clean.slice(0, 8).toUpperCase();
+}
+
+function parsePeso(str) {
+  if (!str) return { valor: "", unidade: "kg" };
+  const s = String(str).trim();
+  const match = s.match(/^([0-9.,]+)\s*(kg|g)?$/i);
+  if (match) {
+    return {
+      valor: match[1].replace(",", "."),
+      unidade: (match[2] || "kg").toLowerCase() === "g" ? "g" : "kg",
+    };
+  }
+  const isG = s.toLowerCase().includes("g") && !s.toLowerCase().includes("kg");
+  return {
+    valor: s.replace(/[^0-9.,]/g, "").replace(",", "."),
+    unidade: isG ? "g" : "kg",
+  };
 }
 
 let currentUser = getCachedUser();
@@ -692,6 +708,25 @@ function renderFichaContent(a) {
   const ed = editando;
 
   const field = (label, val, id, type = "text", opts = null) => {
+    if (id === "peso") {
+      if (ed) {
+        const parsed = parsePeso(val);
+        return `<div class="form-field">
+          <label>${label}</label>
+          <div class="peso-input-wrap">
+            <input type="number" step="0.01" min="0" id="f-peso-val" value="${parsed.valor}" placeholder="0.00" />
+            <select id="f-peso-unit">
+              <option value="kg"${parsed.unidade === "kg" ? " selected" : ""}>kg</option>
+              <option value="g"${parsed.unidade === "g" ? " selected" : ""}>g</option>
+            </select>
+          </div>
+        </div>`;
+      }
+      return `<div class="form-field">
+        <label>${label}</label>
+        <div class="field-value">${val || "Não informado"}</div>
+      </div>`;
+    }
     if (ed) {
       if (opts)
         return `<div class="form-field">
@@ -1324,6 +1359,14 @@ function limparGeneModal() {
 }
 
 function selecionar(id) {
+  if (selecionado === id) {
+    selecionado = null;
+    editando = false;
+    fotoTemp = null;
+    renderSidebar();
+    renderFicha();
+    return;
+  }
   selecionado = id;
   editando = false;
   fotoTemp = null;
@@ -1368,7 +1411,9 @@ function salvarEdicao() {
   a.raca = g("f-raca");
   a.sexo = g("f-sexo");
   a.nasc = g("f-nasc");
-  a.peso = g("f-peso");
+  const pVal = document.getElementById("f-peso-val")?.value?.trim();
+  const pUnit = document.getElementById("f-peso-unit")?.value || "kg";
+  a.peso = pVal ? `${pVal.replace(",", ".")} ${pUnit}` : (g("f-peso") || "");
   a.pelagem = g("f-pelagem");
   a.microchip = g("f-microchip");
   a.status = g("f-status") || a.status;
@@ -1679,10 +1724,12 @@ function abrirModal() {
 }
 function fecharModal() {
   document.getElementById("modal").style.display = "none";
-  ["m-nome", "m-raca", "m-id"].forEach((id) => {
+  ["m-nome", "m-raca", "m-id", "m-pelagem", "m-nasc", "m-peso-val"].forEach((id) => {
     const el = document.getElementById(id);
     if (el) el.value = "";
   });
+  const pesoUnit = document.getElementById("m-peso-unit");
+  if (pesoUnit) pesoUnit.value = "kg";
 
   const especieLbl = document.getElementById("especie-modal-label");
   if (especieLbl) especieLbl.textContent = "Selecione";
@@ -1718,6 +1765,10 @@ function salvarNovoAnimal() {
     mostrarAlerta("Preencha pelo menos o nome e a espécie.");
     return;
   }
+  const pVal = document.getElementById("m-peso-val")?.value?.trim();
+  const pUnit = document.getElementById("m-peso-unit")?.value || "kg";
+  const peso = pVal ? `${pVal.replace(",", ".")} ${pUnit}` : "";
+
   const novo = {
     id: Date.now(),
     nome,
@@ -1727,7 +1778,7 @@ function salvarNovoAnimal() {
     nasc: document.getElementById("m-nasc")?.value || "",
     pelagem: document.getElementById("m-pelagem")?.value || "",
     status: document.getElementById("m-status")?.value || "Ativo",
-    peso: "",
+    peso: peso,
     microchip: document.getElementById("m-id")?.value || "",
     foto: null,
     paiNome: "",
@@ -2550,6 +2601,10 @@ salvarNovoAnimal = function () {
     mostrarAlerta("Preencha pelo menos o nome e a espécie.");
     return;
   }
+  const pVal = document.getElementById("m-peso-val")?.value?.trim();
+  const pUnit = document.getElementById("m-peso-unit")?.value || "kg";
+  const peso = pVal ? `${pVal.replace(",", ".")} ${pUnit}` : "";
+
   const novo = {
     id: Date.now(),
     nome,
@@ -2560,7 +2615,7 @@ salvarNovoAnimal = function () {
     pelagem: document.getElementById("m-pelagem")?.value || "",
     status: document.getElementById("m-status")?.value || "Ativo",
     area: document.getElementById("m-area")?.value || "",
-    peso: "",
+    peso: peso,
     microchip: document.getElementById("m-id")?.value || "",
     foto: null,
     paiNome: "",
