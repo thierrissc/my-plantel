@@ -175,9 +175,8 @@ async function lpLogin() {
     setCachedUser(currentUser);
     updateAuthUI();
     animais = carregarAnimais();
-    if (animais.length > 0 && !selecionado) {
-      selecionado = animais[0].id;
-    }
+    selecionado = null;
+    editando = false;
     renderSidebar();
     renderFicha();
     await syncFromCloud();
@@ -251,9 +250,8 @@ async function lpRegistrar() {
     currentUser = data.user;
     setCachedUser(currentUser);
     animais = carregarAnimais();
-    if (animais.length > 0 && !selecionado) {
-      selecionado = animais[0].id;
-    }
+    selecionado = null;
+    editando = false;
     setTimeout(async () => {
       updateAuthUI();
       renderSidebar();
@@ -1947,6 +1945,14 @@ async function logout() {
   localStorage.removeItem(STORAGE_INIT_KEY);
   salvarAreas(["Todos"]);
 
+  areaFiltro = "Todos";
+  filtro = "Todos";
+  localStorage.setItem("plantel-filtro-especie", "Todos");
+  const sInp = document.getElementById("search-input");
+  if (sInp) sInp.value = "";
+  popularSelectAreas();
+  renderAreaBar();
+
   selecionado = null;
   editando = false;
   fotoTemp = null;
@@ -2846,9 +2852,8 @@ setInterval(() => {
 
 document.addEventListener("DOMContentLoaded", () => {
   animais = carregarAnimais();
-  if (animais.length > 0 && !selecionado) {
-    selecionado = animais[0].id;
-  }
+  selecionado = null;
+  editando = false;
   showApp();
   checkSession();
 });
