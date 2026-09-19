@@ -42,7 +42,7 @@ export async function ensureTablesExist() {
       CREATE INDEX IF NOT EXISTS idx_plantel_users_email ON plantel_users(email);
 
       CREATE TABLE IF NOT EXISTS plantel_workspaces (
-        user_id VARCHAR(64) PRIMARY KEY REFERENCES plantel_users(id) ON DELETE CASCADE,
+        user_id VARCHAR(64) PRIMARY KEY REFERENCES plantel_users(id) ON UPDATE CASCADE ON DELETE CASCADE,
         animais JSONB NOT NULL DEFAULT '[]',
         areas JSONB NOT NULL DEFAULT '["Todos"]',
         theme VARCHAR(32) DEFAULT 'light',
