@@ -14,14 +14,12 @@ export default async function handler(req, res) {
 
   try {
     const rawId = session.id;
-    const shortId =
-      rawId && rawId.length > 8
-        ? (rawId.toLowerCase().startsWith("usr_") ? rawId.slice(4, 12) : rawId.slice(0, 8)).toUpperCase()
-        : rawId;
+    const cleanId = rawId ? rawId.replace(/^(usr_|user_)/i, "").slice(0, 8).toUpperCase() : "";
+    const formattedId = "User_" + cleanId;
 
     const rows = await query(
-      "SELECT id, name, email, avatar FROM plantel_users WHERE id = $1 OR id = $2 LIMIT 1",
-      [rawId, shortId]
+      "SELECT id, name, email, avatar FROM plantel_users WHERE id = $1 OR id = $2 OR id = $3 LIMIT 1",
+      [rawId, cleanId, formattedId]
     );
 
     if (rows.length === 0) {
@@ -29,13 +27,14 @@ export default async function handler(req, res) {
     }
 
     let user = rows[0];
-    if (user.id && user.id.length > 8) {
-      const fixedId = (user.id.toLowerCase().startsWith("usr_") ? user.id.slice(4, 12) : user.id.slice(0, 8)).toUpperCase();
+    let userClean = user.id ? user.id.replace(/^(usr_|user_)/i, "").slice(0, 8).toUpperCase() : "";
+    let finalId = "User_" + userClean;
+    if (user.id !== finalId) {
       try {
-        await query("UPDATE plantel_users SET id = $1 WHERE id = $2", [fixedId, user.id]);
-        await query("UPDATE plantel_workspaces SET user_id = $1 WHERE user_id = $2", [fixedId, user.id]);
+        await query("UPDATE plantel_users SET id = $1 WHERE id = $2", [finalId, user.id]);
+        await query("UPDATE plantel_workspaces SET user_id = $1 WHERE user_id = $2", [finalId, user.id]);
       } catch (e) {}
-      user.id = fixedId;
+      user.id = finalId;
     }
 
     return res.status(200).json({
