@@ -1,4 +1,27 @@
-let currentUser = null;
+const USER_CACHE_KEY = "plantel_user";
+function getCachedUser() {
+  try {
+    const raw = localStorage.getItem(USER_CACHE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+function setCachedUser(u) {
+  try {
+    if (u) localStorage.setItem(USER_CACHE_KEY, JSON.stringify(u));
+    else localStorage.removeItem(USER_CACHE_KEY);
+  } catch {}
+}
+
+function formatPlantelId(id) {
+  if (!id) return "Não definido";
+  let clean = String(id).trim();
+  if (clean.toLowerCase().startsWith("usr_")) clean = clean.slice(4);
+  return clean.slice(0, 8).toUpperCase();
+}
+
+let currentUser = getCachedUser();
 let _cloudSyncTimer = null;
 
 function abrirLoginModal(viewId = "lp-login") {
@@ -123,6 +146,7 @@ async function lpLogin() {
     }
 
     currentUser = data.user;
+    setCachedUser(currentUser);
     updateAuthUI();
     await syncFromCloud();
     fecharLoginModal();
@@ -190,6 +214,7 @@ async function lpRegistrar() {
 
     lpAlert("lp-reg-ok", "Conta criada com sucesso! Entrando…", "ok");
     currentUser = data.user;
+    setCachedUser(currentUser);
     setTimeout(async () => {
       updateAuthUI();
       await syncFromCloud();
@@ -248,6 +273,7 @@ async function checkSession() {
       const data = await res.json();
       if (data.authenticated && data.user) {
         currentUser = data.user;
+        setCachedUser(currentUser);
         updateAuthUI();
         await syncFromCloud();
         return;
@@ -256,6 +282,7 @@ async function checkSession() {
   } catch (e) {}
 
   currentUser = null;
+  setCachedUser(null);
   updateAuthUI();
   animais = SEED_ANIMAIS.map((a) => ({ ...a }));
   showApp();
@@ -807,11 +834,18 @@ function renderFichaContent(a) {
   `;
 }
 
-let _geneGeracoes = localStorage.getItem("plantel-gene-geracoes") || "4";
+let _exibirBisavos = localStorage.getItem("plantel-gene-bisavos") === "true";
+
+function toggleBisavos() {
+  _exibirBisavos = !_exibirBisavos;
+  localStorage.setItem("plantel-gene-bisavos", _exibirBisavos ? "true" : "false");
+  const a = animais.find((x) => x.id === selecionado);
+  if (a) renderGenealogia(a);
+}
 
 function setGeneGeracoes(g) {
-  _geneGeracoes = String(g);
-  localStorage.setItem("plantel-gene-geracoes", _geneGeracoes);
+  _exibirBisavos = String(g) === "4";
+  localStorage.setItem("plantel-gene-bisavos", _exibirBisavos ? "true" : "false");
   const a = animais.find((x) => x.id === selecionado);
   if (a) renderGenealogia(a);
 }
@@ -878,72 +912,141 @@ function renderGenealogia(a) {
   const b_mm_f_n = a.bis_mm_f_nome || "";
   const b_mm_f_r = a.bis_mm_f_raca || "";
 
-  const bisavosHtml = _geneGeracoes === "4" ? `
-    <div class="gene-gen gene-gen-bis">
-      ${nodeHtml(b_pp_m_n, b_pp_m_r, "bis_pp_m", "Bisavô (Pat.)", "Macho", "gene-bis")}
-      ${nodeHtml(b_pp_f_n, b_pp_f_r, "bis_pp_f", "Bisavó (Pat.)", "Fêmea", "gene-bis")}
-      ${nodeHtml(b_pm_m_n, b_pm_m_r, "bis_pm_m", "Bisavô (Pat.)", "Macho", "gene-bis")}
-      ${nodeHtml(b_pm_f_n, b_pm_f_r, "bis_pm_f", "Bisavó (Pat.)", "Fêmea", "gene-bis")}
-      ${nodeHtml(b_mp_m_n, b_mp_m_r, "bis_mp_m", "Bisavô (Mat.)", "Macho", "gene-bis")}
-      ${nodeHtml(b_mp_f_n, b_mp_f_r, "bis_mp_f", "Bisavó (Mat.)", "Fêmea", "gene-bis")}
-      ${nodeHtml(b_mm_m_n, b_mm_m_r, "bis_mm_m", "Bisavô (Mat.)", "Macho", "gene-bis")}
-      ${nodeHtml(b_mm_f_n, b_mm_f_r, "bis_mm_f", "Bisavó (Mat.)", "Fêmea", "gene-bis")}
-    </div>
-    <div class="gene-connector">
-      <svg viewBox="0 0 1000 38" preserveAspectRatio="none" style="width:100%;height:100%">
-        <path d="M62 0 V19 H187 V38 M187 19 H312 V0" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
-        <path d="M312 0 V19 H437 V38 M437 19 H562 V0" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
-        <path d="M562 0 V19 H687 V38 M687 19 H812 V0" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
-        <path d="M812 0 V19 H937 V38 M937 19 H1000 V0" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
-      </svg>
-    </div>` : "";
+  const hasBisavos = Boolean(
+    b_pp_m_n || b_pp_f_n || b_pm_m_n || b_pm_f_n ||
+    b_mp_m_n || b_mp_f_n || b_mm_m_n || b_mm_f_n
+  );
+  const showBisavos = _exibirBisavos || hasBisavos;
 
   document.getElementById("genealogia-content").innerHTML = `
     <div class="gene-header">
-      <h2 class="gene-title">Árvore Genealógica <span class="gene-title-sep"></span> <span class="gene-title-name">${a.nome}</span></h2>
-      <p class="gene-sub">${a.especie}${a.raca ? " · " + a.raca : ""}${(() => {
-        const i = a.nasc ? calcIdade(a.nasc) : "";
-        return i && i !== "Não informada" ? " · " + i : "";
-      })()}</p>
-      <div class="gene-toolbar">
-        <span style="font-size:12px;color:var(--c-text-3)">Clique em qualquer parente para definir ou editar</span>
-        <div class="gene-level-toggle">
-          <button class="gene-level-btn ${_geneGeracoes === '3' ? 'active' : ''}" onclick="setGeneGeracoes(3)" type="button">3 Gerações</button>
-          <button class="gene-level-btn ${_geneGeracoes === '4' ? 'active' : ''}" onclick="setGeneGeracoes(4)" type="button">4 Gerações (Bisavós)</button>
+      <div class="gene-header-top">
+        <div class="gene-header-info">
+          <h2 class="gene-title">
+            Árvore Genealógica
+            <span class="gene-animal-badge">${emoji} ${a.nome}</span>
+          </h2>
+          <p class="gene-sub">
+            <span>${a.especie}</span>
+            ${a.raca ? `<span class="gene-sub-dot"></span><span>${a.raca}</span>` : ""}
+            ${(() => {
+              const i = a.nasc ? calcIdade(a.nasc) : "";
+              return i && i !== "Não informada"
+                ? `<span class="gene-sub-dot"></span><span>${i}</span>`
+                : "";
+            })()}
+            ${a.sexo ? `<span class="gene-sub-dot"></span><span>${a.sexo}</span>` : ""}
+          </p>
         </div>
+        <div class="gene-header-actions">
+          <button type="button" class="gene-btn-action ${showBisavos ? 'active' : ''}" onclick="toggleBisavos()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+              ${showBisavos
+                ? '<path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'
+                : '<path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'
+              }
+            </svg>
+            ${showBisavos ? "Ocultar Bisavós" : "Adicionar Bisavós"}
+          </button>
+        </div>
+      </div>
+      <div class="gene-header-hint">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="opacity:0.7">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M12 16v-4M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>Clique em qualquer cartão para visualizar ou cadastrar parentes.</span>
       </div>
     </div>
 
     <div class="gene-viewport">
       <div class="gene-tree">
-        ${bisavosHtml}
+        <!-- Branches Row: Paterno e Materno -->
+        <div class="gene-branches-row">
 
-        <div class="gene-gen">
-          ${nodeHtml(avoPatNome, avoPatRaca, "avo", "Avô paterno", "Macho")}
-          ${nodeHtml(avPatMaeNome, avPatMaeRaca, "avopat_f", "Avó paterna", "Fêmea")}
-          ${nodeHtml(avMatPaiNome, avMatPaiRaca, "avomat_m", "Avô materno", "Macho")}
-          ${nodeHtml(avoMatNome, avoMatRaca, "avomat", "Avó materna", "Fêmea")}
+          <!-- Ramo Paterno -->
+          <div class="gene-branch" style="width: ${showBisavos ? '504px' : '352px'};">
+            ${showBisavos ? `
+              <div class="gene-branches-row" style="gap: 8px; margin-bottom: 6px;">
+                <div class="gene-branch" style="width: 248px;">
+                  <div class="gene-pair gene-pair-bis">
+                    ${nodeHtml(b_pp_m_n, b_pp_m_r, "bis_pp_m", "Bisavô (Pat.)", "Macho", "gene-bis")}
+                    ${nodeHtml(b_pp_f_n, b_pp_f_r, "bis_pp_f", "Bisavó (Pat.)", "Fêmea", "gene-bis")}
+                  </div>
+                  <div class="gene-pair-connector-box" style="height: 24px;">
+                    <div class="gene-pair-line bis-line"></div>
+                  </div>
+                </div>
+                <div class="gene-branch" style="width: 248px;">
+                  <div class="gene-pair gene-pair-bis">
+                    ${nodeHtml(b_pm_m_n, b_pm_m_r, "bis_pm_m", "Bisavô (Pat.)", "Macho", "gene-bis")}
+                    ${nodeHtml(b_pm_f_n, b_pm_f_r, "bis_pm_f", "Bisavó (Pat.)", "Fêmea", "gene-bis")}
+                  </div>
+                  <div class="gene-pair-connector-box" style="height: 24px;">
+                    <div class="gene-pair-line bis-line"></div>
+                  </div>
+                </div>
+              </div>
+            ` : ""}
+
+            <div class="gene-pair">
+              ${nodeHtml(avoPatNome, avoPatRaca, "avo", "Avô paterno", "Macho")}
+              ${nodeHtml(avPatMaeNome, avPatMaeRaca, "avopat_f", "Avó paterna", "Fêmea")}
+            </div>
+            <div class="gene-pair-connector-box">
+              <div class="gene-pair-line"></div>
+            </div>
+            <div style="display: flex; justify-content: center; width: 100%;">
+              ${nodeHtml(paiNome, paiRaca, "pai", "Pai", "Macho")}
+            </div>
+          </div>
+
+          <!-- Ramo Materno -->
+          <div class="gene-branch" style="width: ${showBisavos ? '504px' : '352px'};">
+            ${showBisavos ? `
+              <div class="gene-branches-row" style="gap: 8px; margin-bottom: 6px;">
+                <div class="gene-branch" style="width: 248px;">
+                  <div class="gene-pair gene-pair-bis">
+                    ${nodeHtml(b_mp_m_n, b_mp_m_r, "bis_mp_m", "Bisavô (Mat.)", "Macho", "gene-bis")}
+                    ${nodeHtml(b_mp_f_n, b_mp_f_r, "bis_mp_f", "Bisavó (Mat.)", "Fêmea", "gene-bis")}
+                  </div>
+                  <div class="gene-pair-connector-box" style="height: 24px;">
+                    <div class="gene-pair-line bis-line"></div>
+                  </div>
+                </div>
+                <div class="gene-branch" style="width: 248px;">
+                  <div class="gene-pair gene-pair-bis">
+                    ${nodeHtml(b_mm_m_n, b_mm_m_r, "bis_mm_m", "Bisavô (Mat.)", "Macho", "gene-bis")}
+                    ${nodeHtml(b_mm_f_n, b_mm_f_r, "bis_mm_f", "Bisavó (Mat.)", "Fêmea", "gene-bis")}
+                  </div>
+                  <div class="gene-pair-connector-box" style="height: 24px;">
+                    <div class="gene-pair-line bis-line"></div>
+                  </div>
+                </div>
+              </div>
+            ` : ""}
+
+            <div class="gene-pair">
+              ${nodeHtml(avMatPaiNome, avMatPaiRaca, "avomat_m", "Avô materno", "Macho")}
+              ${nodeHtml(avoMatNome, avoMatRaca, "avomat", "Avó materna", "Fêmea")}
+            </div>
+            <div class="gene-pair-connector-box">
+              <div class="gene-pair-line"></div>
+            </div>
+            <div style="display: flex; justify-content: center; width: 100%;">
+              ${nodeHtml(maeNome, maeRaca, "mae", "Mãe", "Fêmea")}
+            </div>
+          </div>
+
         </div>
 
-        <div class="gene-connector">
-          <svg viewBox="0 0 1000 38" preserveAspectRatio="none" style="width:100%;height:100%">
-            <path d="M187 0 V19 H375 V38 M375 19 H562 V0" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
-            <path d="M562 0 V19 H750 V38 M750 19 H937 V0" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
-          </svg>
+        <!-- Conector Pai + Mãe -> Animal Focal -->
+        <div class="gene-pair-connector-box" style="width: ${showBisavos ? '1044px' : '740px'}; max-width: 100%;">
+          <div class="gene-pair-line" style="width: ${showBisavos ? 'calc(100% - 504px)' : 'calc(100% - 352px)'};"></div>
         </div>
 
-        <div class="gene-gen">
-          ${nodeHtml(paiNome, paiRaca, "pai", "Pai", "Macho")}
-          ${nodeHtml(maeNome, maeRaca, "mae", "Mãe", "Fêmea")}
-        </div>
-
-        <div class="gene-connector">
-          <svg viewBox="0 0 1000 38" preserveAspectRatio="none" style="width:100%;height:100%">
-            <path d="M375 0 V19 H500 V38 M500 19 H750 V0" stroke="var(--c-border)" stroke-width="1.5" fill="none"/>
-          </svg>
-        </div>
-
-        <div class="gene-gen">
+        <!-- Animal Focal -->
+        <div style="display: flex; justify-content: center; width: 100%; margin-top: 0;">
           ${nodeHtml(a.nome, a.raca, "focal", "Animal", a.sexo)}
         </div>
       </div>
@@ -1716,6 +1819,7 @@ async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
   } catch (e) {}
   currentUser = null;
+  setCachedUser(null);
   updateAuthUI();
   animais = SEED_ANIMAIS.map((a) => ({ ...a }));
   selecionadoId = animais[0]?.id || null;
@@ -2493,7 +2597,8 @@ function salvarProfileStorage(p) {
 function initProfile() {
   try {
     const nome = currentUser?.name || "Usuário";
-    const id = currentUser?.id || "Não definido";
+    const rawId = currentUser?.id;
+    const id = rawId ? formatPlantelId(rawId) : "Não definido";
     const avatar = currentUser?.avatar || null;
 
     const nameEl = document.getElementById("um-name");
@@ -2513,7 +2618,8 @@ function abrirPerfil() {
   try {
     const nome = currentUser?.name || "";
     const email = currentUser?.email || "";
-    const id = currentUser?.id || "Não definido";
+    const rawId = currentUser?.id;
+    const id = rawId ? formatPlantelId(rawId) : "Não definido";
     const avatar = currentUser?.avatar || null;
 
     document.getElementById("perfil-nome").value = nome;
@@ -2604,4 +2710,14 @@ setInterval(() => {
   }
 }, 20000);
 
-document.addEventListener("DOMContentLoaded", checkSession);
+document.addEventListener("DOMContentLoaded", () => {
+  if (currentUser) {
+    updateAuthUI();
+    animais = carregarAnimais();
+    if (animais.length > 0 && !selecionado) {
+      selecionado = animais[0].id;
+    }
+    showApp();
+  }
+  checkSession();
+});
