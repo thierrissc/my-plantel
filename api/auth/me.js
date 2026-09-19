@@ -18,8 +18,8 @@ export default async function handler(req, res) {
     const formattedId = "User_" + cleanId;
 
     const rows = await query(
-      "SELECT id, name, email, avatar FROM plantel_users WHERE id = $1 OR id = $2 OR id = $3 LIMIT 1",
-      [rawId, cleanId, formattedId]
+      "SELECT id, name, email, avatar FROM plantel_users WHERE id = $1 OR id = $2 OR id = $3 OR email = $4 LIMIT 1",
+      [rawId, cleanId, formattedId, session.email || ""]
     );
 
     if (rows.length === 0) {
@@ -32,7 +32,6 @@ export default async function handler(req, res) {
     if (user.id !== finalId) {
       try {
         await query("UPDATE plantel_users SET id = $1 WHERE id = $2", [finalId, user.id]);
-        await query("UPDATE plantel_workspaces SET user_id = $1 WHERE user_id = $2", [finalId, user.id]);
       } catch (e) {}
       user.id = finalId;
     }
