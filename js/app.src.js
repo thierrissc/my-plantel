@@ -770,6 +770,10 @@ function renderFichaContent(a) {
   const ed = editando;
 
   const field = (label, val, id, type = "text", opts = null) => {
+    let displayVal = val || "";
+    if (id === "nasc" && val) {
+      displayVal = fmtDate(val);
+    }
     if (id === "peso") {
       if (ed) {
         const parsed = parsePeso(val);
@@ -786,7 +790,7 @@ function renderFichaContent(a) {
       }
       return `<div class="form-field">
         <label>${label}</label>
-        <div class="field-value">${val || "Não informado"}</div>
+        <div class="field-value">${displayVal || "&nbsp;"}</div>
       </div>`;
     }
     if (ed) {
@@ -802,7 +806,7 @@ function renderFichaContent(a) {
     }
     return `<div class="form-field">
       <label>${label}</label>
-      <div class="field-value">${val || "Não informado"}</div>
+      <div class="field-value">${displayVal || "&nbsp;"}</div>
     </div>`;
   };
 
@@ -905,15 +909,19 @@ function renderFichaContent(a) {
         <div class="section-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M9 3l-4 4 8 8 4-4-8-8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M15 7l2 2M5 13l-2 4 4-2M19 5l1-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
         <span class="section-title">Vacinação</span>
       </div>
-      <div class="vac-table-wrap">
-        <table class="vac-table">
-          <thead><tr>
-            <th>Vacina</th><th>Aplicação</th><th>Próxima dose</th><th>Situação</th>
-            ${ed ? "<th></th>" : ""}
-          </tr></thead>
-          <tbody>${vacRows || `<tr><td colspan="${ed ? 5 : 4}" style="color:var(--c-text-3);font-style:italic;text-align:center;padding:16px">Nenhuma vacina registrada</td></tr>`}</tbody>
-        </table>
-      </div>
+      ${
+        (a.vacinas || []).length > 0
+          ? `<div class="vac-table-wrap">
+              <table class="vac-table">
+                <thead><tr>
+                  <th>Vacina</th><th>Aplicação</th><th>Próxima dose</th><th>Situação</th>
+                  ${ed ? "<th></th>" : ""}
+                </tr></thead>
+                <tbody>${vacRows}</tbody>
+              </table>
+            </div>`
+          : `<div class="vac-empty-state">Nenhuma vacina registrada</div>`
+      }
       ${addVacForm}
     </div>
 
@@ -971,7 +979,7 @@ function renderGenealogia(a) {
       <div class="gene-node ${genderClass} ${extraClass}${!hasName ? " unknown" : ""}${role === "focal" ? " focal" : ""}" ${clickAttr} title="${hasName ? nome : 'Clique para adicionar ' + roleLabel}">
         <div class="gene-thumb">${thumbContent}</div>
         <div class="gene-node-role">${roleLabel}</div>
-        <div class="gene-node-name">${hasName ? nome : "Não informado"}</div>
+        <div class="gene-node-name">${hasName ? nome : "&nbsp;"}</div>
         <div class="gene-node-info">${raca || (hasName ? "" : "Clique para editar")}</div>
         ${inPlantel}
       </div>`;
