@@ -3109,6 +3109,33 @@ function isAve(especie) {
   return /ave|p[aá]ssaro|passaro|can[aá]rio|curi[oó]|trinca|calopsita|periquito|papagaio|galinha|galo|calafate|manon|diamante/i.test(especie);
 }
 
+let repFiltroStatus = "todos";
+
+function toggleRepFiltro(e) {
+  if (e) e.stopPropagation();
+  const drop = document.getElementById("rep-filter-dropdown");
+  if (!drop) return;
+  const isShown = drop.style.display === "block";
+  drop.style.display = isShown ? "none" : "block";
+}
+
+function filtrarCasaisStatus(st) {
+  repFiltroStatus = st;
+  const drop = document.getElementById("rep-filter-dropdown");
+  if (drop) drop.style.display = "none";
+  renderReproducao();
+}
+
+if (typeof document !== "undefined") {
+  document.addEventListener("click", (e) => {
+    const wrap = document.getElementById("rep-filter-wrap");
+    const drop = document.getElementById("rep-filter-dropdown");
+    if (drop && wrap && !wrap.contains(e.target)) {
+      drop.style.display = "none";
+    }
+  });
+}
+
 function renderReproducao() {
   const container = document.getElementById("reproducao-content");
   if (!container) return;
@@ -3132,8 +3159,14 @@ function renderReproducao() {
 
   const temAves = casais.length === 0 || casais.some((c) => isAve(c.especie));
 
-  const casaisHtml = casais.length
-    ? casais
+  const casaisFiltrados = casais.filter((c) => {
+    if (repFiltroStatus === "todos") return true;
+    if (repFiltroStatus === "Com filhotes") return c.status === "Com filhotes" || c.status === "Gestação";
+    return c.status === repFiltroStatus;
+  });
+
+  const casaisHtml = casaisFiltrados.length
+    ? casaisFiltrados
         .map((c) => {
           const macho = c.machoId ? animais.find((x) => x.id === c.machoId) : null;
           const femea = c.femeaId ? animais.find((x) => x.id === c.femeaId) : null;
@@ -3151,11 +3184,11 @@ function renderReproducao() {
           const casalAve = isAve(c.especie);
           const ultimaNinhada = (c.ninhadas && c.ninhadas.length > 0) ? c.ninhadas[c.ninhadas.length - 1] : null;
           const ovosNum = ultimaNinhada ? (ultimaNinhada.ovosTotal || 0) : 0;
-          const ferteisNum = ultimaNinhada ? (ultimaNinhada.ovosFerteis || 0) : 0;
           const filhotesNum = ultimaNinhada ? (ultimaNinhada.filhotesQtd || 0) : 0;
           const eclosaoTxt = ultimaNinhada?.dataEclosao
             ? fmtDate(ultimaNinhada.dataEclosao)
             : (ultimaNinhada?.previsao ? fmtDate(ultimaNinhada.previsao) : "");
+          const emPosturaOuChocando = c.status === "Em postura" || c.status === "Chocando" || c.status === "Gestação";
 
           let badgeClass = "badge-formado";
           if (c.status === "Em postura") badgeClass = "badge-postura";
@@ -3175,39 +3208,34 @@ function renderReproducao() {
                   (an) => `
                 <div class="filhote-card-row">
                   <div class="filhote-anilha-tag">
-                    <span class="noto-emoji noto-emoji-inline">🏷</span>
-                    <strong>${an}</strong>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1.5"/></svg>
+                    <span>Anilha: <strong>${an}</strong></span>
                   </div>
                   <button class="btn-reg-filhote-pro" onclick="registrarFilhoteNoPlantel(${c.id}, ${idx}, '${an}')" title="Cadastrar filhote como animal no plantel">
-                    <svg width="12" height="12" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    <svg width="11" height="11" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     Cadastrar no Plantel
                   </button>
                 </div>`
                 )
                 .join("");
 
-              const chipsDatas = [];
+              const datasItems = [];
               if (casalAve) {
-                if (n.dataPostura) chipsDatas.push(`<span class="nin-chip">🥚 1º Ovo: <strong>${fmtDate(n.dataPostura)}</strong></span>`);
-                if (n.dataUltimoOvo) chipsDatas.push(`<span class="nin-chip">🥚 Fim: <strong>${fmtDate(n.dataUltimoOvo)}</strong></span>`);
-                if (n.dataChoco) chipsDatas.push(`<span class="nin-chip">🪺 Choco: <strong>${fmtDate(n.dataChoco)}</strong></span>`);
-                if (n.dataEclosao) chipsDatas.push(`<span class="nin-chip chip-success">🐣 Eclosão: <strong>${fmtDate(n.dataEclosao)}</strong></span>`);
-                else if (n.previsao) chipsDatas.push(`<span class="nin-chip chip-accent">⏳ Prev: <strong>${fmtDate(n.previsao)}</strong></span>`);
+                if (n.dataPostura) datasItems.push(`<div class="ninhada-timeline-item"><span class="tl-lbl">1º Ovo</span><span class="tl-val">${fmtDate(n.dataPostura)}</span></div>`);
+                if (n.dataUltimoOvo) datasItems.push(`<div class="ninhada-timeline-item"><span class="tl-lbl">Fim Postura</span><span class="tl-val">${fmtDate(n.dataUltimoOvo)}</span></div>`);
+                if (n.dataChoco) datasItems.push(`<div class="ninhada-timeline-item"><span class="tl-lbl">Início Choco</span><span class="tl-val">${fmtDate(n.dataChoco)}</span></div>`);
+                if (n.dataEclosao) {
+                  datasItems.push(`<div class="ninhada-timeline-item tl-destaque"><span class="tl-lbl">Eclosão Real</span><span class="tl-val">${fmtDate(n.dataEclosao)}</span></div>`);
+                } else if ((n.status === "Em postura" || n.status === "Chocando") && n.previsao) {
+                  datasItems.push(`<div class="ninhada-timeline-item tl-destaque"><span class="tl-lbl">Prev. Eclosão</span><span class="tl-val">${fmtDate(n.previsao)}</span></div>`);
+                }
               } else {
-                if (n.dataInicio) chipsDatas.push(`<span class="nin-chip">📅 Cobertura: <strong>${fmtDate(n.dataInicio)}</strong></span>`);
-                if (n.previsao) chipsDatas.push(`<span class="nin-chip chip-accent">⏳ Prev. Parto: <strong>${fmtDate(n.previsao)}</strong></span>`);
-                if (n.dataEclosao) chipsDatas.push(`<span class="nin-chip chip-success">🐾 Parto: <strong>${fmtDate(n.dataEclosao)}</strong></span>`);
-              }
-
-              const chipsOvos = [];
-              if (casalAve) {
-                chipsOvos.push(`<span class="nin-chip">🥚 <strong>${n.ovosTotal || 0}</strong> ovos</span>`);
-                if ((n.ovosFerteis || 0) > 0) chipsOvos.push(`<span class="nin-chip chip-success">🟢 <strong>${n.ovosFerteis}</strong> férteis</span>`);
-                if ((n.ovosGoros || 0) > 0) chipsOvos.push(`<span class="nin-chip chip-danger">🔴 <strong>${n.ovosGoros}</strong> goros</span>`);
-                if ((n.ovosMortos || 0) > 0) chipsOvos.push(`<span class="nin-chip">🥀 <strong>${n.ovosMortos}</strong> mortos</span>`);
-              }
-              if ((n.filhotesQtd || 0) > 0) {
-                chipsOvos.push(`<span class="nin-chip chip-success">🐣 <strong>${n.filhotesQtd}</strong> filhotes</span>`);
+                if (n.dataInicio) datasItems.push(`<div class="ninhada-timeline-item"><span class="tl-lbl">Cobertura</span><span class="tl-val">${fmtDate(n.dataInicio)}</span></div>`);
+                if (n.dataEclosao) {
+                  datasItems.push(`<div class="ninhada-timeline-item tl-destaque"><span class="tl-lbl">Parto Real</span><span class="tl-val">${fmtDate(n.dataEclosao)}</span></div>`);
+                } else if (n.status === "Gestação" && n.previsao) {
+                  datasItems.push(`<div class="ninhada-timeline-item tl-destaque"><span class="tl-lbl">Prev. Parto</span><span class="tl-val">${fmtDate(n.previsao)}</span></div>`);
+                }
               }
 
               let badgeNinhada = "badge-descanso";
@@ -3220,7 +3248,7 @@ function renderReproducao() {
                 <div class="ninhada-box-header">
                   <div class="ninhada-box-title">
                     <span class="ninhada-num-badge">Ninhada #${idx + 1}</span>
-                    ${n.dataInicio ? `<span class="ninhada-data-sub">📅 Início: <strong>${fmtDate(n.dataInicio)}</strong></span>` : ""}
+                    ${n.dataInicio ? `<span class="ninhada-data-sub">Início: <strong>${fmtDate(n.dataInicio)}</strong></span>` : ""}
                   </div>
                   <div class="ninhada-box-right">
                     <span class="casal-badge ${badgeNinhada}">${n.status || 'Em andamento'}</span>
@@ -3230,13 +3258,35 @@ function renderReproducao() {
                   </div>
                 </div>
 
-                <div class="ninhada-body-compact">
-                  ${chipsDatas.length ? `<div class="ninhada-row-datas">${chipsDatas.join("")}</div>` : ""}
-                  ${chipsOvos.length ? `<div class="ninhada-row-ovos">${chipsOvos.join("")}</div>` : ""}
+                <div class="ninhada-metrics-bar">
+                  ${casalAve ? `
+                    <div class="ninhada-m-col">
+                      <span class="m-val">${n.ovosTotal || 0}</span>
+                      <span class="m-lbl">Ovos</span>
+                    </div>
+                    <div class="ninhada-m-col m-ferteis">
+                      <span class="m-val">${n.ovosFerteis || 0}</span>
+                      <span class="m-lbl">Férteis</span>
+                    </div>
+                    <div class="ninhada-m-col m-goros">
+                      <span class="m-val">${n.ovosGoros || 0}</span>
+                      <span class="m-lbl">Goros</span>
+                    </div>
+                    ${(n.ovosMortos || 0) > 0 ? `
+                    <div class="ninhada-m-col m-mortos">
+                      <span class="m-val">${n.ovosMortos}</span>
+                      <span class="m-lbl">Mortos</span>
+                    </div>` : ""}
+                  ` : ""}
+                  <div class="ninhada-m-col m-filhotes">
+                    <span class="m-val">${n.filhotesQtd || 0}</span>
+                    <span class="m-lbl">Filhotes</span>
+                  </div>
                 </div>
 
+                ${datasItems.length ? `<div class="ninhada-timeline-grid">${datasItems.join("")}</div>` : ""}
                 ${filhotesBadges ? `<div class="filhotes-container">${filhotesBadges}</div>` : ""}
-                ${n.obs ? `<div class="ninhada-obs-inline">💬 "${n.obs}"</div>` : ""}
+                ${n.obs ? `<div class="ninhada-obs-clean"><strong>Obs:</strong> "${n.obs}"</div>` : ""}
               </div>`;
             })
             .join("");
@@ -3284,14 +3334,18 @@ function renderReproducao() {
               ${
                 casalAve
                   ? `<div class="casal-sum-pill">
-                      <span class="sum-icon"><span class="noto-emoji noto-emoji-inline">🥚</span></span>
+                      <span class="sum-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><ellipse cx="12" cy="13" rx="7" ry="9"/></svg>
+                      </span>
                       <div class="sum-data">
-                        <span class="sum-val">${ovosNum}${ferteisNum > 0 ? ` <small style="font-size:10.5px;color:var(--c-accent);font-weight:700">(${ferteisNum} férteis)</small>` : ""}</span>
+                        <span class="sum-val">${ovosNum}</span>
                         <span class="sum-lbl">Ovos</span>
                       </div>
                     </div>`
                   : `<div class="casal-sum-pill">
-                      <span class="sum-icon"><span class="noto-emoji noto-emoji-inline">🧬</span></span>
+                      <span class="sum-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                      </span>
                       <div class="sum-data">
                         <span class="sum-val">${c.status || "Ativo"}</span>
                         <span class="sum-lbl">Reprodução</span>
@@ -3299,19 +3353,27 @@ function renderReproducao() {
                     </div>`
               }
               <div class="casal-sum-pill">
-                <span class="sum-icon"><span class="noto-emoji noto-emoji-inline">🐣</span></span>
+                <span class="sum-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="M3 18a9 9 0 0 1 9-9h1a4 4 0 0 1 4 4v1a4 4 0 0 1-4 4H3z"/><circle cx="13" cy="9" r="1.5" fill="currentColor"/><path d="M17 9l4-2-2 4"/><path d="M7 18a5 5 0 0 1 5-5"/></svg>
+                </span>
                 <div class="sum-data">
                   <span class="sum-val">${filhotesNum}</span>
                   <span class="sum-lbl">Filhotes</span>
                 </div>
               </div>
-              <div class="casal-sum-pill">
-                <span class="sum-icon"><span class="noto-emoji noto-emoji-inline">⏳</span></span>
-                <div class="sum-data">
-                  <span class="sum-val">${eclosaoTxt}</span>
-                  <span class="sum-lbl">${casalAve ? "Previsão" : "Prev. Parto"}</span>
-                </div>
-              </div>
+              ${
+                emPosturaOuChocando && eclosaoTxt
+                  ? `<div class="casal-sum-pill">
+                      <span class="sum-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                      </span>
+                      <div class="sum-data">
+                        <span class="sum-val">${eclosaoTxt}</span>
+                        <span class="sum-lbl">${casalAve ? "Previsão" : "Prev. Parto"}</span>
+                      </div>
+                    </div>`
+                  : ""
+              }
             </div>
 
             <div class="casal-actions-bar">
@@ -3334,22 +3396,36 @@ function renderReproducao() {
             </div>
 
             <div class="ninhadas-section" id="ninhadas-sec-${c.id}">
-              ${ninhadasListHtml || '<div style="font-size:12px;color:var(--c-text-3);text-align:center;padding:8px">Nenhuma ninhada registrada para este casal ainda.</div>'}
+              ${ninhadasListHtml || '<div style="font-size:12px;color:var(--c-text-3);text-align:center;padding:12px">Nenhuma ninhada registrada para este casal ainda.</div>'}
             </div>
           </div>`;
         })
         .join("")
-    : `
-    <div style="background:var(--c-card);border:1.5px dashed var(--c-border);border-radius:16px;padding:48px 20px;text-align:center;grid-column:1/-1">
-      <div style="width:56px;height:56px;border-radius:50%;background:var(--c-accent-bg);color:var(--c-accent);display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:28px;height:28px">
-          <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <h3 style="font-size:18px;font-weight:700;color:var(--c-text-1);margin:0 0 6px">Nenhum casal formado</h3>
-      <p style="font-size:13px;color:var(--c-text-2);margin:0 0 18px">Forme casais da mesma espécie para acompanhar reprodução, filhotes e ninhadas.</p>
-      <button class="btn-novo-casal" onclick="abrirModalCasal()">+ Formar Primeiro Casal</button>
-    </div>`;
+    : "";
+
+  let casaisConteudoHtml = "";
+  if (casais.length === 0) {
+    casaisConteudoHtml = `
+      <div style="background:var(--c-card);border:1.5px dashed var(--c-border);border-radius:16px;padding:48px 20px;text-align:center;grid-column:1/-1">
+        <div style="width:56px;height:56px;border-radius:50%;background:var(--c-accent-bg);color:var(--c-accent);display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:28px;height:28px">
+            <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h3 style="font-size:18px;font-weight:700;color:var(--c-text-1);margin:0 0 6px">Nenhum casal formado</h3>
+        <p style="font-size:13px;color:var(--c-text-2);margin:0 0 18px">Forme casais da mesma espécie para acompanhar reprodução, filhotes e ninhadas.</p>
+        <button class="btn-novo-casal" onclick="abrirModalCasal()">+ Formar Primeiro Casal</button>
+      </div>`;
+  } else if (casaisFiltrados.length === 0) {
+    casaisConteudoHtml = `
+      <div style="background:var(--c-card);border:1.5px dashed var(--c-border);border-radius:16px;padding:42px 20px;text-align:center;grid-column:1/-1">
+        <h3 style="font-size:16px;font-weight:700;color:var(--c-text-1);margin:0 0 6px">Nenhum casal com status "${repFiltroStatus}"</h3>
+        <p style="font-size:13px;color:var(--c-text-2);margin:0 0 16px">Não há registros correspondentes a este filtro no momento.</p>
+        <button class="btn-rep-stats-toggle" onclick="filtrarCasaisStatus('todos')">Mostrar Todos os Casais</button>
+      </div>`;
+  } else {
+    casaisConteudoHtml = casaisHtml;
+  }
 
   container.innerHTML = `
     <div class="rep-wrap">
@@ -3372,6 +3448,59 @@ function renderReproducao() {
               : `<svg viewBox="0 0 20 20" fill="none" style="width:14px;height:14px"><path d="M2 10h3M7 6h3M12 3h3M17 8h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> <span>Estatísticas Gerais</span>`
             }
           </button>
+
+          <div class="rep-filter-wrap" id="rep-filter-wrap">
+            <button class="btn-rep-filter-toggle ${repFiltroStatus !== 'todos' ? 'active' : ''}" onclick="toggleRepFiltro(event)" title="Filtrar casais por status">
+              <svg viewBox="0 0 20 20" fill="none" style="width:14px;height:14px">
+                <path d="M3 5h14M6 10h8M9 15h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <span>${repFiltroStatus === 'todos' ? 'Filtrar' : repFiltroStatus}</span>
+              ${repFiltroStatus !== 'todos' ? `<span class="rep-filter-active-dot"></span>` : ''}
+              <svg width="10" height="6" viewBox="0 0 10 6" fill="none" style="margin-left:2px"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            </button>
+            <div class="rep-filter-dropdown" id="rep-filter-dropdown" style="display:none">
+              <button class="rep-filter-opt ${repFiltroStatus === 'todos' ? 'selected' : ''}" onclick="filtrarCasaisStatus('todos')">
+                <span>Todos os Casais</span>
+                <span class="rep-filter-count">${casais.length}</span>
+              </button>
+              <button class="rep-filter-opt ${repFiltroStatus === 'Em postura' ? 'selected' : ''}" onclick="filtrarCasaisStatus('Em postura')">
+                <span class="rep-filter-opt-left">
+                  <span class="status-dot-sm" style="background:#ea580c"></span>
+                  <span>Em postura</span>
+                </span>
+                <span class="rep-filter-count">${casais.filter(x => x.status === 'Em postura').length}</span>
+              </button>
+              <button class="rep-filter-opt ${repFiltroStatus === 'Chocando' ? 'selected' : ''}" onclick="filtrarCasaisStatus('Chocando')">
+                <span class="rep-filter-opt-left">
+                  <span class="status-dot-sm" style="background:#a21caf"></span>
+                  <span>Chocando</span>
+                </span>
+                <span class="rep-filter-count">${casais.filter(x => x.status === 'Chocando').length}</span>
+              </button>
+              <button class="rep-filter-opt ${repFiltroStatus === 'Com filhotes' ? 'selected' : ''}" onclick="filtrarCasaisStatus('Com filhotes')">
+                <span class="rep-filter-opt-left">
+                  <span class="status-dot-sm" style="background:#16a34a"></span>
+                  <span>Com filhotes</span>
+                </span>
+                <span class="rep-filter-count">${casais.filter(x => x.status === 'Com filhotes' || x.status === 'Gestação').length}</span>
+              </button>
+              <button class="rep-filter-opt ${repFiltroStatus === 'Formado' ? 'selected' : ''}" onclick="filtrarCasaisStatus('Formado')">
+                <span class="rep-filter-opt-left">
+                  <span class="status-dot-sm" style="background:#2563eb"></span>
+                  <span>Formado</span>
+                </span>
+                <span class="rep-filter-count">${casais.filter(x => x.status === 'Formado').length}</span>
+              </button>
+              <button class="rep-filter-opt ${repFiltroStatus === 'Descanso' ? 'selected' : ''}" onclick="filtrarCasaisStatus('Descanso')">
+                <span class="rep-filter-opt-left">
+                  <span class="status-dot-sm" style="background:#64748b"></span>
+                  <span>Descanso</span>
+                </span>
+                <span class="rep-filter-count">${casais.filter(x => x.status === 'Descanso').length}</span>
+              </button>
+            </div>
+          </div>
+
           <button class="btn-novo-casal" onclick="abrirModalCasal()">
             <svg viewBox="0 0 20 20" fill="none" style="width:16px;height:16px"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
             Novo Casal
@@ -3441,7 +3570,7 @@ function renderReproducao() {
       </div>
 
       <div class="casais-grid">
-        ${casaisHtml}
+        ${casaisConteudoHtml}
       </div>
     </div>`;
 }
