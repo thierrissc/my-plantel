@@ -11,7 +11,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Noto+Emoji:wght@400&display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=3.2" />
+  <link rel="stylesheet" href="css/style.css?v=3.3" />
   <link rel="preload" as="image" href="img/loginicon.png" />
 </head>
 
@@ -374,6 +374,12 @@
             </svg>
             Árvore Genealógica
           </button>
+          <button class="tab-btn" data-tab="reproducao" onclick="switchTab('reproducao', this)">
+            <svg viewBox="0 0 20 20" fill="none">
+              <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+            </svg>
+            Reprodução
+          </button>
         </div>
 
       </div>
@@ -407,6 +413,11 @@
       <div class="tab-content" id="tab-genealogia">
         <div class="ficha-wrap">
           <div id="genealogia-content"></div>
+        </div>
+      </div>
+      <div class="tab-content" id="tab-reproducao">
+        <div class="ficha-wrap">
+          <div id="reproducao-content"></div>
         </div>
       </div>
     </main>
@@ -631,6 +642,12 @@
         </svg>
         <span>Genealogia</span>
       </button>
+      <button class="mobile-tab-btn" data-tab="reproducao" onclick="switchTab('reproducao', this)">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>
+        <span>Reprodução</span>
+      </button>
       <button class="mobile-nav-btn" onclick="abrirModal()">
         <svg viewBox="0 0 24 24" fill="none">
           <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8" />
@@ -639,6 +656,284 @@
         <span>Novo</span>
       </button>
     </nav>
+
+    <!-- Modal Certificado -->
+    <div class="modal-overlay" id="modal-certificado" onclick="fecharModalCertificadoExterno(event)">
+      <div class="modal-box modal-cert-box">
+        <div class="modal-header">
+          <span class="modal-title">Certificado de Origem & Transferência</span>
+          <button class="modal-close" onclick="fecharModalCertificado()">
+            <svg viewBox="0 0 20 20" fill="none">
+              <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body cert-modal-body">
+          <div class="cert-controls no-print">
+            <div class="form-grid-2">
+              <div class="form-field">
+                <label>Nome do Novo Tutor / Cliente</label>
+                <input id="cert-tutor-nome" type="text" placeholder="Ex: Carlos Eduardo Silveira" oninput="atualizarPreviewCertificado()" />
+              </div>
+              <div class="form-field">
+                <label>CPF / Documento do Tutor (opcional)</label>
+                <input id="cert-tutor-doc" type="text" placeholder="Ex: 123.456.789-00" oninput="atualizarPreviewCertificado()" />
+              </div>
+            </div>
+            <div class="form-grid-2">
+              <div class="form-field">
+                <label>Data de Transferência / Emissão</label>
+                <input id="cert-data-emissao" type="date" oninput="atualizarPreviewCertificado()" />
+              </div>
+              <div class="form-field">
+                <label>Finalidade / Destinação (opcional)</label>
+                <input id="cert-obs" type="text" placeholder="Ex: Reprodução / Seleção / Pet" oninput="atualizarPreviewCertificado()" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Documento Imprimível -->
+          <div class="cert-paper" id="cert-printable-area">
+            <div class="cert-border-outer">
+              <div class="cert-border-inner">
+                <div class="cert-header">
+                  <div class="cert-logo-wrap" id="cert-logo-container">
+                    <img id="cert-criatorio-logo" src="img/loginicon.png" alt="Logo Criatório" />
+                  </div>
+                  <div class="cert-criatorio-info">
+                    <h2 class="cert-criatorio-nome" id="cert-criatorio-nome">Criatório Plantel</h2>
+                    <p class="cert-criatorio-sub" id="cert-criatorio-sub">Gestão e Seleção Zootécnica</p>
+                    <p class="cert-criatorio-id" id="cert-criatorio-id">Registro: Plantel Oficial</p>
+                  </div>
+                  <div class="cert-seal">
+                    <div class="cert-seal-inner">
+                      <span>ORIGEM</span>
+                      <strong>CERTIFICADA</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="cert-title-wrap">
+                  <h1 class="cert-main-title">CERTIFICADO DE ORIGEM ZOOTÉCNICA</h1>
+                  <p class="cert-subtitle">REGISTRO GENEALÓGICO E TERMO DE TRANSFERÊNCIA</p>
+                </div>
+
+                <div class="cert-section-title">DADOS DO EXEMPLAR</div>
+                <div class="cert-grid cert-animal-grid">
+                  <div class="cert-field"><span class="cert-label">NOME:</span> <strong id="c-nome">-</strong></div>
+                  <div class="cert-field"><span class="cert-label">ANILHA / REGISTRO:</span> <strong id="c-anilha" class="cert-highlight">-</strong></div>
+                  <div class="cert-field"><span class="cert-label">ESPÉCIE:</span> <strong id="c-especie">-</strong></div>
+                  <div class="cert-field"><span class="cert-label">RAÇA:</span> <strong id="c-raca">-</strong></div>
+                  <div class="cert-field"><span class="cert-label">SEXO:</span> <strong id="c-sexo">-</strong></div>
+                  <div class="cert-field"><span class="cert-label">NASCIMENTO:</span> <strong id="c-nasc">-</strong></div>
+                  <div class="cert-field"><span class="cert-label">PELAGEM / COR:</span> <strong id="c-pelagem">-</strong></div>
+                  <div class="cert-field"><span class="cert-label">STATUS:</span> <strong id="c-status">-</strong></div>
+                </div>
+
+                <div class="cert-section-title">FILIAÇÃO E ANILHAS DOS PAIS</div>
+                <div class="cert-filiacao-grid">
+                  <div class="cert-parent-box">
+                    <span class="cert-parent-role">PAI (MACHO)</span>
+                    <strong class="cert-parent-nome" id="c-pai-nome">Não informado</strong>
+                    <span class="cert-parent-anilha" id="c-pai-anilha">Anilha: Não informada</span>
+                  </div>
+                  <div class="cert-parent-box">
+                    <span class="cert-parent-role">MÃE (FÊMEA)</span>
+                    <strong class="cert-parent-nome" id="c-mae-nome">Não informada</strong>
+                    <span class="cert-parent-anilha" id="c-mae-anilha">Anilha: Não informada</span>
+                  </div>
+                </div>
+
+                <div class="cert-section-title">TRANSFERÊNCIA DE PROPRIEDADE</div>
+                <div class="cert-grid cert-tutor-grid">
+                  <div class="cert-field full"><span class="cert-label">NOVO TUTOR / COMPRADOR:</span> <strong id="c-tutor-nome">Consumidor Final</strong></div>
+                  <div class="cert-field"><span class="cert-label">DOCUMENTO:</span> <strong id="c-tutor-doc">-</strong></div>
+                  <div class="cert-field"><span class="cert-label">DATA DE TRANSFERÊNCIA:</span> <strong id="c-data-transf">-</strong></div>
+                </div>
+
+                <div class="cert-footer">
+                  <div class="cert-disclaimer">
+                    Certificamos que as informações de filiação, anilhamento e características descritas neste documento correspondem com fidelidade aos registros genealógicos do plantel.
+                  </div>
+                  <div class="cert-signature-block">
+                    <div class="cert-signature-line"></div>
+                    <span class="cert-signature-name" id="c-ass-nome">Criador Responsável</span>
+                    <span class="cert-signature-role">Assinatura do Criatório / Plantel</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer no-print">
+          <button class="btn-ghost" onclick="fecharModalCertificado()">Fechar</button>
+          <button class="btn-primary btn-print-action" onclick="imprimirCertificado()">
+            <svg viewBox="0 0 20 20" fill="none" style="width:16px;height:16px;margin-right:6px">
+              <path d="M5 7V3h10v4M5 15H3a1 1 0 01-1-1V9a1 1 0 011-1h14a1 1 0 011 1v5a1 1 0 01-1 1h-2" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M5 12h10v5H5v-5z" stroke="currentColor" stroke-width="1.6"/>
+            </svg>
+            Imprimir / Salvar PDF
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Casal -->
+    <div class="modal-overlay" id="modal-casal" onclick="fecharModalCasalExterno(event)">
+      <div class="modal-box modal-casal-box">
+        <div class="modal-header">
+          <span class="modal-title" id="modal-casal-title">Novo Casal de Reprodução</span>
+          <button class="modal-close" onclick="fecharModalCasal()">
+            <svg viewBox="0 0 20 20" fill="none">
+              <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="casal-id" />
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label>Nome / Código do Casal *</label>
+              <input id="casal-nome" type="text" placeholder="Ex: Casal 01 - Curiós Ouro" />
+            </div>
+            <div class="form-field">
+              <label>Espécie *</label>
+              <select id="casal-especie" onchange="atualizarSelectsCasal()">
+                <option value="Ave">Ave</option>
+                <option value="Cão">Cão</option>
+                <option value="Gato">Gato</option>
+                <option value="Cavalo">Cavalo</option>
+                <option value="Bovino">Bovino</option>
+                <option value="Caprino">Caprino</option>
+                <option value="Ovino">Ovino</option>
+                <option value="Suíno">Suíno</option>
+                <option value="Roedor">Roedor</option>
+                <option value="Outro">Outro</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label>Macho (Pai) *</label>
+              <select id="casal-macho">
+                <option value="">Selecione o macho...</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Fêmea (Mãe) *</label>
+              <select id="casal-femea">
+                <option value="">Selecione a fêmea...</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label>Local / Acomodação (Gaiola, Viveiro, Baia)</label>
+              <input id="casal-local" type="text" placeholder="Ex: Gaiola 04 / Viveiro 2" />
+            </div>
+            <div class="form-field">
+              <label>Status do Casal</label>
+              <select id="casal-status">
+                <option value="Formado">Formado</option>
+                <option value="Em postura">Em postura</option>
+                <option value="Chocando">Chocando / Gestação</option>
+                <option value="Com filhotes">Com filhotes</option>
+                <option value="Descanso">Descanso / Pausa</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label>Data de Formação / Início</label>
+              <input id="casal-inicio" type="date" />
+            </div>
+            <div class="form-field">
+              <label>Observações</label>
+              <input id="casal-obs" type="text" placeholder="Ex: Casal muito fértil..." />
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-ghost" onclick="fecharModalCasal()">Cancelar</button>
+          <button class="btn-primary" onclick="salvarCasalForm()">Salvar Casal</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Ninhada -->
+    <div class="modal-overlay" id="modal-ninhada" onclick="fecharModalNinhadaExterno(event)">
+      <div class="modal-box modal-ninhada-box">
+        <div class="modal-header">
+          <span class="modal-title" id="modal-ninhada-title">Registro de Ninhada / Postura</span>
+          <button class="modal-close" onclick="fecharModalNinhada()">
+            <svg viewBox="0 0 20 20" fill="none">
+              <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="ninhada-casal-id" />
+          <input type="hidden" id="ninhada-idx" />
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label>Data de Início / Acasalamento</label>
+              <input id="nin-data-inicio" type="date" />
+            </div>
+            <div class="form-field">
+              <label>Data da 1ª Postura / Cobertura</label>
+              <input id="nin-data-postura" type="date" />
+            </div>
+          </div>
+          <div class="form-grid-3">
+            <div class="form-field">
+              <label>Total de Ovos</label>
+              <input id="nin-ovos-total" type="number" min="0" value="0" />
+            </div>
+            <div class="form-field">
+              <label>Ovos Férteis (Galados)</label>
+              <input id="nin-ovos-ferteis" type="number" min="0" value="0" />
+            </div>
+            <div class="form-field">
+              <label>Ovos Goros / Inférteis</label>
+              <input id="nin-ovos-goros" type="number" min="0" value="0" />
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label>Previsão de Nascimento / Eclosão</label>
+              <input id="nin-previsao" type="date" />
+            </div>
+            <div class="form-field">
+              <label>Filhotes Nascidos</label>
+              <input id="nin-filhotes-qtd" type="number" min="0" value="0" />
+            </div>
+          </div>
+          <div class="form-field full">
+            <label>Anilhas / Identificação dos Filhotes (separar por vírgula)</label>
+            <input id="nin-anilhas" type="text" placeholder="Ex: BR-2026-001, BR-2026-002" />
+          </div>
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label>Status da Ninhada</label>
+              <select id="nin-status">
+                <option value="Em postura">Em postura</option>
+                <option value="Chocando">Chocando / Gestação</option>
+                <option value="Com filhotes">Com filhotes</option>
+                <option value="Concluída">Concluída</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Observações da Ninhada</label>
+              <input id="nin-obs" type="text" placeholder="Anotações veterinárias, cuidados..." />
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-ghost" onclick="fecharModalNinhada()">Cancelar</button>
+          <button class="btn-primary" onclick="salvarNinhadaForm()">Salvar Ninhada</button>
+        </div>
+      </div>
+    </div>
 
     <div class="dialog-overlay" id="dialog-overlay" onclick="fecharDialogExterno(event)">
       <div class="dialog-box" role="alertdialog" aria-modal="true">
@@ -661,7 +956,7 @@
     <input type="file" id="foto-input" accept="image/*" onchange="carregarFoto(event)" />
   </div>
 
-  <script src="js/app.js?v=3.2"></script>
+  <script src="js/app.js?v=3.3"></script>
 </body>
 
 </html>
