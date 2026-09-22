@@ -4627,6 +4627,107 @@ body {
   background: var(--c-accent-bg);
 }
 
+/* Filtro de Status na Reprodução */
+.rep-filter-wrap {
+  position: relative;
+}
+.btn-rep-filter-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--c-card);
+  border: 1.5px solid var(--c-border);
+  color: var(--c-text-2);
+  padding: 8px 14px;
+  border-radius: var(--r-md);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+.btn-rep-filter-toggle:hover {
+  border-color: var(--c-accent);
+  color: var(--c-accent);
+  background: var(--c-accent-bg);
+}
+.btn-rep-filter-toggle.active {
+  border-color: var(--c-accent);
+  color: var(--c-accent);
+  background: var(--c-accent-bg);
+  font-weight: 700;
+}
+.rep-filter-active-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--c-accent);
+  display: inline-block;
+}
+.rep-filter-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 195px;
+  background: var(--c-card);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+  padding: 6px;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.rep-filter-opt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 7px 10px;
+  border-radius: var(--r-sm);
+  background: transparent;
+  border: none;
+  color: var(--c-text-1);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  text-align: left;
+  font-family: inherit;
+}
+.rep-filter-opt:hover {
+  background: var(--c-surface-2, rgba(0, 0, 0, 0.04));
+}
+.rep-filter-opt.selected {
+  background: var(--c-accent-bg);
+  color: var(--c-accent);
+  font-weight: 700;
+}
+.rep-filter-opt-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.rep-filter-count {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--c-text-3);
+  background: var(--c-surface-2, rgba(0, 0, 0, 0.05));
+  padding: 1px 6px;
+  border-radius: 999px;
+}
+.rep-filter-opt.selected .rep-filter-count {
+  background: rgba(16, 185, 129, 0.2);
+  color: var(--c-accent);
+}
+.status-dot-sm {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
 .btn-novo-casal {
   display: inline-flex;
   align-items: center;
@@ -4890,8 +4991,7 @@ body {
 
 /* Barra de Resumo das Ninhadas no Card */
 .casal-summary-bar {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: flex;
   gap: 8px;
   padding: 10px 14px;
   background: var(--c-surface-2, rgba(0, 0, 0, 0.02));
@@ -4899,6 +4999,7 @@ body {
   border-bottom: 1px solid var(--c-border-soft);
 }
 .casal-sum-pill {
+  flex: 1 1 0;
   display: flex;
   align-items: center;
   gap: 7px;
@@ -4906,7 +5007,7 @@ body {
   background: var(--c-card);
   border: 1px solid var(--c-border);
   border-radius: var(--r-sm);
-  min-width: 0;
+  min-width: 80px;
 }
 .casal-sum-pill .sum-icon {
   font-size: 15px;
@@ -5076,57 +5177,86 @@ body {
   gap: 6px;
 }
 
-.ninhada-body-compact {
+/* Ninhada - Novo Layout Limpo e Estruturado (Sem Emojis, Sem Balões) */
+.ninhada-metrics-bar {
+  display: flex;
+  background: var(--c-surface-2, rgba(0, 0, 0, 0.02));
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-sm);
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+.ninhada-m-col {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  margin-bottom: 6px;
-}
-.ninhada-row-datas,
-.ninhada-row-ovos {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
   align-items: center;
+  justify-content: center;
+  padding: 6px 4px;
+  border-right: 1px solid var(--c-border-soft);
 }
-.nin-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  padding: 3px 8px;
-  border-radius: 6px;
-  background: var(--c-surface-2, rgba(0, 0, 0, 0.03));
-  border: 1px solid var(--c-border);
-  color: var(--c-text-2);
-  line-height: 1.25;
+.ninhada-m-col:last-child {
+  border-right: none;
 }
-.nin-chip strong {
+.ninhada-m-col .m-val {
+  font-size: 13.5px;
+  font-weight: 800;
   color: var(--c-text-1);
-  font-weight: 700;
+  line-height: 1.1;
 }
-.nin-chip.chip-success {
-  background: #ecfdf5;
-  border-color: #a7f3d0;
-  color: #059669;
+.ninhada-m-col .m-lbl {
+  font-size: 9.5px;
+  color: var(--c-text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-top: 2px;
+  font-weight: 600;
 }
-.nin-chip.chip-success strong {
-  color: #047857;
+.ninhada-m-col.m-ferteis .m-val {
+  color: #16a34a;
 }
-.nin-chip.chip-danger {
-  background: #fef2f2;
-  border-color: #fecaca;
+.ninhada-m-col.m-goros .m-val {
   color: #dc2626;
 }
-.nin-chip.chip-danger strong {
-  color: #b91c1c;
+.ninhada-m-col.m-mortos .m-val {
+  color: #71717a;
 }
-.nin-chip.chip-accent {
-  background: var(--c-accent-bg);
-  border-color: rgba(16, 185, 129, 0.3);
+.ninhada-m-col.m-filhotes .m-val {
   color: var(--c-accent);
 }
-.nin-chip.chip-accent strong {
+
+.ninhada-timeline-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(105px, 1fr));
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.ninhada-timeline-item {
+  display: flex;
+  flex-direction: column;
+  background: var(--c-card);
+  border: 1px solid var(--c-border-soft);
+  border-radius: var(--r-sm);
+  padding: 5px 8px;
+}
+.ninhada-timeline-item .tl-lbl {
+  font-size: 9.5px;
+  font-weight: 600;
+  color: var(--c-text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.ninhada-timeline-item .tl-val {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--c-text-1);
+  margin-top: 2px;
+}
+.ninhada-timeline-item.tl-destaque {
+  background: var(--c-accent-bg);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+.ninhada-timeline-item.tl-destaque .tl-val {
   color: var(--c-accent);
 }
 
@@ -5134,7 +5264,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 5px;
-  margin-top: 4px;
+  margin-top: 6px;
 }
 .filhote-card-row {
   display: flex;
@@ -5149,10 +5279,11 @@ body {
 .filhote-anilha-tag {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   font-size: 11.5px;
   color: #166534;
   font-family: monospace;
+  font-weight: 600;
 }
 .btn-reg-filhote-pro {
   display: inline-flex;
@@ -5173,13 +5304,20 @@ body {
   background: #15803d;
   transform: translateY(-1px);
 }
-.ninhada-obs-inline {
+.ninhada-obs-clean {
   font-size: 11px;
   color: var(--c-text-2);
+  margin-top: 6px;
+  padding: 6px 10px;
+  background: var(--c-surface-2, rgba(0, 0, 0, 0.02));
+  border-left: 3px solid var(--c-accent);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
   font-style: italic;
-  margin-top: 4px;
-  padding-top: 4px;
-  border-top: 1px dashed var(--c-border-soft);
+}
+.ninhada-obs-clean strong {
+  font-style: normal;
+  color: var(--c-text-1);
+  margin-right: 4px;
 }
 
 /* Modais de Casal e Ninhada */
