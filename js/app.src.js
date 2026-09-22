@@ -3077,6 +3077,11 @@ function toggleRepStats() {
   }
 }
 
+function isAve(especie) {
+  if (!especie) return true;
+  return /ave|p[aá]ssaro|passaro|can[aá]rio|curi[oó]|trinca|calopsita|periquito|papagaio|galinha|galo|calafate|manon|diamante/i.test(especie);
+}
+
 function renderReproducao() {
   const container = document.getElementById("reproducao-content");
   if (!container) return;
@@ -3088,12 +3093,17 @@ function renderReproducao() {
 
   let totalOvos = 0;
   let totalFilhotes = 0;
+  let totalNinhadas = 0;
   casais.forEach((c) => {
-    (c.ninhadas || []).forEach((n) => {
+    const nin = c.ninhadas || [];
+    totalNinhadas += nin.length;
+    nin.forEach((n) => {
       totalOvos += parseInt(n.ovosTotal) || 0;
       totalFilhotes += parseInt(n.filhotesQtd) || 0;
     });
   });
+
+  const temAves = casais.length === 0 || casais.some((c) => isAve(c.especie));
 
   const casaisHtml = casais.length
     ? casais
@@ -3111,12 +3121,14 @@ function renderReproducao() {
           const femeaFoto = femea?.foto || null;
           const femeaEmoji = femea ? (EMOJIS[femea.especie] || `<span class="noto-emoji">🐾</span>`) : `<span class="noto-emoji">♀</span>`;
 
+          const casalAve = isAve(c.especie);
           const ultimaNinhada = (c.ninhadas && c.ninhadas.length > 0) ? c.ninhadas[c.ninhadas.length - 1] : null;
-          const ovosTxt = ultimaNinhada ? `${ultimaNinhada.ovosTotal || 0} (${ultimaNinhada.ovosFerteis || 0} férteis)` : "0";
-          const filhotesTxt = ultimaNinhada ? `${ultimaNinhada.filhotesQtd || 0}` : "0";
+          const ovosNum = ultimaNinhada ? (ultimaNinhada.ovosTotal || 0) : 0;
+          const ferteisNum = ultimaNinhada ? (ultimaNinhada.ovosFerteis || 0) : 0;
+          const filhotesNum = ultimaNinhada ? (ultimaNinhada.filhotesQtd || 0) : 0;
           const eclosaoTxt = ultimaNinhada?.dataEclosao
             ? fmtDate(ultimaNinhada.dataEclosao)
-            : (ultimaNinhada?.previsao ? fmtDate(ultimaNinhada.previsao) : "—");
+            : (ultimaNinhada?.previsao ? fmtDate(ultimaNinhada.previsao) : "");
 
           let badgeClass = "badge-formado";
           if (c.status === "Em postura") badgeClass = "badge-postura";
@@ -3140,110 +3152,61 @@ function renderReproducao() {
                     <strong>${an}</strong>
                   </div>
                   <button class="btn-reg-filhote-pro" onclick="registrarFilhoteNoPlantel(${c.id}, ${idx}, '${an}')" title="Cadastrar filhote como animal no plantel">
-                    <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    <svg width="12" height="12" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     Cadastrar no Plantel
                   </button>
                 </div>`
                 )
                 .join("");
 
+              const chipsDatas = [];
+              if (casalAve) {
+                if (n.dataPostura) chipsDatas.push(`<span class="nin-chip">1º Ovo: <strong>${fmtDate(n.dataPostura)}</strong></span>`);
+                if (n.dataUltimoOvo) chipsDatas.push(`<span class="nin-chip">Último Ovo: <strong>${fmtDate(n.dataUltimoOvo)}</strong></span>`);
+                if (n.dataChoco) chipsDatas.push(`<span class="nin-chip">Choco: <strong>${fmtDate(n.dataChoco)}</strong></span>`);
+                if (n.dataEclosao) chipsDatas.push(`<span class="nin-chip chip-success">Eclosão: <strong>${fmtDate(n.dataEclosao)}</strong></span>`);
+                else if (n.previsao) chipsDatas.push(`<span class="nin-chip chip-accent">Prev. Eclosão: <strong>${fmtDate(n.previsao)}</strong></span>`);
+              } else {
+                if (n.dataInicio) chipsDatas.push(`<span class="nin-chip">Cobertura: <strong>${fmtDate(n.dataInicio)}</strong></span>`);
+                if (n.previsao) chipsDatas.push(`<span class="nin-chip chip-accent">Prev. Parto: <strong>${fmtDate(n.previsao)}</strong></span>`);
+                if (n.dataEclosao) chipsDatas.push(`<span class="nin-chip chip-success">Parto Real: <strong>${fmtDate(n.dataEclosao)}</strong></span>`);
+              }
+
+              const chipsOvos = [];
+              if (casalAve) {
+                chipsOvos.push(`<span class="nin-chip">🥚 <strong>${n.ovosTotal || 0}</strong> ovos</span>`);
+                if ((n.ovosFerteis || 0) > 0) chipsOvos.push(`<span class="nin-chip chip-success">✓ <strong>${n.ovosFerteis}</strong> férteis</span>`);
+                if ((n.ovosGoros || 0) > 0) chipsOvos.push(`<span class="nin-chip chip-danger">✗ <strong>${n.ovosGoros}</strong> goros</span>`);
+                if ((n.ovosMortos || 0) > 0) chipsOvos.push(`<span class="nin-chip">† <strong>${n.ovosMortos}</strong> mortos</span>`);
+              }
+
+              const chipFilhotes = (n.filhotesQtd || 0) > 0
+                ? `<span class="nin-chip chip-success">🐣 <strong>${n.filhotesQtd}</strong> filhotes</span>`
+                : "";
+
               return `
               <div class="ninhada-card-box">
                 <div class="ninhada-box-header">
                   <div class="ninhada-box-title">
                     <span class="ninhada-num-badge">Ninhada #${idx + 1}</span>
-                    ${n.dataInicio ? `<span class="ninhada-data-sub">Iniciada em <strong>${fmtDate(n.dataInicio)}</strong></span>` : ""}
+                    ${n.dataInicio ? `<span class="ninhada-data-sub">Início: <strong>${fmtDate(n.dataInicio)}</strong></span>` : ""}
                   </div>
                   <div class="ninhada-box-right">
                     <span class="casal-badge ${n.status === 'Concluída' ? 'badge-descanso' : 'badge-filhotes'}">${n.status || 'Em andamento'}</span>
                     <button class="btn-action-icon btn-danger" onclick="excluirNinhada(${c.id}, ${idx})" title="Excluir ninhada">
-                      <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M4 6h12M8 6V4h4v2M6 6v10h8V6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><path d="M4 6h12M8 6V4h4v2M6 6v10h8V6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </button>
                   </div>
                 </div>
 
-                <!-- 1. Cronograma / Datas -->
-                <div class="ninhada-block">
-                  <div class="ninhada-block-label">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                    CRONOGRAMA & DATAS
-                  </div>
-                  <div class="ninhada-cronograma-grid">
-                    <div class="crono-item">
-                      <span class="crono-lbl">1º Ovo</span>
-                      <strong class="crono-val">${n.dataPostura ? fmtDate(n.dataPostura) : '—'}</strong>
-                    </div>
-                    <div class="crono-item">
-                      <span class="crono-lbl">Último Ovo</span>
-                      <strong class="crono-val">${n.dataUltimoOvo ? fmtDate(n.dataUltimoOvo) : '—'}</strong>
-                    </div>
-                    <div class="crono-item">
-                      <span class="crono-lbl">Início Choco</span>
-                      <strong class="crono-val">${n.dataChoco ? fmtDate(n.dataChoco) : '—'}</strong>
-                    </div>
-                    <div class="crono-item highlight">
-                      <span class="crono-lbl">${n.dataEclosao ? 'Eclosão Real' : 'Prev. Eclosão'}</span>
-                      <strong class="crono-val ${n.dataEclosao ? 'crono-success' : ''}">
-                        ${n.dataEclosao ? fmtDate(n.dataEclosao) : (n.previsao ? fmtDate(n.previsao) : '—')}
-                      </strong>
-                    </div>
-                  </div>
+                <div class="ninhada-chips-row">
+                  ${chipsDatas.join("")}
+                  ${chipsOvos.join("")}
+                  ${chipFilhotes}
                 </div>
 
-                <!-- 2. Balanço dos Ovos -->
-                <div class="ninhada-block">
-                  <div class="ninhada-block-label">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="13" rx="7" ry="9"/></svg>
-                    BALANÇO DOS OVOS
-                  </div>
-                  <div class="ninhada-ovos-grid">
-                    <div class="ovos-card ovos-total">
-                      <span class="ovos-num">${n.ovosTotal || 0}</span>
-                      <span class="ovos-desc">Total Ovos</span>
-                    </div>
-                    <div class="ovos-card ovos-ferteis">
-                      <span class="ovos-num">${n.ovosFerteis || 0}</span>
-                      <span class="ovos-desc">Férteis</span>
-                    </div>
-                    <div class="ovos-card ovos-goros">
-                      <span class="ovos-num">${n.ovosGoros || 0}</span>
-                      <span class="ovos-desc">Goros</span>
-                    </div>
-                    <div class="ovos-card ovos-mortos">
-                      <span class="ovos-num">${n.ovosMortos || 0}</span>
-                      <span class="ovos-desc">Mortos no Ovo</span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 3. Filhotes & Anilhas -->
-                <div class="ninhada-block">
-                  <div class="ninhada-block-label">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v3m7.071.929l-2.121 2.121M22 12h-3m.929 7.071l-2.121-2.121M12 22v-3m-7.071-.929l2.121-2.121M2 12h3m-.929-7.071l2.121 2.121"/></svg>
-                    FILHOTES NASCIDOS (${n.filhotesQtd || 0})
-                  </div>
-                  ${
-                    filhotesBadges
-                      ? `<div class="filhotes-container">${filhotesBadges}</div>`
-                      : `<div class="filhotes-empty-note">
-                          ${n.filhotesQtd > 0 ? `${n.filhotesQtd} filhote(s) registrado(s) sem anilhas adicionadas.` : 'Nenhum filhote nascido registrado ainda.'}
-                        </div>`
-                  }
-                </div>
-
-                <!-- 4. Observações -->
-                ${
-                  n.obs
-                    ? `
-                <div class="ninhada-block">
-                  <div class="ninhada-block-label">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
-                    OBSERVAÇÕES DO CRIADOR
-                  </div>
-                  <div class="ninhada-obs-card">"${n.obs}"</div>
-                </div>`
-                    : ""
-                }
+                ${filhotesBadges ? `<div class="filhotes-container">${filhotesBadges}</div>` : ""}
+                ${n.obs ? `<div class="ninhada-obs-inline">"${n.obs}"</div>` : ""}
               </div>`;
             })
             .join("");
@@ -3288,17 +3251,27 @@ function renderReproducao() {
             </div>
 
             <div class="casal-summary-bar">
-              <div class="casal-sum-pill">
-                <span class="sum-icon"><span class="noto-emoji noto-emoji-inline">🥚</span></span>
-                <div class="sum-data">
-                  <span class="sum-val">${ovosTxt}</span>
-                  <span class="sum-lbl">Ovos</span>
-                </div>
-              </div>
+              ${
+                casalAve
+                  ? `<div class="casal-sum-pill">
+                      <span class="sum-icon"><span class="noto-emoji noto-emoji-inline">🥚</span></span>
+                      <div class="sum-data">
+                        <span class="sum-val">${ovosNum}${ferteisNum > 0 ? ` <small style="font-size:10.5px;color:var(--c-accent);font-weight:700">(${ferteisNum} férteis)</small>` : ""}</span>
+                        <span class="sum-lbl">Ovos</span>
+                      </div>
+                    </div>`
+                  : `<div class="casal-sum-pill">
+                      <span class="sum-icon"><span class="noto-emoji noto-emoji-inline">🧬</span></span>
+                      <div class="sum-data">
+                        <span class="sum-val">${c.status || "Ativo"}</span>
+                        <span class="sum-lbl">Reprodução</span>
+                      </div>
+                    </div>`
+              }
               <div class="casal-sum-pill">
                 <span class="sum-icon"><span class="noto-emoji noto-emoji-inline">🐣</span></span>
                 <div class="sum-data">
-                  <span class="sum-val">${filhotesTxt}</span>
+                  <span class="sum-val">${filhotesNum}</span>
                   <span class="sum-lbl">Filhotes</span>
                 </div>
               </div>
@@ -3306,7 +3279,7 @@ function renderReproducao() {
                 <span class="sum-icon"><span class="noto-emoji noto-emoji-inline">⏳</span></span>
                 <div class="sum-data">
                   <span class="sum-val">${eclosaoTxt}</span>
-                  <span class="sum-lbl">Previsão</span>
+                  <span class="sum-lbl">${casalAve ? "Previsão" : "Prev. Parto"}</span>
                 </div>
               </div>
             </div>
@@ -3317,9 +3290,9 @@ function renderReproducao() {
                 <span>Ninhadas (${(c.ninhadas || []).length})</span>
               </button>
               <div class="casal-actions-right">
-                <button class="btn-action-primary" onclick="abrirModalNinhada(${c.id})" title="Registrar nova postura">
+                <button class="btn-action-primary" onclick="abrirModalNinhada(${c.id})" title="${casalAve ? 'Registrar nova postura' : 'Registrar nova ninhada'}">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-                  <span>Nova Postura</span>
+                  <span>${casalAve ? "Nova Postura" : "Nova Ninhada"}</span>
                 </button>
                 <button class="btn-action-icon" onclick="abrirModalCasal(${c.id})" title="Editar casal">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -3331,7 +3304,7 @@ function renderReproducao() {
             </div>
 
             <div class="ninhadas-section" id="ninhadas-sec-${c.id}">
-              ${ninhadasListHtml || '<div style="font-size:12px;color:var(--c-text-3);text-align:center;padding:12px">Nenhuma ninhada registrada para este casal ainda.</div>'}
+              ${ninhadasListHtml || '<div style="font-size:12px;color:var(--c-text-3);text-align:center;padding:8px">Nenhuma ninhada registrada para este casal ainda.</div>'}
             </div>
           </div>`;
         })
@@ -3344,7 +3317,7 @@ function renderReproducao() {
         </svg>
       </div>
       <h3 style="font-size:18px;font-weight:700;color:var(--c-text-1);margin:0 0 6px">Nenhum casal formado</h3>
-      <p style="font-size:13px;color:var(--c-text-2);margin:0 0 18px">Forme casais da mesma espécie para acompanhar posturas de ovos, filhotes e ninhadas.</p>
+      <p style="font-size:13px;color:var(--c-text-2);margin:0 0 18px">Forme casais da mesma espécie para acompanhar reprodução, filhotes e ninhadas.</p>
       <button class="btn-novo-casal" onclick="abrirModalCasal()">+ Formar Primeiro Casal</button>
     </div>`;
 
@@ -3359,8 +3332,7 @@ function renderReproducao() {
             Área de Reprodução
           </h1>
           <p>
-            Gestão de casais, controle de posturas, ovos e registro de filhotes
-            <span class="rep-summary-pill">${totalCasais} Casais · ${totalOvos} Ovos · ${totalFilhotes} Filhotes</span>
+            Gestão de casais, controle reprodutivo e registro de filhotes
           </p>
         </div>
         <div class="rep-header-actions">
@@ -3380,7 +3352,7 @@ function renderReproducao() {
       <div class="rep-stats-wrapper" id="rep-stats-wrapper" style="display: ${repStatsVisivel ? 'block' : 'none'};">
         <div class="rep-stats-grid">
           <div class="rep-stat-card">
-            <div class="rep-stat-icon" style="background:var(--c-accent-bg);color:var(--c-accent)">
+            <div class="rep-stat-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px">
                 <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
                 <circle cx="9" cy="7" r="4"/>
@@ -3394,7 +3366,7 @@ function renderReproducao() {
             </div>
           </div>
           <div class="rep-stat-card">
-            <div class="rep-stat-icon" style="background:#fef3c7;color:#b45309">
+            <div class="rep-stat-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px">
                 <path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 3z"/>
               </svg>
@@ -3405,21 +3377,29 @@ function renderReproducao() {
             </div>
           </div>
           <div class="rep-stat-card">
-            <div class="rep-stat-icon" style="background:#f0fdf4;color:#16a34a">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px">
-                <ellipse cx="12" cy="13" rx="7" ry="9"/>
-              </svg>
+            <div class="rep-stat-icon">
+              ${
+                temAves
+                  ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px">
+                      <ellipse cx="12" cy="13" rx="7" ry="9"/>
+                    </svg>`
+                  : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px">
+                      <path d="M3 12h18M3 12a9 9 0 0118 0M5 16h14M7 20h10"/>
+                    </svg>`
+              }
             </div>
             <div>
-              <div class="rep-stat-val">${totalOvos}</div>
-              <div class="rep-stat-lbl">Total de Ovos</div>
+              <div class="rep-stat-val">${temAves ? totalOvos : totalNinhadas}</div>
+              <div class="rep-stat-lbl">${temAves ? "Total de Ovos" : "Ninhadas Registradas"}</div>
             </div>
           </div>
           <div class="rep-stat-card">
-            <div class="rep-stat-icon" style="background:#eff6ff;color:#2563eb">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px">
-                <path d="M12 2v3m7.071.929l-2.121 2.121M22 12h-3m.929 7.071l-2.121-2.121M12 22v-3m-7.071-.929l2.121-2.121M2 12h3m-.929-7.071l2.121 2.121"/>
-                <circle cx="12" cy="12" r="4"/>
+            <div class="rep-stat-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px">
+                <path d="M3 18a9 9 0 0 1 9-9h1a4 4 0 0 1 4 4v1a4 4 0 0 1-4 4H3z"/>
+                <circle cx="13" cy="9" r="1.5" fill="currentColor"/>
+                <path d="M17 9l4-2-2 4"/>
+                <path d="M7 18a5 5 0 0 1 5-5"/>
               </svg>
             </div>
             <div>
@@ -3581,8 +3561,44 @@ function abrirModalNinhada(casalId) {
   const modal = document.getElementById("modal-ninhada");
   if (!modal) return;
 
+  const casalAve = isAve(c.especie);
+
   document.getElementById("ninhada-casal-id").value = casalId;
-  document.getElementById("modal-ninhada-title").textContent = `Nova Ninhada · ${c.nome}`;
+  document.getElementById("modal-ninhada-title").textContent = casalAve
+    ? `Nova Postura · ${c.nome}`
+    : `Nova Ninhada · ${c.nome}`;
+
+  // Ajustar visibilidade e textos para aves vs mamíferos
+  document.querySelectorAll(".nin-campo-ave").forEach((el) => {
+    el.style.display = casalAve ? "" : "none";
+  });
+  const lblInicio = document.getElementById("nin-label-inicio");
+  if (lblInicio) lblInicio.textContent = casalAve ? "Data de Acasalamento" : "Data de Cobertura / Cruzamento";
+  const lblPrev = document.getElementById("nin-label-previsao");
+  if (lblPrev) lblPrev.textContent = casalAve ? "Previsão de Eclosão" : "Previsão do Parto";
+  const lblEclosao = document.getElementById("nin-label-eclosao");
+  if (lblEclosao) lblEclosao.textContent = casalAve ? "Data Real da Eclosão" : "Data Real do Parto";
+
+  // Ajustar opções do select status
+  const selectStatus = document.getElementById("nin-status");
+  if (selectStatus) {
+    if (casalAve) {
+      selectStatus.innerHTML = `
+        <option value="Em postura">Em postura</option>
+        <option value="Chocando">Chocando / Incubação</option>
+        <option value="Com filhotes">Com filhotes no ninho</option>
+        <option value="Concluída">Concluída</option>
+      `;
+    } else {
+      selectStatus.innerHTML = `
+        <option value="Cobertura">Cobertura realizada</option>
+        <option value="Gestação">Gestação confirmada</option>
+        <option value="Com filhotes">Com filhotes / Lactação</option>
+        <option value="Concluída">Concluída / Desmamados</option>
+      `;
+    }
+  }
+
   document.getElementById("nin-data-inicio").value = new Date().toISOString().slice(0, 10);
   document.getElementById("nin-data-postura").value = "";
   if (document.getElementById("nin-data-ultimo-ovo")) document.getElementById("nin-data-ultimo-ovo").value = "";
@@ -3595,7 +3611,7 @@ function abrirModalNinhada(casalId) {
   if (document.getElementById("nin-ovos-mortos")) document.getElementById("nin-ovos-mortos").value = 0;
   document.getElementById("nin-filhotes-qtd").value = 0;
   document.getElementById("nin-anilhas").value = "";
-  document.getElementById("nin-status").value = "Em postura";
+  document.getElementById("nin-status").value = casalAve ? "Em postura" : "Gestação";
   document.getElementById("nin-obs").value = "";
 
   modal.style.display = "flex";
@@ -3615,21 +3631,23 @@ function salvarNinhadaForm() {
   const c = casais.find((x) => x.id === cid);
   if (!c) return;
 
+  const casalAve = isAve(c.especie);
+
   const nova = {
     id: Date.now(),
     dataInicio: document.getElementById("nin-data-inicio")?.value || "",
-    dataPostura: document.getElementById("nin-data-postura")?.value || "",
-    dataUltimoOvo: document.getElementById("nin-data-ultimo-ovo")?.value || "",
-    dataChoco: document.getElementById("nin-data-choco")?.value || "",
+    dataPostura: casalAve ? (document.getElementById("nin-data-postura")?.value || "") : "",
+    dataUltimoOvo: casalAve ? (document.getElementById("nin-data-ultimo-ovo")?.value || "") : "",
+    dataChoco: casalAve ? (document.getElementById("nin-data-choco")?.value || "") : "",
     previsao: document.getElementById("nin-previsao")?.value || "",
     dataEclosao: document.getElementById("nin-data-eclosao")?.value || "",
-    ovosTotal: parseInt(document.getElementById("nin-ovos-total")?.value) || 0,
-    ovosFerteis: parseInt(document.getElementById("nin-ovos-ferteis")?.value) || 0,
-    ovosGoros: parseInt(document.getElementById("nin-ovos-goros")?.value) || 0,
-    ovosMortos: parseInt(document.getElementById("nin-ovos-mortos")?.value) || 0,
+    ovosTotal: casalAve ? (parseInt(document.getElementById("nin-ovos-total")?.value) || 0) : 0,
+    ovosFerteis: casalAve ? (parseInt(document.getElementById("nin-ovos-ferteis")?.value) || 0) : 0,
+    ovosGoros: casalAve ? (parseInt(document.getElementById("nin-ovos-goros")?.value) || 0) : 0,
+    ovosMortos: casalAve ? (parseInt(document.getElementById("nin-ovos-mortos")?.value) || 0) : 0,
     filhotesQtd: parseInt(document.getElementById("nin-filhotes-qtd")?.value) || 0,
     anilhas: document.getElementById("nin-anilhas")?.value?.trim() || "",
-    status: document.getElementById("nin-status")?.value || "Em postura",
+    status: document.getElementById("nin-status")?.value || (casalAve ? "Em postura" : "Gestação"),
     obs: document.getElementById("nin-obs")?.value?.trim() || ""
   };
 
@@ -3639,6 +3657,7 @@ function salvarNinhadaForm() {
   if (nova.status === "Com filhotes") c.status = "Com filhotes";
   else if (nova.status === "Chocando") c.status = "Chocando";
   else if (nova.status === "Em postura") c.status = "Em postura";
+  else if (nova.status === "Gestação") c.status = "Gestação";
 
   salvarCasais(casais);
   fecharModalNinhada();
