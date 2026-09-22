@@ -440,7 +440,7 @@
         </div>
       </div>
       <div class="tab-content" id="tab-reproducao">
-        <div class="ficha-wrap">
+        <div class="rep-container">
           <div id="reproducao-content"></div>
         </div>
       </div>
@@ -901,16 +901,16 @@
           
           <div class="form-grid-2">
             <div class="form-field">
-              <label>Data de Acasalamento</label>
+              <label id="nin-label-inicio">Data de Acasalamento</label>
               <input id="nin-data-inicio" type="date" />
             </div>
-            <div class="form-field">
+            <div class="form-field nin-campo-ave" id="nin-campo-postura">
               <label>Data do 1º Ovo (Início da Postura)</label>
               <input id="nin-data-postura" type="date" />
             </div>
           </div>
 
-          <div class="form-grid-2">
+          <div class="form-grid-2 nin-campo-ave" id="nin-grid-choco">
             <div class="form-field">
               <label>Data do Último Ovo</label>
               <input id="nin-data-ultimo-ovo" type="date" />
@@ -923,16 +923,16 @@
 
           <div class="form-grid-2">
             <div class="form-field">
-              <label>Previsão de Eclosão</label>
+              <label id="nin-label-previsao">Previsão de Eclosão</label>
               <input id="nin-previsao" type="date" />
             </div>
             <div class="form-field">
-              <label>Data Real da Eclosão</label>
+              <label id="nin-label-eclosao">Data Real da Eclosão</label>
               <input id="nin-data-eclosao" type="date" />
             </div>
           </div>
 
-          <div class="form-grid-3">
+          <div class="form-grid-3 nin-campo-ave" id="nin-grid-ovos-balanco">
             <div class="form-field">
               <label>Total de Ovos</label>
               <input id="nin-ovos-total" type="number" min="0" value="0" />
@@ -952,7 +952,7 @@
               <label>Filhotes Nascidos</label>
               <input id="nin-filhotes-qtd" type="number" min="0" value="0" />
             </div>
-            <div class="form-field">
+            <div class="form-field nin-campo-ave" id="nin-campo-ovos-mortos">
               <label>Ovos Bicados / Mortos no Ovo</label>
               <input id="nin-ovos-mortos" type="number" min="0" value="0" />
             </div>
