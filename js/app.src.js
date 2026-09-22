@@ -912,7 +912,7 @@ function renderFichaContent(a) {
       <div class="form-field"><label>Vacina</label><input id="nv-nome" type="text" placeholder="Nome da vacina" /></div>
       <div class="form-field"><label>Aplicação</label><input id="nv-data" type="date" /></div>
       <div class="form-field"><label>Próxima dose</label><input id="nv-prox" type="date" /></div>
-      <button class="btn-add-vac" onclick="adicionarVacina()">+ Adicionar</button>
+      <button class="btn-add-vac" onclick="adicionarVacina()">+ Adicionar Vacinas</button>
     </div>`
     : "";
 
@@ -951,10 +951,6 @@ function renderFichaContent(a) {
         <div class="tag-row">
           ${a.sexo ? `<span class="tag-chip">${a.sexo}</span>` : ""}
           ${a.raca ? `<span class="tag-chip">${a.raca}</span>` : ""}
-          <span class="tag-chip area-chip-interactive" onclick="trocarAreaAnimal(${a.id})" title="Clique para alterar a área do animal">
-            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" style="margin-right:4px"><path d="M2 3h12M4 8h8M7 13h2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-            ${a.area ? `Área: ${a.area}` : "Definir Área"}
-          </span>
         </div>
         <div class="ficha-actions">
           ${
@@ -972,61 +968,58 @@ function renderFichaContent(a) {
       </div>
     </div>
 
-    <div class="ficha-sections-grid ${temVacinas ? 'com-vacina' : 'no-vacina'}">
-      <div class="section-card">
-        <div class="section-header">
-          <div class="section-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M8 2v4M16 2v4M3 10h18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-          <span class="section-title">Dados Gerais</span>
-          ${!temVacinas ? `
-            <button type="button" class="btn-ativar-vac" onclick="ativarVacinacaoAnimal(${a.id})" title="Adicionar controle de vacinas a este animal">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-              Adicionar Vacina
-            </button>
-          ` : ""}
-        </div>
-        <div class="grid-3">
-          ${field("Espécie", a.especie, "especie", "text", ["Cão", "Gato", "Cavalo", "Bovino", "Suíno", "Ave", "Caprino", "Ovino", "Roedor", "Outro"])}
-          ${field("Raça", a.raca, "raca")}
-          ${field("Sexo", a.sexo, "sexo", "text", ["", "Macho", "Fêmea"])}
-        </div>
-        <div class="grid-3 mt">
-          ${field("Nascimento", a.nasc, "nasc", "date")}
-          ${field("Peso", a.peso, "peso")}
-          ${field("Pelagem / Cor", a.pelagem, "pelagem")}
-        </div>
-        <div class="grid-3 mt">
-          ${field("Microchip / ID", a.microchip, "microchip")}
-          ${field("Status", a.status, "status", "text", ["Ativo", "Em tratamento", "Inativo"])}
-          ${field("Área / Local", a.area || "", "area", "select", areasDisponiveis)}
-        </div>
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M8 2v4M16 2v4M3 10h18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <span class="section-title">Dados Gerais</span>
       </div>
-
-      ${
-        temVacinas
-          ? `<div class="section-card">
-              <div class="section-header">
-                <div class="section-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M9 3l-4 4 8 8 4-4-8-8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M15 7l2 2M5 13l-2 4 4-2M19 5l1-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-                <span class="section-title">Vacinação</span>
-                ${ed ? `<button type="button" class="btn-vac-toggle-off" onclick="desativarVacinacaoAnimal(${a.id})" title="Ocultar cartão de vacinas">Ocultar</button>` : ""}
-              </div>
-              ${
-                (a.vacinas || []).length > 0
-                  ? `<div class="vac-table-wrap">
-                      <table class="vac-table">
-                        <thead><tr>
-                          <th>Vacina</th><th>Aplicação</th><th>Próxima dose</th><th>Situação</th>
-                          ${ed ? "<th></th>" : ""}
-                        </tr></thead>
-                        <tbody>${vacRows}</tbody>
-                      </table>
-                    </div>`
-                  : `<div class="vac-empty-state">Nenhuma vacina registrada</div>`
-              }
-              ${addVacForm}
-            </div>`
-          : ""
-      }
+      <div class="grid-3">
+        ${field("Espécie", a.especie, "especie", "text", ["Cão", "Gato", "Cavalo", "Bovino", "Suíno", "Ave", "Caprino", "Ovino", "Roedor", "Outro"])}
+        ${field("Raça", a.raca, "raca")}
+        ${field("Sexo", a.sexo, "sexo", "text", ["", "Macho", "Fêmea"])}
+      </div>
+      <div class="grid-3 mt">
+        ${field("Nascimento", a.nasc, "nasc", "date")}
+        ${field("Peso", a.peso, "peso")}
+        ${field("Pelagem / Cor", a.pelagem, "pelagem")}
+      </div>
+      <div class="grid-3 mt">
+        ${field("Microchip / ID", a.microchip, "microchip")}
+        ${field("Status", a.status, "status", "text", ["Ativo", "Em tratamento", "Inativo"])}
+        ${field("Área / Local", a.area || "", "area", "select", areasDisponiveis)}
+      </div>
     </div>
+
+    ${
+      temVacinas
+        ? `<div class="section-card">
+            <div class="section-header">
+              <div class="section-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M9 3l-4 4 8 8 4-4-8-8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M15 7l2 2M5 13l-2 4 4-2M19 5l1-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+              <span class="section-title">Vacinação</span>
+              ${ed ? `<button type="button" class="btn-vac-toggle-off" onclick="desativarVacinacaoAnimal(${a.id})" title="Ocultar cartão de vacinas">Ocultar</button>` : ""}
+            </div>
+            ${
+              (a.vacinas || []).length > 0
+                ? `<div class="vac-table-wrap">
+                    <table class="vac-table">
+                      <thead><tr>
+                        <th>Vacina</th><th>Aplicação</th><th>Próxima dose</th><th>Situação</th>
+                        ${ed ? "<th></th>" : ""}
+                      </tr></thead>
+                      <tbody>${vacRows}</tbody>
+                    </table>
+                  </div>`
+                : `<div class="vac-empty-state">Nenhuma vacina registrada</div>`
+            }
+            ${addVacForm}
+          </div>`
+        : `<div class="vac-optional-trigger">
+            <button type="button" class="btn-cta-vac" onclick="ativarVacinacaoAnimal(${a.id})">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              Adicionar Vacinas
+            </button>
+          </div>`
+    }
 
     <div class="section-card">
       <div class="section-header">
@@ -1646,41 +1639,12 @@ function ativarVacinacaoAnimal(id) {
 function desativarVacinacaoAnimal(id) {
   const a = animais.find((x) => x.id === id);
   if (!a) return;
+  if (a.vacinas && a.vacinas.length > 0) {
+    if (!confirm("Deseja ocultar a vacinação e remover as vacinas registradas deste animal?")) return;
+    a.vacinas = [];
+  }
   a.exibirVacinacao = false;
   salvarAnimais();
-  renderFicha();
-}
-
-function trocarAreaAnimal(id) {
-  const a = animais.find((x) => x.id === id);
-  if (!a) return;
-  const listaAreas = getAreas().filter((x) => x !== "Todos");
-  let msg = `Área atual: ${a.area || "Sem área definida"}\n\nEscolha o número da nova área:\n0: Sem área definida\n`;
-  listaAreas.forEach((ar, i) => {
-    msg += `${i + 1}: ${ar}\n`;
-  });
-  msg += `\nOu digite o nome de uma nova área:`;
-  const res = prompt(msg, a.area || "");
-  if (res === null) return;
-  const t = res.trim();
-  const n = parseInt(t, 10);
-  if (!isNaN(n) && n === 0) {
-    a.area = "";
-  } else if (!isNaN(n) && n >= 1 && n <= listaAreas.length) {
-    a.area = listaAreas[n - 1];
-  } else if (t) {
-    a.area = t;
-    const todas = getAreas();
-    if (!todas.includes(t)) {
-      todas.push(t);
-      salvarAreas(todas);
-      renderAreaBar();
-    }
-  } else {
-    a.area = "";
-  }
-  salvarAnimais();
-  renderSidebar();
   renderFicha();
 }
 
@@ -3968,16 +3932,6 @@ function abrirModalCertificado(animalId) {
   const modal = document.getElementById("modal-certificado");
   if (!modal) return;
 
-  const tutorNome = document.getElementById("cert-tutor-nome");
-  const tutorDoc = document.getElementById("cert-tutor-doc");
-  const emissao = document.getElementById("cert-data-emissao");
-  const obs = document.getElementById("cert-obs");
-
-  if (tutorNome) tutorNome.value = "";
-  if (tutorDoc) tutorDoc.value = "";
-  if (emissao) emissao.value = "";
-  if (obs) obs.value = "";
-
   atualizarPreviewCertificado();
   modal.style.display = "flex";
 }
@@ -4028,13 +3982,9 @@ function atualizarPreviewCertificado() {
   setT("c-mae-nome", a.maeNome, "________________________________");
   setT("c-mae-anilha", mae?.microchip ? `Anilha: ${mae.microchip}` : "", "Anilha: ________________________");
 
-  const tutNome = document.getElementById("cert-tutor-nome")?.value?.trim();
-  const tutDoc = document.getElementById("cert-tutor-doc")?.value?.trim();
-  const dataEmissao = document.getElementById("cert-data-emissao")?.value;
-
-  setT("c-tutor-nome", tutNome, "________________________________________________");
-  setT("c-tutor-doc", tutDoc, "________________________________");
-  setT("c-data-transf", dataEmissao ? fmtDate(dataEmissao) : "", "____ / ____ / ________");
+  setT("c-tutor-nome", "", "________________________________________________");
+  setT("c-tutor-doc", "", "________________________________");
+  setT("c-data-transf", "", "____ / ____ / ________");
   setT("c-ass-nome", cNome, "________________________________");
 }
 
