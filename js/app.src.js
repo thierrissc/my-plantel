@@ -739,10 +739,35 @@ function renderFicha() {
   const tabG = document.getElementById("tab-genealogia");
   const tabR = document.getElementById("tab-reproducao");
 
+  const navAnimais = document.getElementById("nav-btn-animais");
+  const navRep = document.getElementById("nav-btn-reproducao");
+  if (navAnimais && navRep) {
+    if (abaAtiva === "reproducao") {
+      navAnimais.classList.remove("active");
+      navRep.classList.add("active");
+    } else {
+      navAnimais.classList.add("active");
+      navRep.classList.remove("active");
+    }
+  }
+
   if (abaAtiva === "reproducao") {
     if (empty) empty.style.display = "none";
     if (topbar) topbar.style.display = "flex";
-    if (topbarTabs) topbarTabs.style.visibility = "visible";
+    if (topbarTabs) {
+      topbarTabs.style.visibility = "visible";
+      topbarTabs.querySelectorAll(".tab-btn").forEach((b) => {
+        if (b.dataset.tab === "reproducao") {
+          b.classList.add("active");
+          b.style.opacity = "1";
+          b.style.pointerEvents = "auto";
+        } else {
+          b.classList.remove("active");
+          b.style.opacity = a ? "1" : "0.45";
+          b.style.pointerEvents = a ? "auto" : "none";
+        }
+      });
+    }
     if (tabF) tabF.style.display = "none";
     if (tabG) tabG.style.display = "none";
     if (tabR) tabR.style.display = "block";
@@ -756,15 +781,33 @@ function renderFicha() {
   if (!a) {
     if (empty) empty.style.display = "flex";
     if (topbar) topbar.style.display = "flex";
-    if (topbarTabs) topbarTabs.style.visibility = "hidden";
+    if (topbarTabs) {
+      topbarTabs.style.visibility = "visible";
+      topbarTabs.querySelectorAll(".tab-btn").forEach((btn) => {
+        if (btn.dataset.tab === "reproducao") {
+          btn.style.opacity = "1";
+          btn.style.pointerEvents = "auto";
+        } else {
+          btn.style.opacity = "0.45";
+          btn.style.pointerEvents = "none";
+        }
+      });
+    }
     if (tabF) tabF.style.display = "none";
     if (tabG) tabG.style.display = "none";
     atualizarMobileBottombar(false);
     return;
   }
+
   if (empty) empty.style.display = "none";
   if (topbar) topbar.style.display = "flex";
-  if (topbarTabs) topbarTabs.style.visibility = "visible";
+  if (topbarTabs) {
+    topbarTabs.style.visibility = "visible";
+    topbarTabs.querySelectorAll(".tab-btn").forEach((btn) => {
+      btn.style.opacity = "1";
+      btn.style.pointerEvents = "auto";
+    });
+  }
   if (tabF) tabF.style.display = abaAtiva === "ficha" ? "block" : "none";
   if (tabG) tabG.style.display = abaAtiva === "genealogia" ? "block" : "none";
 
@@ -1460,6 +1503,12 @@ function selecionar(id) {
       if (b.dataset.tab === "ficha") b.classList.add("active");
       else b.classList.remove("active");
     });
+    const navAnimais = document.getElementById("nav-btn-animais");
+    const navRep = document.getElementById("nav-btn-reproducao");
+    if (navAnimais && navRep) {
+      navAnimais.classList.add("active");
+      navRep.classList.remove("active");
+    }
   }
   if (selecionado === id) {
     selecionado = null;
@@ -1485,12 +1534,30 @@ function filtrarAnimais() {
   renderSidebar();
 }
 
+function irParaAba(tab) {
+  if (tab === "animais") tab = "ficha";
+  switchTab(tab);
+}
+
 function switchTab(tab, el) {
   abaAtiva = tab;
   document.querySelectorAll(".tab-btn, .mobile-tab-btn").forEach((b) => {
     if (b.dataset.tab === tab) b.classList.add("active");
     else b.classList.remove("active");
   });
+
+  const navAnimais = document.getElementById("nav-btn-animais");
+  const navRep = document.getElementById("nav-btn-reproducao");
+  if (navAnimais && navRep) {
+    if (tab === "reproducao") {
+      navAnimais.classList.remove("active");
+      navRep.classList.add("active");
+    } else {
+      navAnimais.classList.add("active");
+      navRep.classList.remove("active");
+    }
+  }
+
   renderFicha();
 }
 
@@ -2924,10 +2991,14 @@ const SEED_CASAIS = [
         id: 1,
         dataInicio: "2026-08-12",
         dataPostura: "2026-08-16",
+        dataUltimoOvo: "2026-08-20",
+        dataChoco: "2026-08-20",
+        previsao: "2026-08-30",
+        dataEclosao: "2026-08-30",
         ovosTotal: 4,
         ovosFerteis: 4,
         ovosGoros: 0,
-        previsao: "2026-08-30",
+        ovosMortos: 0,
         filhotesQtd: 4,
         anilhas: "BR-2026-01, BR-2026-02, BR-2026-03, BR-2026-04",
         status: "Com filhotes",
@@ -2953,11 +3024,15 @@ const SEED_CASAIS = [
       {
         id: 1,
         dataInicio: "2026-09-05",
-        dataPostura: "2026-09-12",
+        dataPostura: "2026-09-08",
+        dataUltimoOvo: "2026-09-12",
+        dataChoco: "2026-09-12",
+        previsao: "2026-09-26",
+        dataEclosao: "",
         ovosTotal: 5,
         ovosFerteis: 4,
         ovosGoros: 1,
-        previsao: "2026-09-26",
+        ovosMortos: 0,
         filhotesQtd: 0,
         anilhas: "",
         status: "Chocando",
@@ -3058,15 +3133,22 @@ function renderReproducao() {
                   <span class="ninhada-data">Ninhada #${idx + 1} · Início: ${fmtDate(n.dataInicio)}</span>
                   <div style="display:flex;gap:6px;align-items:center">
                     <span class="casal-badge ${n.status === 'Concluída' ? 'badge-descanso' : 'badge-filhotes'}">${n.status || 'Em andamento'}</span>
-                    <button class="btn-casal-delete" onclick="excluirNinhada(${c.id}, ${idx})" title="Excluir ninhada">✕</button>
+                    <button class="btn-casal-delete" onclick="excluirNinhada(${c.id}, ${idx})" title="Excluir ninhada">
+                      <svg viewBox="0 0 20 20" fill="none" style="width:14px;height:14px"><path d="M4 6h12M8 6V4h4v2M6 6v10h8V6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
                   </div>
                 </div>
                 <div class="ninhada-badges">
-                  <span class="ninhada-tag">🥚 Ovos: <strong>${n.ovosTotal || 0}</strong></span>
-                  <span class="ninhada-tag" style="color:#059669">✨ Férteis: <strong>${n.ovosFerteis || 0}</strong></span>
-                  <span class="ninhada-tag" style="color:#dc2626">⚪ Goros: <strong>${n.ovosGoros || 0}</strong></span>
-                  <span class="ninhada-tag" style="color:#2563eb">🐣 Filhotes: <strong>${n.filhotesQtd || 0}</strong></span>
-                  ${n.previsao ? `<span class="ninhada-tag">⏳ Previsão: <strong>${fmtDate(n.previsao)}</strong></span>` : ""}
+                  <span class="ninhada-tag"><span class="noto-emoji noto-emoji-inline">🥚</span> Ovos: <strong>${n.ovosTotal || 0}</strong></span>
+                  ${n.ovosFerteis ? `<span class="ninhada-tag" style="color:#059669"><span class="noto-emoji noto-emoji-inline">✨</span> Férteis: <strong>${n.ovosFerteis}</strong></span>` : ""}
+                  ${n.ovosGoros ? `<span class="ninhada-tag" style="color:#dc2626"><span class="noto-emoji noto-emoji-inline">⚪</span> Goros: <strong>${n.ovosGoros}</strong></span>` : ""}
+                  ${n.ovosMortos ? `<span class="ninhada-tag" style="color:#b45309"><span class="noto-emoji noto-emoji-inline">⚠</span> Mortos: <strong>${n.ovosMortos}</strong></span>` : ""}
+                  <span class="ninhada-tag" style="color:#2563eb"><span class="noto-emoji noto-emoji-inline">🐣</span> Filhotes: <strong>${n.filhotesQtd || 0}</strong></span>
+                  ${n.dataPostura ? `<span class="ninhada-tag"><span class="noto-emoji noto-emoji-inline">📅</span> 1º Ovo: <strong>${fmtDate(n.dataPostura)}</strong></span>` : ""}
+                  ${n.dataUltimoOvo ? `<span class="ninhada-tag"><span class="noto-emoji noto-emoji-inline">📅</span> Último Ovo: <strong>${fmtDate(n.dataUltimoOvo)}</strong></span>` : ""}
+                  ${n.dataChoco ? `<span class="ninhada-tag"><span class="noto-emoji noto-emoji-inline">🌡</span> Choco: <strong>${fmtDate(n.dataChoco)}</strong></span>` : ""}
+                  ${n.previsao ? `<span class="ninhada-tag"><span class="noto-emoji noto-emoji-inline">⏳</span> Previsão: <strong>${fmtDate(n.previsao)}</strong></span>` : ""}
+                  ${n.dataEclosao ? `<span class="ninhada-tag" style="color:#059669"><span class="noto-emoji noto-emoji-inline">🎉</span> Eclosão: <strong>${fmtDate(n.dataEclosao)}</strong></span>` : ""}
                 </div>
                 ${n.obs ? `<div style="font-size:11.5px;color:var(--c-text-2);margin-top:4px;font-style:italic">${n.obs}</div>` : ""}
                 ${filhotesBadges ? `<div class="filhotes-list">${filhotesBadges}</div>` : ""}
@@ -3094,7 +3176,9 @@ function renderReproducao() {
                 ${machoAnilha ? `<span class="casal-partner-anilha">Anilha: ${machoAnilha}</span>` : ""}
               </div>
 
-              <div class="casal-heart-divider">❤</div>
+              <div class="casal-heart-divider">
+                <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+              </div>
 
               <div class="casal-partner partner-femea">
                 <div class="casal-partner-thumb">
@@ -3125,7 +3209,9 @@ function renderReproducao() {
               <button class="btn-action-ninhada" onclick="abrirModalNinhada(${c.id})">+ Nova Postura</button>
               <button class="btn-toggle-ninhadas" onclick="toggleNinhadas(${c.id})">Ninhadas (${(c.ninhadas || []).length})</button>
               <button class="btn-toggle-ninhadas" onclick="abrirModalCasal(${c.id})">Editar</button>
-              <button class="btn-casal-delete" onclick="confirmarExclusaoCasal(${c.id})" title="Excluir casal">🗑</button>
+              <button class="btn-casal-delete" onclick="confirmarExclusaoCasal(${c.id})" title="Excluir casal">
+                <svg viewBox="0 0 20 20" fill="none" style="width:15px;height:15px"><path d="M4 6h12M8 6V4h4v2M6 6v10h8V6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
             </div>
 
             <div class="ninhadas-section" id="ninhadas-sec-${c.id}">
@@ -3136,7 +3222,11 @@ function renderReproducao() {
         .join("")
     : `
     <div style="background:var(--c-card);border:1.5px dashed var(--c-border);border-radius:16px;padding:48px 20px;text-align:center;grid-column:1/-1">
-      <div style="font-size:36px;margin-bottom:12px">🕊</div>
+      <div style="width:56px;height:56px;border-radius:50%;background:var(--c-accent-bg);color:var(--c-accent);display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:28px;height:28px">
+          <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke-linejoin="round"/>
+        </svg>
+      </div>
       <h3 style="font-size:18px;font-weight:700;color:var(--c-text-1);margin:0 0 6px">Nenhum casal formado</h3>
       <p style="font-size:13px;color:var(--c-text-2);margin:0 0 18px">Forme casais da mesma espécie para acompanhar posturas de ovos, filhotes e ninhadas.</p>
       <button class="btn-novo-casal" onclick="abrirModalCasal()">+ Formar Primeiro Casal</button>
@@ -3162,28 +3252,48 @@ function renderReproducao() {
 
       <div class="rep-stats-grid">
         <div class="rep-stat-card">
-          <div class="rep-stat-icon">🕊</div>
+          <div class="rep-stat-icon" style="background:var(--c-accent-bg);color:var(--c-accent)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px">
+              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+              <path d="M16 3.13a4 4 0 010 7.75"/>
+            </svg>
+          </div>
           <div>
             <div class="rep-stat-val">${totalCasais}</div>
             <div class="rep-stat-lbl">Casais Formados</div>
           </div>
         </div>
         <div class="rep-stat-card">
-          <div class="rep-stat-icon" style="background:#fef3c7;color:#b45309">🔥</div>
+          <div class="rep-stat-icon" style="background:#fef3c7;color:#b45309">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px">
+              <path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 3z"/>
+            </svg>
+          </div>
           <div>
             <div class="rep-stat-val">${casaisAtivos}</div>
             <div class="rep-stat-lbl">Casais em Reprodução</div>
           </div>
         </div>
         <div class="rep-stat-card">
-          <div class="rep-stat-icon" style="background:#ecfdf5;color:#059669">🥚</div>
+          <div class="rep-stat-icon" style="background:#f0fdf4;color:#16a34a">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px">
+              <ellipse cx="12" cy="13" rx="7" ry="9"/>
+            </svg>
+          </div>
           <div>
             <div class="rep-stat-val">${totalOvos}</div>
             <div class="rep-stat-lbl">Total de Ovos</div>
           </div>
         </div>
         <div class="rep-stat-card">
-          <div class="rep-stat-icon" style="background:#eff6ff;color:#2563eb">🐣</div>
+          <div class="rep-stat-icon" style="background:#eff6ff;color:#2563eb">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px">
+              <path d="M12 2v3m7.071.929l-2.121 2.121M22 12h-3m.929 7.071l-2.121-2.121M12 22v-3m-7.071-.929l2.121-2.121M2 12h3m-.929-7.071l2.121 2.121"/>
+              <circle cx="12" cy="12" r="4"/>
+            </svg>
+          </div>
           <div>
             <div class="rep-stat-val">${totalFilhotes}</div>
             <div class="rep-stat-lbl">Filhotes Nascidos</div>
@@ -3340,10 +3450,14 @@ function abrirModalNinhada(casalId) {
   document.getElementById("modal-ninhada-title").textContent = `Nova Ninhada · ${c.nome}`;
   document.getElementById("nin-data-inicio").value = new Date().toISOString().slice(0, 10);
   document.getElementById("nin-data-postura").value = "";
+  if (document.getElementById("nin-data-ultimo-ovo")) document.getElementById("nin-data-ultimo-ovo").value = "";
+  if (document.getElementById("nin-data-choco")) document.getElementById("nin-data-choco").value = "";
+  if (document.getElementById("nin-previsao")) document.getElementById("nin-previsao").value = "";
+  if (document.getElementById("nin-data-eclosao")) document.getElementById("nin-data-eclosao").value = "";
   document.getElementById("nin-ovos-total").value = 0;
   document.getElementById("nin-ovos-ferteis").value = 0;
   document.getElementById("nin-ovos-goros").value = 0;
-  document.getElementById("nin-previsao").value = "";
+  if (document.getElementById("nin-ovos-mortos")) document.getElementById("nin-ovos-mortos").value = 0;
   document.getElementById("nin-filhotes-qtd").value = 0;
   document.getElementById("nin-anilhas").value = "";
   document.getElementById("nin-status").value = "Em postura";
@@ -3370,10 +3484,14 @@ function salvarNinhadaForm() {
     id: Date.now(),
     dataInicio: document.getElementById("nin-data-inicio")?.value || "",
     dataPostura: document.getElementById("nin-data-postura")?.value || "",
+    dataUltimoOvo: document.getElementById("nin-data-ultimo-ovo")?.value || "",
+    dataChoco: document.getElementById("nin-data-choco")?.value || "",
+    previsao: document.getElementById("nin-previsao")?.value || "",
+    dataEclosao: document.getElementById("nin-data-eclosao")?.value || "",
     ovosTotal: parseInt(document.getElementById("nin-ovos-total")?.value) || 0,
     ovosFerteis: parseInt(document.getElementById("nin-ovos-ferteis")?.value) || 0,
     ovosGoros: parseInt(document.getElementById("nin-ovos-goros")?.value) || 0,
-    previsao: document.getElementById("nin-previsao")?.value || "",
+    ovosMortos: parseInt(document.getElementById("nin-ovos-mortos")?.value) || 0,
     filhotesQtd: parseInt(document.getElementById("nin-filhotes-qtd")?.value) || 0,
     anilhas: document.getElementById("nin-anilhas")?.value?.trim() || "",
     status: document.getElementById("nin-status")?.value || "Em postura",
