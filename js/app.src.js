@@ -2026,6 +2026,18 @@ function fecharDialog() {
   );
 }
 
+function mostrarDialog(opts) {
+  if (typeof opts === "string") {
+    mostrarAlerta(opts);
+    return;
+  }
+  if (opts.onConfirm) {
+    mostrarConfirm(opts.title || "Confirmação", opts.desc || "", opts.onConfirm);
+  } else {
+    mostrarAlerta(opts.title || opts.desc || "");
+  }
+}
+
 function abrirFilePicker() {
   if (!editando) return;
   const inp = document.getElementById("foto-input");
@@ -2863,28 +2875,30 @@ function initProfile() {
 
 function abrirPerfil() {
   try {
-    const nome = currentUser?.name || "";
+    const p = getProfile();
+    const nome = currentUser?.name || p?.nome || localStorage.getItem("plantel_criatorio_nome") || "";
     const email = currentUser?.email || "";
     const rawId = currentUser?.id;
     const id = rawId ? formatPlantelId(rawId) : "Não definido";
-    const avatar = currentUser?.avatar || null;
+    const avatar = currentUser?.avatar || p?.avatar || localStorage.getItem("plantel_criatorio_logo") || null;
 
     document.getElementById("perfil-nome").value = nome;
     document.getElementById("perfil-email").value = email;
     document.getElementById("perfil-plantel-id").value = id;
     const largeEl = document.getElementById("perfil-avatar-large");
     if (largeEl && avatar) largeEl.src = avatar;
-    else if (largeEl) largeEl.src = "img/favicon.png";
+    else if (largeEl) largeEl.src = "img/loginicon.png";
   } catch {}
   document.getElementById("modal-perfil").style.display = "flex";
 }
 
 function fecharModalPerfil() {
   _perfilAvatarPending = null;
-  const avatar = currentUser?.avatar || null;
+  const p = getProfile();
+  const avatar = currentUser?.avatar || p?.avatar || localStorage.getItem("plantel_criatorio_logo") || null;
   const largeEl = document.getElementById("perfil-avatar-large");
   if (largeEl && avatar) largeEl.src = avatar;
-  else if (largeEl) largeEl.src = "img/favicon.png";
+  else if (largeEl) largeEl.src = "img/loginicon.png";
   document.getElementById("modal-perfil").style.display = "none";
 }
 function fecharModalPerfilExterno(e) {
@@ -2920,6 +2934,15 @@ async function salvarPerfil() {
   if (umName) umName.textContent = nome;
   if (umHeaderName) umHeaderName.textContent = nome;
 
+  localStorage.setItem("plantel_criatorio_nome", nome);
+  if (avatarToSend) {
+    localStorage.setItem("plantel_criatorio_logo", avatarToSend);
+  }
+  salvarProfileStorage({
+    nome: nome,
+    avatar: avatarToSend || currentUser?.avatar || localStorage.getItem("plantel_criatorio_logo") || null
+  });
+
   if (currentUser) {
     currentUser.name = nome;
     if (avatarToSend) currentUser.avatar = avatarToSend;
@@ -2930,6 +2953,10 @@ async function salvarPerfil() {
         body: JSON.stringify({ name: nome, avatar: avatarToSend }),
       });
     } catch (e) {}
+  }
+  
+  if (typeof atualizarPreviewCertificado === "function" && animalCertId) {
+    atualizarPreviewCertificado();
   }
   fecharModalPerfil();
 }
@@ -3161,52 +3188,55 @@ function renderReproducao() {
 
               const chipsDatas = [];
               if (casalAve) {
-                if (n.dataPostura) chipsDatas.push(`<span class="nin-chip">1º Ovo: <strong>${fmtDate(n.dataPostura)}</strong></span>`);
-                if (n.dataUltimoOvo) chipsDatas.push(`<span class="nin-chip">Último Ovo: <strong>${fmtDate(n.dataUltimoOvo)}</strong></span>`);
-                if (n.dataChoco) chipsDatas.push(`<span class="nin-chip">Choco: <strong>${fmtDate(n.dataChoco)}</strong></span>`);
-                if (n.dataEclosao) chipsDatas.push(`<span class="nin-chip chip-success">Eclosão: <strong>${fmtDate(n.dataEclosao)}</strong></span>`);
-                else if (n.previsao) chipsDatas.push(`<span class="nin-chip chip-accent">Prev. Eclosão: <strong>${fmtDate(n.previsao)}</strong></span>`);
+                if (n.dataPostura) chipsDatas.push(`<span class="nin-chip">🥚 1º Ovo: <strong>${fmtDate(n.dataPostura)}</strong></span>`);
+                if (n.dataUltimoOvo) chipsDatas.push(`<span class="nin-chip">🥚 Fim: <strong>${fmtDate(n.dataUltimoOvo)}</strong></span>`);
+                if (n.dataChoco) chipsDatas.push(`<span class="nin-chip">🪺 Choco: <strong>${fmtDate(n.dataChoco)}</strong></span>`);
+                if (n.dataEclosao) chipsDatas.push(`<span class="nin-chip chip-success">🐣 Eclosão: <strong>${fmtDate(n.dataEclosao)}</strong></span>`);
+                else if (n.previsao) chipsDatas.push(`<span class="nin-chip chip-accent">⏳ Prev: <strong>${fmtDate(n.previsao)}</strong></span>`);
               } else {
-                if (n.dataInicio) chipsDatas.push(`<span class="nin-chip">Cobertura: <strong>${fmtDate(n.dataInicio)}</strong></span>`);
-                if (n.previsao) chipsDatas.push(`<span class="nin-chip chip-accent">Prev. Parto: <strong>${fmtDate(n.previsao)}</strong></span>`);
-                if (n.dataEclosao) chipsDatas.push(`<span class="nin-chip chip-success">Parto Real: <strong>${fmtDate(n.dataEclosao)}</strong></span>`);
+                if (n.dataInicio) chipsDatas.push(`<span class="nin-chip">📅 Cobertura: <strong>${fmtDate(n.dataInicio)}</strong></span>`);
+                if (n.previsao) chipsDatas.push(`<span class="nin-chip chip-accent">⏳ Prev. Parto: <strong>${fmtDate(n.previsao)}</strong></span>`);
+                if (n.dataEclosao) chipsDatas.push(`<span class="nin-chip chip-success">🐾 Parto: <strong>${fmtDate(n.dataEclosao)}</strong></span>`);
               }
 
               const chipsOvos = [];
               if (casalAve) {
                 chipsOvos.push(`<span class="nin-chip">🥚 <strong>${n.ovosTotal || 0}</strong> ovos</span>`);
-                if ((n.ovosFerteis || 0) > 0) chipsOvos.push(`<span class="nin-chip chip-success">✓ <strong>${n.ovosFerteis}</strong> férteis</span>`);
-                if ((n.ovosGoros || 0) > 0) chipsOvos.push(`<span class="nin-chip chip-danger">✗ <strong>${n.ovosGoros}</strong> goros</span>`);
-                if ((n.ovosMortos || 0) > 0) chipsOvos.push(`<span class="nin-chip">† <strong>${n.ovosMortos}</strong> mortos</span>`);
+                if ((n.ovosFerteis || 0) > 0) chipsOvos.push(`<span class="nin-chip chip-success">🟢 <strong>${n.ovosFerteis}</strong> férteis</span>`);
+                if ((n.ovosGoros || 0) > 0) chipsOvos.push(`<span class="nin-chip chip-danger">🔴 <strong>${n.ovosGoros}</strong> goros</span>`);
+                if ((n.ovosMortos || 0) > 0) chipsOvos.push(`<span class="nin-chip">🥀 <strong>${n.ovosMortos}</strong> mortos</span>`);
+              }
+              if ((n.filhotesQtd || 0) > 0) {
+                chipsOvos.push(`<span class="nin-chip chip-success">🐣 <strong>${n.filhotesQtd}</strong> filhotes</span>`);
               }
 
-              const chipFilhotes = (n.filhotesQtd || 0) > 0
-                ? `<span class="nin-chip chip-success">🐣 <strong>${n.filhotesQtd}</strong> filhotes</span>`
-                : "";
+              let badgeNinhada = "badge-descanso";
+              if (n.status === "Em postura") badgeNinhada = "badge-postura";
+              else if (n.status === "Chocando") badgeNinhada = "badge-chocando";
+              else if (n.status === "Com filhotes" || n.status === "Gestação") badgeNinhada = "badge-filhotes";
 
               return `
               <div class="ninhada-card-box">
                 <div class="ninhada-box-header">
                   <div class="ninhada-box-title">
                     <span class="ninhada-num-badge">Ninhada #${idx + 1}</span>
-                    ${n.dataInicio ? `<span class="ninhada-data-sub">Início: <strong>${fmtDate(n.dataInicio)}</strong></span>` : ""}
+                    ${n.dataInicio ? `<span class="ninhada-data-sub">📅 Início: <strong>${fmtDate(n.dataInicio)}</strong></span>` : ""}
                   </div>
                   <div class="ninhada-box-right">
-                    <span class="casal-badge ${n.status === 'Concluída' ? 'badge-descanso' : 'badge-filhotes'}">${n.status || 'Em andamento'}</span>
+                    <span class="casal-badge ${badgeNinhada}">${n.status || 'Em andamento'}</span>
                     <button class="btn-action-icon btn-danger" onclick="excluirNinhada(${c.id}, ${idx})" title="Excluir ninhada">
                       <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><path d="M4 6h12M8 6V4h4v2M6 6v10h8V6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </button>
                   </div>
                 </div>
 
-                <div class="ninhada-chips-row">
-                  ${chipsDatas.join("")}
-                  ${chipsOvos.join("")}
-                  ${chipFilhotes}
+                <div class="ninhada-body-compact">
+                  ${chipsDatas.length ? `<div class="ninhada-row-datas">${chipsDatas.join("")}</div>` : ""}
+                  ${chipsOvos.length ? `<div class="ninhada-row-ovos">${chipsOvos.join("")}</div>` : ""}
                 </div>
 
                 ${filhotesBadges ? `<div class="filhotes-container">${filhotesBadges}</div>` : ""}
-                ${n.obs ? `<div class="ninhada-obs-inline">"${n.obs}"</div>` : ""}
+                ${n.obs ? `<div class="ninhada-obs-inline">💬 "${n.obs}"</div>` : ""}
               </div>`;
             })
             .join("");
@@ -3540,16 +3570,10 @@ function salvarCasalForm() {
 }
 
 function confirmarExclusaoCasal(id) {
-  mostrarDialog({
-    title: "Excluir Casal",
-    desc: "Tem certeza que deseja remover este casal e seu histórico de ninhadas?",
-    btnConfirmText: "Excluir",
-    btnConfirmDanger: true,
-    onConfirm: () => {
-      casais = casais.filter((x) => x.id !== id);
-      salvarCasais(casais);
-      renderReproducao();
-    }
+  mostrarConfirm("Excluir Casal", "Tem certeza que deseja remover este casal e seu histórico de ninhadas?", () => {
+    casais = casais.filter((x) => x.id !== id);
+    salvarCasais(casais);
+    renderReproducao();
   });
 }
 
@@ -3665,18 +3689,12 @@ function salvarNinhadaForm() {
 }
 
 function excluirNinhada(casalId, idx) {
-  mostrarDialog({
-    title: "Excluir Ninhada",
-    desc: "Deseja remover este registro de postura/ninhada?",
-    btnConfirmText: "Excluir",
-    btnConfirmDanger: true,
-    onConfirm: () => {
-      const c = casais.find((x) => x.id === casalId);
-      if (c && c.ninhadas) {
-        c.ninhadas.splice(idx, 1);
-        salvarCasais(casais);
-        renderReproducao();
-      }
+  mostrarConfirm("Excluir Ninhada", "Deseja realmente remover este registro de postura/ninhada?", () => {
+    const c = casais.find((x) => x.id === casalId);
+    if (c && c.ninhadas) {
+      c.ninhadas.splice(idx, 1);
+      salvarCasais(casais);
+      renderReproducao();
     }
   });
 }
@@ -3739,8 +3757,10 @@ function abrirModalCertificado(animalId) {
   const emissao = document.getElementById("cert-data-emissao");
   const obs = document.getElementById("cert-obs");
 
-  if (tutorNome && !tutorNome.value) tutorNome.value = "Consumidor Final";
-  if (emissao) emissao.value = new Date().toISOString().slice(0, 10);
+  if (tutorNome) tutorNome.value = "";
+  if (tutorDoc) tutorDoc.value = "";
+  if (emissao) emissao.value = "";
+  if (obs) obs.value = "";
 
   atualizarPreviewCertificado();
   modal.style.display = "flex";
@@ -3760,52 +3780,46 @@ function atualizarPreviewCertificado() {
   if (!a) return;
 
   const p = getProfile();
-  const cNome = p?.nome || currentUser?.name || "Criatório Plantel";
-  const cSub = currentUser ? `Usuário: ${currentUser.email}` : "Gestão e Seleção Zootécnica";
-  const rawId = currentUser?.id;
-  const cId = rawId ? formatPlantelId(rawId) : "Plantel Oficial";
+  const cNome = p?.nome || currentUser?.name || localStorage.getItem("plantel_criatorio_nome") || "Criatório Plantel";
+  const cLogo = p?.avatar || currentUser?.avatar || localStorage.getItem("plantel_criatorio_logo") || "img/loginicon.png";
 
   const nomeCriatEl = document.getElementById("cert-criatorio-nome");
-  const subCriatEl = document.getElementById("cert-criatorio-sub");
-  const idCriatEl = document.getElementById("cert-criatorio-id");
   const logoCriatEl = document.getElementById("cert-criatorio-logo");
 
   if (nomeCriatEl) nomeCriatEl.textContent = cNome;
-  if (subCriatEl) subCriatEl.textContent = cSub;
-  if (idCriatEl) idCriatEl.textContent = `Registro: ${cId}`;
-  if (logoCriatEl && currentUser?.avatar) logoCriatEl.src = currentUser.avatar;
+  if (logoCriatEl) logoCriatEl.src = cLogo;
 
-  const setT = (id, val) => {
+  const setT = (id, val, fallbackLine = "____________________") => {
     const el = document.getElementById(id);
-    if (el) el.textContent = val || "-";
+    if (el) el.textContent = (val && String(val).trim()) ? val : fallbackLine;
   };
 
-  setT("c-nome", a.nome);
-  setT("c-anilha", a.microchip || "Não informada");
-  setT("c-especie", a.especie);
-  setT("c-raca", a.raca || "Mestiço / Padrão");
-  setT("c-sexo", a.sexo || "Não informado");
-  setT("c-nasc", a.nasc ? fmtDate(a.nasc) : "-");
-  setT("c-pelagem", a.pelagem || "-");
-  setT("c-status", a.status || "Ativo");
+  setT("c-nome", a.nome, "____________________");
+  setT("c-anilha", a.microchip, "____________________");
+  setT("c-especie", a.especie, "____________________");
+  setT("c-raca", a.raca, "____________________");
+  setT("c-sexo", a.sexo, "____________________");
+  setT("c-nasc", a.nasc ? fmtDate(a.nasc) : "", "____ / ____ / ________");
+  setT("c-pelagem", a.pelagem, "____________________");
+  setT("c-status", a.status || "Ativo", "Ativo");
 
   const pai = a.paiNome ? animais.find((x) => x.nome.toLowerCase() === a.paiNome.toLowerCase()) : null;
   const mae = a.maeNome ? animais.find((x) => x.nome.toLowerCase() === a.maeNome.toLowerCase()) : null;
 
-  setT("c-pai-nome", a.paiNome || "Não informado");
-  setT("c-pai-anilha", pai?.microchip ? `Anilha: ${pai.microchip}` : "Anilha: Não informada");
+  setT("c-pai-nome", a.paiNome, "________________________________");
+  setT("c-pai-anilha", pai?.microchip ? `Anilha: ${pai.microchip}` : "", "Anilha: ________________________");
 
-  setT("c-mae-nome", a.maeNome || "Não informada");
-  setT("c-mae-anilha", mae?.microchip ? `Anilha: ${mae.microchip}` : "Anilha: Não informada");
+  setT("c-mae-nome", a.maeNome, "________________________________");
+  setT("c-mae-anilha", mae?.microchip ? `Anilha: ${mae.microchip}` : "", "Anilha: ________________________");
 
-  const tutNome = document.getElementById("cert-tutor-nome")?.value || "Consumidor Final";
-  const tutDoc = document.getElementById("cert-tutor-doc")?.value || "-";
+  const tutNome = document.getElementById("cert-tutor-nome")?.value?.trim();
+  const tutDoc = document.getElementById("cert-tutor-doc")?.value?.trim();
   const dataEmissao = document.getElementById("cert-data-emissao")?.value;
 
-  setT("c-tutor-nome", tutNome);
-  setT("c-tutor-doc", tutDoc);
-  setT("c-data-transf", dataEmissao ? fmtDate(dataEmissao) : fmtDate(new Date().toISOString().slice(0, 10)));
-  setT("c-ass-nome", cNome);
+  setT("c-tutor-nome", tutNome, "________________________________________________");
+  setT("c-tutor-doc", tutDoc, "________________________________");
+  setT("c-data-transf", dataEmissao ? fmtDate(dataEmissao) : "", "____ / ____ / ________");
+  setT("c-ass-nome", cNome, "________________________________");
 }
 
 function imprimirCertificado() {
