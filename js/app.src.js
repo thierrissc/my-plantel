@@ -3405,7 +3405,7 @@ function renderReproducao() {
               }
               <div class="casal-sum-pill">
                 <span class="sum-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="M3 18a9 9 0 0 1 9-9h1a4 4 0 0 1 4 4v1a4 4 0 0 1-4 4H3z"/><circle cx="13" cy="9" r="1.5" fill="currentColor"/><path d="M17 9l4-2-2 4"/><path d="M7 18a5 5 0 0 1 5-5"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><path d="M10 11V7a2 2 0 0 1 4 0v4"/><rect x="5" y="11" width="14" height="4" rx="2"/><circle cx="12" cy="18" r="3"/></svg>
                 </span>
                 <div class="sum-data">
                   <span class="sum-val">${filhotesNum}</span>
@@ -3605,12 +3605,7 @@ function renderReproducao() {
           </div>
           <div class="rep-stat-card">
             <div class="rep-stat-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px">
-                <path d="M3 18a9 9 0 0 1 9-9h1a4 4 0 0 1 4 4v1a4 4 0 0 1-4 4H3z"/>
-                <circle cx="13" cy="9" r="1.5" fill="currentColor"/>
-                <path d="M17 9l4-2-2 4"/>
-                <path d="M7 18a5 5 0 0 1 5-5"/>
-              </svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><path d="M10 11V7a2 2 0 0 1 4 0v4"/><rect x="5" y="11" width="14" height="4" rx="2"/><circle cx="12" cy="18" r="3"/></svg>
             </div>
             <div>
               <div class="rep-stat-val">${totalFilhotes}</div>

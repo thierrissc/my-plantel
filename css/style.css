@@ -1338,10 +1338,20 @@ body {
 
 .topbar-tabs {
   display: flex;
-  gap: 4px;
+  gap: 6px;
   flex: 1;
   align-self: flex-end;
+  align-items: center;
   padding-top: 8px;
+}
+
+.topbar-tab-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--c-border);
+  margin: 0 4px 1px;
+  opacity: 0.8;
+  flex-shrink: 0;
 }
 
 .tab-btn {
@@ -1484,16 +1494,35 @@ body {
 .ficha-hero::after {
   content: "";
   position: absolute;
-  top: 0;
-  right: 0;
-  width: 200px;
-  height: 200px;
+  top: -40px;
+  right: -40px;
+  width: 270px;
+  height: 270px;
   background: radial-gradient(
-    circle at top right,
-    var(--c-accent-bg) 0%,
-    transparent 65%
+    circle at center,
+    rgba(16, 185, 129, 0.22) 0%,
+    rgba(16, 185, 129, 0.08) 50%,
+    transparent 72%
   );
+  border-radius: 50%;
   pointer-events: none;
+  filter: blur(14px);
+  animation: heroGradientPulse 6s ease-in-out infinite alternate;
+}
+
+@keyframes heroGradientPulse {
+  0% {
+    transform: scale(0.92) translate(0, 0);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.15) translate(-12px, 12px);
+    opacity: 0.95;
+  }
+  100% {
+    transform: scale(1.02) translate(8px, -6px);
+    opacity: 0.7;
+  }
 }
 
 .foto-frame {
@@ -5044,48 +5073,70 @@ body {
 
 .casal-summary-bar {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   padding: 10px 14px;
   background: var(--c-surface-2, rgba(0, 0, 0, 0.02));
   border-top: 1px solid var(--c-border-soft);
   border-bottom: 1px solid var(--c-border-soft);
 }
+
 .casal-sum-pill {
   flex: 1 1 0;
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 6px 8px;
+  gap: 10px;
+  padding: 8px 12px;
   background: var(--c-card);
   border: 1px solid var(--c-border);
-  border-radius: var(--r-sm);
-  min-width: 80px;
+  border-radius: var(--r-md);
+  min-width: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: all 0.2s ease;
 }
+
+.casal-sum-pill:hover {
+  border-color: rgba(16, 185, 129, 0.35);
+  background: var(--c-surface-1);
+}
+
 .casal-sum-pill .sum-icon {
-  font-size: 15px;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-sm);
+  background: var(--c-surface-2, rgba(0, 0, 0, 0.03));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--c-accent);
   flex-shrink: 0;
 }
+
+.casal-sum-pill .sum-icon svg {
+  width: 17px;
+  height: 17px;
+}
+
 .casal-sum-pill .sum-data {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  overflow: hidden;
+  justify-content: center;
 }
+
 .casal-sum-pill .sum-val {
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 800;
   color: var(--c-text-1);
-  line-height: 1.25;
-  white-space: normal;
-  word-break: break-word;
+  line-height: 1.15;
 }
+
 .casal-sum-pill .sum-lbl {
-  font-size: 9.5px;
+  font-size: 10px;
   color: var(--c-text-3);
   text-transform: uppercase;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  margin-top: 1px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-top: 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
