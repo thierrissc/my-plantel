@@ -617,14 +617,14 @@
                   <path d="M3 9a2 2 0 012-2h1l2-2h8l2 2h1a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
                     stroke="currentColor" stroke-width="1.5" />
                 </svg>
-                <span>Trocar foto</span>
+                <span>Logo do Criatório</span>
               </div>
             </div>
             <input type="file" id="perfil-foto-input" accept="image/*" onchange="carregarFotoPerfil(event)" />
           </div>
           <div class="form-field full">
-            <label>Nome do Plantel / Usuário</label>
-            <input id="perfil-nome" type="text" placeholder="Seu nome ou nome do plantel" />
+            <label>Nome do Criatório / Plantel</label>
+            <input id="perfil-nome" type="text" placeholder="Nome do seu criatório ou plantel" />
           </div>
           <div class="form-field full">
             <label>E-mail</label>
@@ -721,13 +721,12 @@
             <div class="cert-border-outer">
               <div class="cert-border-inner">
                 <div class="cert-header">
-                  <div class="cert-logo-wrap" id="cert-logo-container">
-                    <img id="cert-criatorio-logo" src="img/loginicon.png" alt="Logo Criatório" />
+                  <div class="cert-logo-circle-wrap">
+                    <img id="cert-criatorio-logo" class="cert-logo-circle" src="img/loginicon.png" alt="Logo Criatório" />
                   </div>
                   <div class="cert-criatorio-info">
                     <h2 class="cert-criatorio-nome" id="cert-criatorio-nome">Criatório Plantel</h2>
-                    <p class="cert-criatorio-sub" id="cert-criatorio-sub">Gestão e Seleção Zootécnica</p>
-                    <p class="cert-criatorio-id" id="cert-criatorio-id">Registro: Plantel Oficial</p>
+                    <p class="cert-criatorio-sub">Certificado Oficial de Origem & Genealogia</p>
                   </div>
                   <div class="cert-seal">
                     <div class="cert-seal-inner">
@@ -744,35 +743,35 @@
 
                 <div class="cert-section-title">DADOS DO EXEMPLAR</div>
                 <div class="cert-grid cert-animal-grid">
-                  <div class="cert-field"><span class="cert-label">NOME:</span> <strong id="c-nome">-</strong></div>
-                  <div class="cert-field"><span class="cert-label">ANILHA / REGISTRO:</span> <strong id="c-anilha" class="cert-highlight">-</strong></div>
-                  <div class="cert-field"><span class="cert-label">ESPÉCIE:</span> <strong id="c-especie">-</strong></div>
-                  <div class="cert-field"><span class="cert-label">RAÇA:</span> <strong id="c-raca">-</strong></div>
-                  <div class="cert-field"><span class="cert-label">SEXO:</span> <strong id="c-sexo">-</strong></div>
-                  <div class="cert-field"><span class="cert-label">NASCIMENTO:</span> <strong id="c-nasc">-</strong></div>
-                  <div class="cert-field"><span class="cert-label">PELAGEM / COR:</span> <strong id="c-pelagem">-</strong></div>
-                  <div class="cert-field"><span class="cert-label">STATUS:</span> <strong id="c-status">-</strong></div>
+                  <div class="cert-field"><span class="cert-label">NOME:</span> <strong id="c-nome">____________________</strong></div>
+                  <div class="cert-field"><span class="cert-label">ANILHA / REGISTRO:</span> <strong id="c-anilha" class="cert-highlight">____________________</strong></div>
+                  <div class="cert-field"><span class="cert-label">ESPÉCIE:</span> <strong id="c-especie">____________________</strong></div>
+                  <div class="cert-field"><span class="cert-label">RAÇA:</span> <strong id="c-raca">____________________</strong></div>
+                  <div class="cert-field"><span class="cert-label">SEXO:</span> <strong id="c-sexo">____________________</strong></div>
+                  <div class="cert-field"><span class="cert-label">NASCIMENTO:</span> <strong id="c-nasc">____________________</strong></div>
+                  <div class="cert-field"><span class="cert-label">PELAGEM / COR:</span> <strong id="c-pelagem">____________________</strong></div>
+                  <div class="cert-field"><span class="cert-label">STATUS:</span> <strong id="c-status">____________________</strong></div>
                 </div>
 
                 <div class="cert-section-title">FILIAÇÃO E ANILHAS DOS PAIS</div>
                 <div class="cert-filiacao-grid">
                   <div class="cert-parent-box">
                     <span class="cert-parent-role">PAI (MACHO)</span>
-                    <strong class="cert-parent-nome" id="c-pai-nome">Não informado</strong>
-                    <span class="cert-parent-anilha" id="c-pai-anilha">Anilha: Não informada</span>
+                    <strong class="cert-parent-nome" id="c-pai-nome">________________________________</strong>
+                    <span class="cert-parent-anilha" id="c-pai-anilha">Anilha: ________________________</span>
                   </div>
                   <div class="cert-parent-box">
                     <span class="cert-parent-role">MÃE (FÊMEA)</span>
-                    <strong class="cert-parent-nome" id="c-mae-nome">Não informada</strong>
-                    <span class="cert-parent-anilha" id="c-mae-anilha">Anilha: Não informada</span>
+                    <strong class="cert-parent-nome" id="c-mae-nome">________________________________</strong>
+                    <span class="cert-parent-anilha" id="c-mae-anilha">Anilha: ________________________</span>
                   </div>
                 </div>
 
                 <div class="cert-section-title">TRANSFERÊNCIA DE PROPRIEDADE</div>
                 <div class="cert-grid cert-tutor-grid">
-                  <div class="cert-field full"><span class="cert-label">NOVO TUTOR / COMPRADOR:</span> <strong id="c-tutor-nome">Consumidor Final</strong></div>
-                  <div class="cert-field"><span class="cert-label">DOCUMENTO:</span> <strong id="c-tutor-doc">-</strong></div>
-                  <div class="cert-field"><span class="cert-label">DATA DE TRANSFERÊNCIA:</span> <strong id="c-data-transf">-</strong></div>
+                  <div class="cert-field full"><span class="cert-label">NOVO TUTOR / COMPRADOR:</span> <strong id="c-tutor-nome">________________________________________________</strong></div>
+                  <div class="cert-field"><span class="cert-label">DOCUMENTO / CPF:</span> <strong id="c-tutor-doc">________________________________</strong></div>
+                  <div class="cert-field"><span class="cert-label">DATA DE TRANSFERÊNCIA:</span> <strong id="c-data-transf">____ / ____ / ________</strong></div>
                 </div>
 
                 <div class="cert-footer">
