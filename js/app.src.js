@@ -737,20 +737,36 @@ function renderFicha() {
   const topbarTabs = document.querySelector(".topbar-tabs");
   const tabF = document.getElementById("tab-ficha");
   const tabG = document.getElementById("tab-genealogia");
+  const tabR = document.getElementById("tab-reproducao");
+
+  if (abaAtiva === "reproducao") {
+    if (empty) empty.style.display = "none";
+    if (topbar) topbar.style.display = "flex";
+    if (topbarTabs) topbarTabs.style.visibility = "visible";
+    if (tabF) tabF.style.display = "none";
+    if (tabG) tabG.style.display = "none";
+    if (tabR) tabR.style.display = "block";
+    atualizarMobileBottombar(Boolean(a));
+    renderReproducao();
+    return;
+  }
+
+  if (tabR) tabR.style.display = "none";
 
   if (!a) {
-    empty.style.display = "flex";
+    if (empty) empty.style.display = "flex";
     if (topbar) topbar.style.display = "flex";
     if (topbarTabs) topbarTabs.style.visibility = "hidden";
-    tabF.style.display = tabG.style.display = "none";
+    if (tabF) tabF.style.display = "none";
+    if (tabG) tabG.style.display = "none";
     atualizarMobileBottombar(false);
     return;
   }
-  empty.style.display = "none";
+  if (empty) empty.style.display = "none";
   if (topbar) topbar.style.display = "flex";
   if (topbarTabs) topbarTabs.style.visibility = "visible";
-  tabF.style.display = abaAtiva === "ficha" ? "block" : "none";
-  tabG.style.display = abaAtiva === "genealogia" ? "block" : "none";
+  if (tabF) tabF.style.display = abaAtiva === "ficha" ? "block" : "none";
+  if (tabG) tabG.style.display = abaAtiva === "genealogia" ? "block" : "none";
 
   atualizarMobileBottombar(true);
 
@@ -761,8 +777,13 @@ function renderFicha() {
 function atualizarMobileBottombar(temAnimal) {
   const btns = document.querySelectorAll(".mobile-tab-btn");
   btns.forEach((btn) => {
-    btn.disabled = !temAnimal;
-    btn.style.opacity = temAnimal ? "1" : "0.4";
+    if (btn.dataset.tab === "reproducao") {
+      btn.disabled = false;
+      btn.style.opacity = "1";
+    } else {
+      btn.disabled = !temAnimal;
+      btn.style.opacity = temAnimal ? "1" : "0.4";
+    }
   });
 }
 
@@ -876,7 +897,11 @@ function renderFichaContent(a) {
             ed
               ? `<button class="btn-save" onclick="salvarEdicao()">Salvar alterações</button>
                <button class="btn-cancel" onclick="cancelarEdicao()">Cancelar</button>`
-              : `<button class="btn-edit" onclick="iniciarEdicao()">Editar ficha</button>`
+              : `<button class="btn-edit" onclick="iniciarEdicao()">Editar ficha</button>
+                 <button class="btn-cert" onclick="abrirModalCertificado(${a.id})" title="Imprimir Certificado para o cliente">
+                   <svg viewBox="0 0 20 20" fill="none" style="width:16px;height:16px;vertical-align:-2px"><path d="M5 3h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z" stroke="currentColor" stroke-width="1.6"/><path d="M8 7h4M8 10h4M8 13h2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                   Certificado
+                 </button>`
           }
           <button class="btn-delete" onclick="confirmarExclusao(${a.id})">Excluir</button>
         </div>
@@ -1429,6 +1454,13 @@ function limparGeneModal() {
 }
 
 function selecionar(id) {
+  if (abaAtiva === "reproducao") {
+    abaAtiva = "ficha";
+    document.querySelectorAll(".tab-btn, .mobile-tab-btn").forEach((b) => {
+      if (b.dataset.tab === "ficha") b.classList.add("active");
+      else b.classList.remove("active");
+    });
+  }
   if (selecionado === id) {
     selecionado = null;
     editando = false;
@@ -1964,6 +1996,8 @@ async function logout() {
   selecionado = null;
   editando = false;
   fotoTemp = null;
+  casais = SEED_CASAIS.map((c) => ({ ...c }));
+  localStorage.setItem(getCasaisStorageKey(), JSON.stringify(casais));
 
   renderSidebar();
   renderFicha();
@@ -2860,8 +2894,649 @@ setInterval(() => {
 
 document.addEventListener("DOMContentLoaded", () => {
   animais = carregarAnimais();
+  casais = carregarCasais();
   selecionado = null;
   editando = false;
   showApp();
   checkSession();
 });
+
+/* ==========================================================================
+   MÓDULO DE REPRODUÇÃO & CERTIFICADO DE ORIGEM
+   ========================================================================== */
+const SEED_CASAIS = [
+  {
+    id: 101,
+    nome: "Casal 01 - Curiós Ouro",
+    especie: "Ave",
+    machoId: null,
+    femeaId: null,
+    machoNomeManual: "Imperador",
+    machoAnilhaManual: "BR-CR-2024-001",
+    femeaNomeManual: "Princesa",
+    femeaAnilhaManual: "BR-CR-2024-002",
+    local: "Gaiola Criadeira 01",
+    status: "Com filhotes",
+    inicio: "2026-08-10",
+    obs: "Casal de excelente genética e alta fertilidade.",
+    ninhadas: [
+      {
+        id: 1,
+        dataInicio: "2026-08-12",
+        dataPostura: "2026-08-16",
+        ovosTotal: 4,
+        ovosFerteis: 4,
+        ovosGoros: 0,
+        previsao: "2026-08-30",
+        filhotesQtd: 4,
+        anilhas: "BR-2026-01, BR-2026-02, BR-2026-03, BR-2026-04",
+        status: "Com filhotes",
+        obs: "Todos os 4 ovos eclodiram com saúde perfeita."
+      }
+    ]
+  },
+  {
+    id: 102,
+    nome: "Casal 02 - Canários da Terra",
+    especie: "Ave",
+    machoId: null,
+    femeaId: null,
+    machoNomeManual: "Soberano",
+    machoAnilhaManual: "CT-2025-108",
+    femeaNomeManual: "Dourada",
+    femeaAnilhaManual: "CT-2025-109",
+    local: "Viveiro Reprodução B",
+    status: "Chocando",
+    inicio: "2026-09-02",
+    obs: "Postura em andamento na caixa ninho 2.",
+    ninhadas: [
+      {
+        id: 1,
+        dataInicio: "2026-09-05",
+        dataPostura: "2026-09-12",
+        ovosTotal: 5,
+        ovosFerteis: 4,
+        ovosGoros: 1,
+        previsao: "2026-09-26",
+        filhotesQtd: 0,
+        anilhas: "",
+        status: "Chocando",
+        obs: "Choco firme, previsão para final do mês."
+      }
+    ]
+  }
+];
+
+let casais = [];
+let casalEmEdicaoId = null;
+
+function getCasaisStorageKey() {
+  const uid = currentUser?.id || "demo";
+  return `plantel-casais-${uid}`;
+}
+
+function carregarCasais() {
+  try {
+    const raw = localStorage.getItem(getCasaisStorageKey());
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return SEED_CASAIS.map((c) => ({ ...c }));
+}
+
+function salvarCasais(lista) {
+  casais = lista;
+  try {
+    localStorage.setItem(getCasaisStorageKey(), JSON.stringify(lista));
+  } catch (e) {}
+}
+
+function renderReproducao() {
+  const container = document.getElementById("reproducao-content");
+  if (!container) return;
+
+  const totalCasais = casais.length;
+  const casaisAtivos = casais.filter((c) =>
+    ["Em postura", "Chocando", "Com filhotes"].includes(c.status)
+  ).length;
+
+  let totalOvos = 0;
+  let totalFilhotes = 0;
+  casais.forEach((c) => {
+    (c.ninhadas || []).forEach((n) => {
+      totalOvos += parseInt(n.ovosTotal) || 0;
+      totalFilhotes += parseInt(n.filhotesQtd) || 0;
+    });
+  });
+
+  const casaisHtml = casais.length
+    ? casais
+        .map((c) => {
+          const macho = c.machoId ? animais.find((x) => x.id === c.machoId) : null;
+          const femea = c.femeaId ? animais.find((x) => x.id === c.femeaId) : null;
+
+          const machoNome = macho ? macho.nome : c.machoNomeManual || "Macho não definido";
+          const machoAnilha = macho ? (macho.microchip || "") : (c.machoAnilhaManual || "");
+          const machoFoto = macho?.foto || null;
+          const machoEmoji = macho ? (EMOJIS[macho.especie] || `<span class="noto-emoji">🐾</span>`) : `<span class="noto-emoji">♂</span>`;
+
+          const femeaNome = femea ? femea.nome : c.femeaNomeManual || "Fêmea não definida";
+          const femeaAnilha = femea ? (femea.microchip || "") : (c.femeaAnilhaManual || "");
+          const femeaFoto = femea?.foto || null;
+          const femeaEmoji = femea ? (EMOJIS[femea.especie] || `<span class="noto-emoji">🐾</span>`) : `<span class="noto-emoji">♀</span>`;
+
+          const ultimaNinhada = (c.ninhadas && c.ninhadas.length > 0) ? c.ninhadas[c.ninhadas.length - 1] : null;
+          const ovosTxt = ultimaNinhada ? `${ultimaNinhada.ovosTotal || 0} (${ultimaNinhada.ovosFerteis || 0} férteis)` : "-";
+          const filhotesTxt = ultimaNinhada ? `${ultimaNinhada.filhotesQtd || 0}` : "-";
+          const eclosaoTxt = ultimaNinhada?.previsao ? fmtDate(ultimaNinhada.previsao) : "-";
+
+          let badgeClass = "badge-formado";
+          if (c.status === "Em postura") badgeClass = "badge-postura";
+          else if (c.status === "Chocando") badgeClass = "badge-chocando";
+          else if (c.status === "Com filhotes") badgeClass = "badge-filhotes";
+          else if (c.status === "Descanso") badgeClass = "badge-descanso";
+
+          const ninhadasListHtml = (c.ninhadas || [])
+            .map((n, idx) => {
+              const anilhasArr = (n.anilhas || "")
+                .split(",")
+                .map((s) => s.trim())
+                .filter(Boolean);
+
+              const filhotesBadges = anilhasArr
+                .map(
+                  (an) => `
+                <span class="filhote-chip">
+                  <span class="noto-emoji noto-emoji-inline">🏷</span> ${an}
+                  <button class="btn-reg-filhote" onclick="registrarFilhoteNoPlantel(${c.id}, ${idx}, '${an}')" title="Cadastrar filhote como animal no plantel">+ Cadastrar</button>
+                </span>`
+                )
+                .join("");
+
+              return `
+              <div class="ninhada-item">
+                <div class="ninhada-top">
+                  <span class="ninhada-data">Ninhada #${idx + 1} · Início: ${fmtDate(n.dataInicio)}</span>
+                  <div style="display:flex;gap:6px;align-items:center">
+                    <span class="casal-badge ${n.status === 'Concluída' ? 'badge-descanso' : 'badge-filhotes'}">${n.status || 'Em andamento'}</span>
+                    <button class="btn-casal-delete" onclick="excluirNinhada(${c.id}, ${idx})" title="Excluir ninhada">✕</button>
+                  </div>
+                </div>
+                <div class="ninhada-badges">
+                  <span class="ninhada-tag">🥚 Ovos: <strong>${n.ovosTotal || 0}</strong></span>
+                  <span class="ninhada-tag" style="color:#059669">✨ Férteis: <strong>${n.ovosFerteis || 0}</strong></span>
+                  <span class="ninhada-tag" style="color:#dc2626">⚪ Goros: <strong>${n.ovosGoros || 0}</strong></span>
+                  <span class="ninhada-tag" style="color:#2563eb">🐣 Filhotes: <strong>${n.filhotesQtd || 0}</strong></span>
+                  ${n.previsao ? `<span class="ninhada-tag">⏳ Previsão: <strong>${fmtDate(n.previsao)}</strong></span>` : ""}
+                </div>
+                ${n.obs ? `<div style="font-size:11.5px;color:var(--c-text-2);margin-top:4px;font-style:italic">${n.obs}</div>` : ""}
+                ${filhotesBadges ? `<div class="filhotes-list">${filhotesBadges}</div>` : ""}
+              </div>`;
+            })
+            .join("");
+
+          return `
+          <div class="casal-card">
+            <div class="casal-header">
+              <div class="casal-name-group">
+                <h3 class="casal-nome">${c.nome}</h3>
+                ${c.local ? `<span class="casal-local">· ${c.local}</span>` : ""}
+              </div>
+              <span class="casal-badge ${badgeClass}">${c.status}</span>
+            </div>
+
+            <div class="casal-pair-wrap">
+              <div class="casal-partner partner-macho">
+                <div class="casal-partner-thumb">
+                  ${machoFoto ? `<img src="${machoFoto}" alt="${machoNome}" />` : machoEmoji}
+                </div>
+                <span class="casal-partner-role">Macho</span>
+                <span class="casal-partner-nome" title="${machoNome}">${machoNome}</span>
+                ${machoAnilha ? `<span class="casal-partner-anilha">Anilha: ${machoAnilha}</span>` : ""}
+              </div>
+
+              <div class="casal-heart-divider">❤</div>
+
+              <div class="casal-partner partner-femea">
+                <div class="casal-partner-thumb">
+                  ${femeaFoto ? `<img src="${femeaFoto}" alt="${femeaNome}" />` : femeaEmoji}
+                </div>
+                <span class="casal-partner-role">Fêmea</span>
+                <span class="casal-partner-nome" title="${femeaNome}">${femeaNome}</span>
+                ${femeaAnilha ? `<span class="casal-partner-anilha">Anilha: ${femeaAnilha}</span>` : ""}
+              </div>
+            </div>
+
+            <div class="casal-resumo">
+              <div class="casal-resumo-item">
+                <strong>${ovosTxt}</strong>
+                <span>Ovos</span>
+              </div>
+              <div class="casal-resumo-item">
+                <strong>${filhotesTxt}</strong>
+                <span>Filhotes</span>
+              </div>
+              <div class="casal-resumo-item">
+                <strong>${eclosaoTxt}</strong>
+                <span>Eclosão</span>
+              </div>
+            </div>
+
+            <div class="casal-actions">
+              <button class="btn-action-ninhada" onclick="abrirModalNinhada(${c.id})">+ Nova Postura</button>
+              <button class="btn-toggle-ninhadas" onclick="toggleNinhadas(${c.id})">Ninhadas (${(c.ninhadas || []).length})</button>
+              <button class="btn-toggle-ninhadas" onclick="abrirModalCasal(${c.id})">Editar</button>
+              <button class="btn-casal-delete" onclick="confirmarExclusaoCasal(${c.id})" title="Excluir casal">🗑</button>
+            </div>
+
+            <div class="ninhadas-section" id="ninhadas-sec-${c.id}">
+              ${ninhadasListHtml || '<div style="font-size:12px;color:var(--c-text-3);text-align:center;padding:8px">Nenhuma ninhada registrada para este casal ainda.</div>'}
+            </div>
+          </div>`;
+        })
+        .join("")
+    : `
+    <div style="background:var(--c-card);border:1.5px dashed var(--c-border);border-radius:16px;padding:48px 20px;text-align:center;grid-column:1/-1">
+      <div style="font-size:36px;margin-bottom:12px">🕊</div>
+      <h3 style="font-size:18px;font-weight:700;color:var(--c-text-1);margin:0 0 6px">Nenhum casal formado</h3>
+      <p style="font-size:13px;color:var(--c-text-2);margin:0 0 18px">Forme casais da mesma espécie para acompanhar posturas de ovos, filhotes e ninhadas.</p>
+      <button class="btn-novo-casal" onclick="abrirModalCasal()">+ Formar Primeiro Casal</button>
+    </div>`;
+
+  container.innerHTML = `
+    <div class="rep-wrap">
+      <div class="rep-header">
+        <div class="rep-title-group">
+          <h1>
+            <svg viewBox="0 0 24 24" fill="none" style="width:24px;height:24px;color:var(--c-accent)">
+              <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+            Área de Reprodução
+          </h1>
+          <p>Gestão de casais, controle de posturas, ovos e registro de filhotes</p>
+        </div>
+        <button class="btn-novo-casal" onclick="abrirModalCasal()">
+          <svg viewBox="0 0 20 20" fill="none" style="width:16px;height:16px"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Novo Casal
+        </button>
+      </div>
+
+      <div class="rep-stats-grid">
+        <div class="rep-stat-card">
+          <div class="rep-stat-icon">🕊</div>
+          <div>
+            <div class="rep-stat-val">${totalCasais}</div>
+            <div class="rep-stat-lbl">Casais Formados</div>
+          </div>
+        </div>
+        <div class="rep-stat-card">
+          <div class="rep-stat-icon" style="background:#fef3c7;color:#b45309">🔥</div>
+          <div>
+            <div class="rep-stat-val">${casaisAtivos}</div>
+            <div class="rep-stat-lbl">Casais em Reprodução</div>
+          </div>
+        </div>
+        <div class="rep-stat-card">
+          <div class="rep-stat-icon" style="background:#ecfdf5;color:#059669">🥚</div>
+          <div>
+            <div class="rep-stat-val">${totalOvos}</div>
+            <div class="rep-stat-lbl">Total de Ovos</div>
+          </div>
+        </div>
+        <div class="rep-stat-card">
+          <div class="rep-stat-icon" style="background:#eff6ff;color:#2563eb">🐣</div>
+          <div>
+            <div class="rep-stat-val">${totalFilhotes}</div>
+            <div class="rep-stat-lbl">Filhotes Nascidos</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="casais-grid">
+        ${casaisHtml}
+      </div>
+    </div>`;
+}
+
+function toggleNinhadas(casalId) {
+  const el = document.getElementById(`ninhadas-sec-${casalId}`);
+  if (el) el.classList.toggle("open");
+}
+
+function abrirModalCasal(id = null) {
+  casalEmEdicaoId = id;
+  const modal = document.getElementById("modal-casal");
+  const title = document.getElementById("modal-casal-title");
+  if (!modal) return;
+
+  if (id) {
+    const c = casais.find((x) => x.id === id);
+    if (!c) return;
+    title.textContent = "Editar Casal";
+    document.getElementById("casal-id").value = c.id;
+    document.getElementById("casal-nome").value = c.nome;
+    document.getElementById("casal-especie").value = c.especie;
+    atualizarSelectsCasal(c.machoId, c.femeaId);
+    document.getElementById("casal-local").value = c.local || "";
+    document.getElementById("casal-status").value = c.status || "Formado";
+    document.getElementById("casal-inicio").value = c.inicio || "";
+    document.getElementById("casal-obs").value = c.obs || "";
+  } else {
+    title.textContent = "Novo Casal de Reprodução";
+    document.getElementById("casal-id").value = "";
+    document.getElementById("casal-nome").value = `Casal ${casais.length + 1}`;
+    document.getElementById("casal-especie").value = "Ave";
+    atualizarSelectsCasal();
+    document.getElementById("casal-local").value = "";
+    document.getElementById("casal-status").value = "Formado";
+    document.getElementById("casal-inicio").value = new Date().toISOString().slice(0, 10);
+    document.getElementById("casal-obs").value = "";
+  }
+  modal.style.display = "flex";
+}
+
+function fecharModalCasal() {
+  const modal = document.getElementById("modal-casal");
+  if (modal) modal.style.display = "none";
+}
+
+function fecharModalCasalExterno(e) {
+  if (e.target.id === "modal-casal") fecharModalCasal();
+}
+
+function atualizarSelectsCasal(selMacho = null, selFemea = null) {
+  const esp = document.getElementById("casal-especie")?.value || "Ave";
+  const sMacho = document.getElementById("casal-macho");
+  const sFemea = document.getElementById("casal-femea");
+  if (!sMacho || !sFemea) return;
+
+  const machos = animais.filter((a) => a.especie === esp && a.sexo === "Macho");
+  const femeas = animais.filter((a) => a.especie === esp && a.sexo === "Fêmea");
+  const outros = animais.filter((a) => a.especie === esp && a.sexo !== "Macho" && a.sexo !== "Fêmea");
+
+  sMacho.innerHTML = `<option value="">-- Selecione o Macho --</option>` +
+    machos.map((m) => `<option value="${m.id}"${selMacho === m.id ? " selected" : ""}>${m.nome} ${m.microchip ? `(${m.microchip})` : ""}</option>`).join("") +
+    (outros.length ? `<optgroup label="Sem sexo definido">` + outros.map((o) => `<option value="${o.id}"${selMacho === o.id ? " selected" : ""}>${o.nome}</option>`).join("") + `</optgroup>` : "");
+
+  sFemea.innerHTML = `<option value="">-- Selecione a Fêmea --</option>` +
+    femeas.map((f) => `<option value="${f.id}"${selFemea === f.id ? " selected" : ""}>${f.nome} ${f.microchip ? `(${f.microchip})` : ""}</option>`).join("") +
+    (outros.length ? `<optgroup label="Sem sexo definido">` + outros.map((o) => `<option value="${o.id}"${selFemea === o.id ? " selected" : ""}>${o.nome}</option>`).join("") + `</optgroup>` : "");
+}
+
+function salvarCasalForm() {
+  const nome = document.getElementById("casal-nome")?.value?.trim();
+  if (!nome) {
+    mostrarDialog({ title: "Campo Obrigatório", desc: "Por favor, informe o nome ou código do casal." });
+    return;
+  }
+  const idStr = document.getElementById("casal-id")?.value;
+  const especie = document.getElementById("casal-especie")?.value || "Ave";
+  const mVal = document.getElementById("casal-macho")?.value;
+  const fVal = document.getElementById("casal-femea")?.value;
+  const local = document.getElementById("casal-local")?.value || "";
+  const status = document.getElementById("casal-status")?.value || "Formado";
+  const inicio = document.getElementById("casal-inicio")?.value || "";
+  const obs = document.getElementById("casal-obs")?.value || "";
+
+  const machoId = mVal ? parseInt(mVal) : null;
+  const femeaId = fVal ? parseInt(fVal) : null;
+
+  if (idStr) {
+    const cid = parseInt(idStr);
+    const c = casais.find((x) => x.id === cid);
+    if (c) {
+      c.nome = nome;
+      c.especie = especie;
+      c.machoId = machoId;
+      c.femeaId = femeaId;
+      c.local = local;
+      c.status = status;
+      c.inicio = inicio;
+      c.obs = obs;
+    }
+  } else {
+    const novo = {
+      id: Date.now(),
+      nome,
+      especie,
+      machoId,
+      femeaId,
+      local,
+      status,
+      inicio,
+      obs,
+      ninhadas: []
+    };
+    casais.push(novo);
+  }
+
+  salvarCasais(casais);
+  fecharModalCasal();
+  renderReproducao();
+}
+
+function confirmarExclusaoCasal(id) {
+  mostrarDialog({
+    title: "Excluir Casal",
+    desc: "Tem certeza que deseja remover este casal e seu histórico de ninhadas?",
+    btnConfirmText: "Excluir",
+    btnConfirmDanger: true,
+    onConfirm: () => {
+      casais = casais.filter((x) => x.id !== id);
+      salvarCasais(casais);
+      renderReproducao();
+    }
+  });
+}
+
+/* Ninhadas */
+function abrirModalNinhada(casalId) {
+  const c = casais.find((x) => x.id === casalId);
+  if (!c) return;
+
+  const modal = document.getElementById("modal-ninhada");
+  if (!modal) return;
+
+  document.getElementById("ninhada-casal-id").value = casalId;
+  document.getElementById("modal-ninhada-title").textContent = `Nova Ninhada · ${c.nome}`;
+  document.getElementById("nin-data-inicio").value = new Date().toISOString().slice(0, 10);
+  document.getElementById("nin-data-postura").value = "";
+  document.getElementById("nin-ovos-total").value = 0;
+  document.getElementById("nin-ovos-ferteis").value = 0;
+  document.getElementById("nin-ovos-goros").value = 0;
+  document.getElementById("nin-previsao").value = "";
+  document.getElementById("nin-filhotes-qtd").value = 0;
+  document.getElementById("nin-anilhas").value = "";
+  document.getElementById("nin-status").value = "Em postura";
+  document.getElementById("nin-obs").value = "";
+
+  modal.style.display = "flex";
+}
+
+function fecharModalNinhada() {
+  const modal = document.getElementById("modal-ninhada");
+  if (modal) modal.style.display = "none";
+}
+
+function fecharModalNinhadaExterno(e) {
+  if (e.target.id === "modal-ninhada") fecharModalNinhada();
+}
+
+function salvarNinhadaForm() {
+  const cid = parseInt(document.getElementById("ninhada-casal-id")?.value);
+  const c = casais.find((x) => x.id === cid);
+  if (!c) return;
+
+  const nova = {
+    id: Date.now(),
+    dataInicio: document.getElementById("nin-data-inicio")?.value || "",
+    dataPostura: document.getElementById("nin-data-postura")?.value || "",
+    ovosTotal: parseInt(document.getElementById("nin-ovos-total")?.value) || 0,
+    ovosFerteis: parseInt(document.getElementById("nin-ovos-ferteis")?.value) || 0,
+    ovosGoros: parseInt(document.getElementById("nin-ovos-goros")?.value) || 0,
+    previsao: document.getElementById("nin-previsao")?.value || "",
+    filhotesQtd: parseInt(document.getElementById("nin-filhotes-qtd")?.value) || 0,
+    anilhas: document.getElementById("nin-anilhas")?.value?.trim() || "",
+    status: document.getElementById("nin-status")?.value || "Em postura",
+    obs: document.getElementById("nin-obs")?.value?.trim() || ""
+  };
+
+  if (!c.ninhadas) c.ninhadas = [];
+  c.ninhadas.push(nova);
+
+  if (nova.status === "Com filhotes") c.status = "Com filhotes";
+  else if (nova.status === "Chocando") c.status = "Chocando";
+  else if (nova.status === "Em postura") c.status = "Em postura";
+
+  salvarCasais(casais);
+  fecharModalNinhada();
+  renderReproducao();
+}
+
+function excluirNinhada(casalId, idx) {
+  mostrarDialog({
+    title: "Excluir Ninhada",
+    desc: "Deseja remover este registro de postura/ninhada?",
+    btnConfirmText: "Excluir",
+    btnConfirmDanger: true,
+    onConfirm: () => {
+      const c = casais.find((x) => x.id === casalId);
+      if (c && c.ninhadas) {
+        c.ninhadas.splice(idx, 1);
+        salvarCasais(casais);
+        renderReproducao();
+      }
+    }
+  });
+}
+
+function registrarFilhoteNoPlantel(casalId, idx, anilha) {
+  const c = casais.find((x) => x.id === casalId);
+  if (!c) return;
+  const n = c.ninhadas ? c.ninhadas[idx] : null;
+
+  const macho = c.machoId ? animais.find((x) => x.id === c.machoId) : null;
+  const femea = c.femeaId ? animais.find((x) => x.id === c.femeaId) : null;
+
+  const paiNome = macho ? macho.nome : (c.machoNomeManual || "");
+  const paiRaca = macho?.raca || "";
+  const maeNome = femea ? femea.nome : (c.femeaNomeManual || "");
+  const maeRaca = femea?.raca || "";
+
+  abrirModal();
+
+  const nomeInput = document.getElementById("m-nome");
+  const espInput = document.getElementById("m-especie");
+  const racaInput = document.getElementById("m-raca");
+  const microInput = document.getElementById("m-microchip");
+  const nascInput = document.getElementById("m-nasc");
+
+  if (nomeInput) nomeInput.value = `Filhote ${anilha || ''}`.trim();
+  if (espInput) {
+    espInput.value = c.especie;
+    atualizarRacasModal();
+  }
+  if (racaInput) racaInput.value = paiRaca || maeRaca || "";
+  if (microInput) microInput.value = anilha || "";
+  if (nascInput && n && n.dataPostura) nascInput.value = n.dataPostura;
+  else if (nascInput) nascInput.value = new Date().toISOString().slice(0, 10);
+
+  const pNome = document.getElementById("m-pai-nome");
+  const pRaca = document.getElementById("m-pai-raca");
+  const mNome = document.getElementById("m-mae-nome");
+  const mRaca = document.getElementById("m-mae-raca");
+
+  if (pNome) pNome.value = paiNome;
+  if (pRaca) pRaca.value = paiRaca;
+  if (mNome) mNome.value = maeNome;
+  if (mRaca) mRaca.value = maeRaca;
+}
+
+/* Certificado */
+let animalCertId = null;
+
+function abrirModalCertificado(animalId) {
+  animalCertId = animalId;
+  const a = animais.find((x) => x.id === animalId);
+  if (!a) return;
+
+  const modal = document.getElementById("modal-certificado");
+  if (!modal) return;
+
+  const tutorNome = document.getElementById("cert-tutor-nome");
+  const tutorDoc = document.getElementById("cert-tutor-doc");
+  const emissao = document.getElementById("cert-data-emissao");
+  const obs = document.getElementById("cert-obs");
+
+  if (tutorNome && !tutorNome.value) tutorNome.value = "Consumidor Final";
+  if (emissao) emissao.value = new Date().toISOString().slice(0, 10);
+
+  atualizarPreviewCertificado();
+  modal.style.display = "flex";
+}
+
+function fecharModalCertificado() {
+  const modal = document.getElementById("modal-certificado");
+  if (modal) modal.style.display = "none";
+}
+
+function fecharModalCertificadoExterno(e) {
+  if (e.target.id === "modal-certificado") fecharModalCertificado();
+}
+
+function atualizarPreviewCertificado() {
+  const a = animais.find((x) => x.id === animalCertId);
+  if (!a) return;
+
+  const p = getProfile();
+  const cNome = p?.nome || currentUser?.name || "Criatório Plantel";
+  const cSub = currentUser ? `Usuário: ${currentUser.email}` : "Gestão e Seleção Zootécnica";
+  const rawId = currentUser?.id;
+  const cId = rawId ? formatPlantelId(rawId) : "Plantel Oficial";
+
+  const nomeCriatEl = document.getElementById("cert-criatorio-nome");
+  const subCriatEl = document.getElementById("cert-criatorio-sub");
+  const idCriatEl = document.getElementById("cert-criatorio-id");
+  const logoCriatEl = document.getElementById("cert-criatorio-logo");
+
+  if (nomeCriatEl) nomeCriatEl.textContent = cNome;
+  if (subCriatEl) subCriatEl.textContent = cSub;
+  if (idCriatEl) idCriatEl.textContent = `Registro: ${cId}`;
+  if (logoCriatEl && currentUser?.avatar) logoCriatEl.src = currentUser.avatar;
+
+  const setT = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val || "-";
+  };
+
+  setT("c-nome", a.nome);
+  setT("c-anilha", a.microchip || "Não informada");
+  setT("c-especie", a.especie);
+  setT("c-raca", a.raca || "Mestiço / Padrão");
+  setT("c-sexo", a.sexo || "Não informado");
+  setT("c-nasc", a.nasc ? fmtDate(a.nasc) : "-");
+  setT("c-pelagem", a.pelagem || "-");
+  setT("c-status", a.status || "Ativo");
+
+  const pai = a.paiNome ? animais.find((x) => x.nome.toLowerCase() === a.paiNome.toLowerCase()) : null;
+  const mae = a.maeNome ? animais.find((x) => x.nome.toLowerCase() === a.maeNome.toLowerCase()) : null;
+
+  setT("c-pai-nome", a.paiNome || "Não informado");
+  setT("c-pai-anilha", pai?.microchip ? `Anilha: ${pai.microchip}` : "Anilha: Não informada");
+
+  setT("c-mae-nome", a.maeNome || "Não informada");
+  setT("c-mae-anilha", mae?.microchip ? `Anilha: ${mae.microchip}` : "Anilha: Não informada");
+
+  const tutNome = document.getElementById("cert-tutor-nome")?.value || "Consumidor Final";
+  const tutDoc = document.getElementById("cert-tutor-doc")?.value || "-";
+  const dataEmissao = document.getElementById("cert-data-emissao")?.value;
+
+  setT("c-tutor-nome", tutNome);
+  setT("c-tutor-doc", tutDoc);
+  setT("c-data-transf", dataEmissao ? fmtDate(dataEmissao) : fmtDate(new Date().toISOString().slice(0, 10)));
+  setT("c-ass-nome", cNome);
+}
+
+function imprimirCertificado() {
+  window.print();
+}
+
