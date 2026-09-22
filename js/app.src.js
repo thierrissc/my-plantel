@@ -3419,7 +3419,7 @@ function renderReproducao() {
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                       </span>
                       <div class="sum-data">
-                        <span class="sum-val">${eclosaoTxt}</span>
+                        <span class="sum-val ${eclosaoTxt && eclosaoTxt.includes('/') ? 'sum-val-date' : ''}">${eclosaoTxt}</span>
                         <span class="sum-lbl">${casalAve ? "Previsão" : "Prev. Parto"}</span>
                       </div>
                     </div>`

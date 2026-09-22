@@ -1494,34 +1494,36 @@ body {
 .ficha-hero::after {
   content: "";
   position: absolute;
-  top: -40px;
-  right: -40px;
-  width: 270px;
-  height: 270px;
-  background: radial-gradient(
-    circle at center,
-    rgba(16, 185, 129, 0.22) 0%,
-    rgba(16, 185, 129, 0.08) 50%,
-    transparent 72%
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 140px;
+  background: linear-gradient(
+    90deg,
+    rgba(16, 185, 129, 0.05) 0%,
+    rgba(16, 185, 129, 0.22) 35%,
+    rgba(5, 150, 105, 0.28) 65%,
+    rgba(16, 185, 129, 0.08) 100%
   );
-  border-radius: 50%;
+  background-size: 250% 100%;
   pointer-events: none;
-  filter: blur(14px);
-  animation: heroGradientPulse 6s ease-in-out infinite alternate;
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 20%, rgba(0, 0, 0, 0) 100%);
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 20%, rgba(0, 0, 0, 0) 100%);
+  animation: heroTopGradientFlow 7s ease-in-out infinite alternate;
 }
 
-@keyframes heroGradientPulse {
+@keyframes heroTopGradientFlow {
   0% {
-    transform: scale(0.92) translate(0, 0);
-    opacity: 0.55;
+    background-position: 0% 50%;
+    opacity: 0.7;
   }
   50% {
-    transform: scale(1.15) translate(-12px, 12px);
-    opacity: 0.95;
+    background-position: 50% 50%;
+    opacity: 1;
   }
   100% {
-    transform: scale(1.02) translate(8px, -6px);
-    opacity: 0.7;
+    background-position: 100% 50%;
+    opacity: 0.8;
   }
 }
 
@@ -5073,8 +5075,8 @@ body {
 
 .casal-summary-bar {
   display: flex;
-  gap: 10px;
-  padding: 10px 14px;
+  gap: 6px;
+  padding: 8px 12px;
   background: var(--c-surface-2, rgba(0, 0, 0, 0.02));
   border-top: 1px solid var(--c-border-soft);
   border-bottom: 1px solid var(--c-border-soft);
@@ -5084,14 +5086,15 @@ body {
   flex: 1 1 0;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
+  gap: 6px;
+  padding: 6px 8px;
   background: var(--c-card);
   border: 1px solid var(--c-border);
   border-radius: var(--r-md);
   min-width: 0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
   transition: all 0.2s ease;
+  overflow: hidden;
 }
 
 .casal-sum-pill:hover {
@@ -5100,10 +5103,10 @@ body {
 }
 
 .casal-sum-pill .sum-icon {
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   border-radius: var(--r-sm);
-  background: var(--c-surface-2, rgba(0, 0, 0, 0.03));
+  background: var(--c-surface-2, rgba(0, 0, 0, 0.04));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -5112,31 +5115,41 @@ body {
 }
 
 .casal-sum-pill .sum-icon svg {
-  width: 17px;
-  height: 17px;
+  width: 13px;
+  height: 13px;
 }
 
 .casal-sum-pill .sum-data {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  justify-content: center;
+  flex: 1;
+  overflow: hidden;
 }
 
 .casal-sum-pill .sum-val {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 800;
   color: var(--c-text-1);
   line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.casal-sum-pill .sum-val.sum-val-date {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
 }
 
 .casal-sum-pill .sum-lbl {
-  font-size: 10px;
+  font-size: 8.5px;
   color: var(--c-text-3);
   text-transform: uppercase;
   font-weight: 700;
-  letter-spacing: 0.05em;
-  margin-top: 2px;
+  letter-spacing: 0.03em;
+  margin-top: 1px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

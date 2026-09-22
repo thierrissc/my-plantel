@@ -263,22 +263,6 @@
         </div>
       </div>
 
-      <div class="sidebar-nav-switch">
-        <button class="nav-switch-btn active" id="nav-btn-animais" onclick="irParaAba('ficha')">
-          <svg viewBox="0 0 20 20" fill="none" style="width:15px;height:15px">
-            <rect x="3" y="2" width="14" height="16" rx="2.5" stroke="currentColor" stroke-width="1.8" />
-            <path d="M7 7h6M7 10.5h6M7 14h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
-          </svg>
-          Plantel
-        </button>
-        <button class="nav-switch-btn" id="nav-btn-reproducao" onclick="irParaAba('reproducao')">
-          <svg viewBox="0 0 20 20" fill="none" style="width:15px;height:15px">
-            <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
-          </svg>
-          Reprodução
-        </button>
-      </div>
-
       <div class="sidebar-search">
         <svg class="search-icon" viewBox="0 0 20 20" fill="none">
           <circle cx="9" cy="9" r="5.5" stroke="currentColor" stroke-width="1.5" />
@@ -390,6 +374,13 @@
                 stroke-linecap="round" />
             </svg>
             Árvore Genealógica
+          </button>
+          <div class="topbar-tab-divider"></div>
+          <button class="tab-btn" data-tab="reproducao" onclick="switchTab('reproducao', this)">
+            <svg viewBox="0 0 20 20" fill="none">
+              <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+            </svg>
+            Reprodução
           </button>
         </div>
 
