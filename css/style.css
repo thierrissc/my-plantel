@@ -1779,6 +1779,75 @@ body {
   animation-delay: 0.15s;
 }
 
+.ficha-sections-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.ficha-sections-grid.com-vacina {
+  grid-template-columns: 1.15fr 0.85fr;
+  align-items: start;
+}
+.ficha-sections-grid .section-card {
+  margin-bottom: 0;
+}
+@media (max-width: 860px) {
+  .ficha-sections-grid.com-vacina {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.btn-ativar-vac {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--c-surface-2, rgba(0, 0, 0, 0.04));
+  border: 1px solid var(--c-border);
+  color: var(--c-accent);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+.btn-ativar-vac:hover {
+  background: var(--c-accent-bg);
+  border-color: var(--c-accent);
+}
+.btn-vac-toggle-off {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: var(--c-text-3);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: var(--r-sm);
+  font-family: inherit;
+}
+.btn-vac-toggle-off:hover {
+  color: var(--c-red);
+  background: var(--c-red-bg);
+}
+
+.area-chip-interactive {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--c-accent-bg);
+  color: var(--c-accent);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  font-weight: 600;
+}
+.area-chip-interactive:hover {
+  border-color: var(--c-accent);
+  transform: translateY(-1px);
+}
+
 .section-header {
   display: flex;
   align-items: center;
@@ -4223,9 +4292,7 @@ body {
   }
 }
 
-/* ==========================================================================
-   BOTÃO DE CERTIFICADO & MODAL DE CERTIFICADO
-   ========================================================================== */
+
 .btn-cert {
   display: inline-flex;
   align-items: center;
@@ -4269,7 +4336,7 @@ body {
   margin-bottom: 20px;
 }
 
-/* Folha Oficial do Certificado */
+
 .cert-paper {
   background: #ffffff;
   color: #1a202c;
@@ -4294,26 +4361,29 @@ body {
   background: radial-gradient(circle at 50% 50%, rgba(25, 135, 84, 0.02) 0%, transparent 70%);
 }
 .cert-header {
+  position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+  justify-content: center;
+  text-align: center;
   border-bottom: 2px solid #e2e8f0;
-  padding-bottom: 14px;
-  margin-bottom: 14px;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
 }
 .cert-logo-circle-wrap {
-  width: 66px;
-  height: 66px;
+  width: 76px;
+  height: 76px;
   border-radius: 50%;
   overflow: hidden;
-  border: 2px solid #0f5132;
+  border: none;
   background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(15, 81, 50, 0.15);
+  margin: 0 auto 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 .cert-logo-circle {
   width: 100%;
@@ -4321,25 +4391,31 @@ body {
   object-fit: cover;
 }
 .cert-criatorio-info {
-  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 .cert-criatorio-nome {
-  font-size: 21px;
+  font-size: 22px;
   font-weight: 800;
   color: #0f5132;
   margin: 0;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
 }
 .cert-criatorio-sub {
   font-size: 12.5px;
   color: #475569;
-  margin: 2px 0 0;
+  margin: 3px 0 0;
   font-weight: 500;
 }
 .cert-seal {
-  width: 72px;
-  height: 72px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 68px;
+  height: 68px;
   border: 2px dashed #198754;
   border-radius: 50%;
   display: flex;
@@ -4491,7 +4567,7 @@ body {
   color: #64748b;
 }
 
-/* Regras de Impressão */
+
 @media print {
   body * {
     visibility: hidden !important;
@@ -4541,9 +4617,7 @@ body {
   }
 }
 
-/* ==========================================================================
-   MÓDULO DE REPRODUÇÃO (CASAIS, NINHADAS, OVOS E FILHOTES)
-   ========================================================================== */
+
 .rep-container {
   width: 100%;
   max-width: 1400px;
@@ -4627,7 +4701,7 @@ body {
   background: var(--c-accent-bg);
 }
 
-/* Filtro de Status na Reprodução */
+
 .rep-filter-wrap {
   position: relative;
 }
@@ -4749,7 +4823,7 @@ body {
   transform: translateY(-1px);
 }
 
-/* Área de Estatísticas Colapsável */
+
 .rep-stats-wrapper {
   margin-bottom: 24px;
   animation: fadeUp 0.25s ease;
@@ -4803,7 +4877,7 @@ body {
   font-weight: 500;
 }
 
-/* Grid de Casais */
+
 .casais-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
@@ -4824,7 +4898,7 @@ body {
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
 }
 
-/* Topo do Casal Redesenhado */
+
 .casal-header {
   padding: 14px 16px;
   background: var(--c-surface-2, rgba(0, 0, 0, 0.02));
@@ -4909,7 +4983,7 @@ body {
   border: 1px solid #e2e8f0;
 }
 
-/* Área de Parceiros (Macho e Fêmea com Coração) */
+
 .casal-pair-wrap {
   display: flex;
   align-items: center;
@@ -4989,7 +5063,7 @@ body {
   box-shadow: 0 2px 6px rgba(236, 72, 153, 0.2);
 }
 
-/* Barra de Resumo das Ninhadas no Card */
+
 .casal-summary-bar {
   display: flex;
   gap: 8px;
@@ -5039,7 +5113,7 @@ body {
   text-overflow: ellipsis;
 }
 
-/* Barra de Ações do Casal */
+
 .casal-actions-bar {
   display: flex;
   align-items: center;
@@ -5119,7 +5193,7 @@ body {
   background: #fef2f2;
 }
 
-/* Área de Ninhadas Estruturada e Compacta */
+
 .ninhadas-section {
   padding: 10px 12px 14px;
   background: var(--c-surface-2, rgba(0, 0, 0, 0.02));
@@ -5177,7 +5251,7 @@ body {
   gap: 6px;
 }
 
-/* Ninhada - Novo Layout Limpo e Estruturado (Sem Emojis, Sem Balões) */
+
 .ninhada-metrics-bar {
   display: flex;
   background: var(--c-surface-2, rgba(0, 0, 0, 0.02));
@@ -5320,7 +5394,7 @@ body {
   margin-right: 4px;
 }
 
-/* Modais de Casal e Ninhada */
+
 .modal-casal-box {
   max-width: 580px;
   width: 95vw;
