@@ -261,6 +261,20 @@
           <div class="brand-name">Plantel</div>
           <div class="brand-sub">Gestão de Animais</div>
         </div>
+      <div class="sidebar-nav-switch">
+        <button class="nav-switch-btn active" id="nav-btn-animais" onclick="irParaAba('ficha')">
+          <svg viewBox="0 0 20 20" fill="none" style="width:15px;height:15px">
+            <rect x="3" y="2" width="14" height="16" rx="2.5" stroke="currentColor" stroke-width="1.8" />
+            <path d="M7 7h6M7 10.5h6M7 14h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+          </svg>
+          Plantel
+        </button>
+        <button class="nav-switch-btn" id="nav-btn-reproducao" onclick="irParaAba('reproducao')">
+          <svg viewBox="0 0 20 20" fill="none" style="width:15px;height:15px">
+            <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+          </svg>
+          Reprodução
+        </button>
       </div>
 
       <div class="sidebar-search">
@@ -397,12 +411,20 @@
         </div>
         <h2 class="empty-title">Bem-vindo ao Plantel</h2>
         <p class="empty-desc">Selecione um animal na lista ou cadastre um novo para começar.</p>
-        <button class="btn-cta" onclick="abrirModal()">
-          <svg viewBox="0 0 20 20" fill="none">
-            <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-          </svg>
-          Cadastrar animal
-        </button>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+          <button class="btn-cta" onclick="abrirModal()">
+            <svg viewBox="0 0 20 20" fill="none">
+              <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            Cadastrar animal
+          </button>
+          <button class="btn-cta" style="background:var(--c-surface);color:var(--c-text-1);border:1.5px solid var(--c-border)" onclick="irParaAba('reproducao')">
+            <svg viewBox="0 0 20 20" fill="none">
+              <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+            </svg>
+            Área de Reprodução
+          </button>
+        </div>
       </div>
 
       <div class="tab-content" id="tab-ficha">
@@ -658,7 +680,7 @@
     </nav>
 
     <!-- Modal Certificado -->
-    <div class="modal-overlay" id="modal-certificado" onclick="fecharModalCertificadoExterno(event)">
+    <div class="modal-overlay" id="modal-certificado" style="display: none;" onclick="fecharModalCertificadoExterno(event)">
       <div class="modal-box modal-cert-box">
         <div class="modal-header">
           <span class="modal-title">Certificado de Origem & Transferência</span>
@@ -779,7 +801,7 @@
     </div>
 
     <!-- Modal Casal -->
-    <div class="modal-overlay" id="modal-casal" onclick="fecharModalCasalExterno(event)">
+    <div class="modal-overlay" id="modal-casal" style="display: none;" onclick="fecharModalCasalExterno(event)">
       <div class="modal-box modal-casal-box">
         <div class="modal-header">
           <span class="modal-title" id="modal-casal-title">Novo Casal de Reprodução</span>
@@ -793,7 +815,7 @@
           <input type="hidden" id="casal-id" />
           <div class="form-grid-2">
             <div class="form-field">
-              <label>Nome / Código do Casal *</label>
+              <label>Nome do Casal *</label>
               <input id="casal-nome" type="text" placeholder="Ex: Casal 01 - Curiós Ouro" />
             </div>
             <div class="form-field">
@@ -828,7 +850,7 @@
           </div>
           <div class="form-grid-2">
             <div class="form-field">
-              <label>Local / Acomodação (Gaiola, Viveiro, Baia)</label>
+              <label>Acomodação (Gaiola / Baia)</label>
               <input id="casal-local" type="text" placeholder="Ex: Gaiola 04 / Viveiro 2" />
             </div>
             <div class="form-field">
@@ -844,12 +866,12 @@
           </div>
           <div class="form-grid-2">
             <div class="form-field">
-              <label>Data de Formação / Início</label>
+              <label>Data de Início</label>
               <input id="casal-inicio" type="date" />
             </div>
             <div class="form-field">
               <label>Observações</label>
-              <input id="casal-obs" type="text" placeholder="Ex: Casal muito fértil..." />
+              <input id="casal-obs" type="text" placeholder="Ex: Casal fértil, boa alimentação..." />
             </div>
           </div>
         </div>
@@ -861,7 +883,7 @@
     </div>
 
     <!-- Modal Ninhada -->
-    <div class="modal-overlay" id="modal-ninhada" onclick="fecharModalNinhadaExterno(event)">
+    <div class="modal-overlay" id="modal-ninhada" style="display: none;" onclick="fecharModalNinhadaExterno(event)">
       <div class="modal-box modal-ninhada-box">
         <div class="modal-header">
           <span class="modal-title" id="modal-ninhada-title">Registro de Ninhada / Postura</span>
@@ -874,16 +896,40 @@
         <div class="modal-body">
           <input type="hidden" id="ninhada-casal-id" />
           <input type="hidden" id="ninhada-idx" />
+          
           <div class="form-grid-2">
             <div class="form-field">
-              <label>Data de Início / Acasalamento</label>
+              <label>Data de Acasalamento</label>
               <input id="nin-data-inicio" type="date" />
             </div>
             <div class="form-field">
-              <label>Data da 1ª Postura / Cobertura</label>
+              <label>Data do 1º Ovo (Início da Postura)</label>
               <input id="nin-data-postura" type="date" />
             </div>
           </div>
+
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label>Data do Último Ovo</label>
+              <input id="nin-data-ultimo-ovo" type="date" />
+            </div>
+            <div class="form-field">
+              <label>Início do Choco / Incubação</label>
+              <input id="nin-data-choco" type="date" />
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label>Previsão de Eclosão</label>
+              <input id="nin-previsao" type="date" />
+            </div>
+            <div class="form-field">
+              <label>Data Real da Eclosão</label>
+              <input id="nin-data-eclosao" type="date" />
+            </div>
+          </div>
+
           <div class="form-grid-3">
             <div class="form-field">
               <label>Total de Ovos</label>
@@ -894,37 +940,40 @@
               <input id="nin-ovos-ferteis" type="number" min="0" value="0" />
             </div>
             <div class="form-field">
-              <label>Ovos Goros / Inférteis</label>
+              <label>Ovos Goros (Inférteis)</label>
               <input id="nin-ovos-goros" type="number" min="0" value="0" />
             </div>
           </div>
+
           <div class="form-grid-2">
-            <div class="form-field">
-              <label>Previsão de Nascimento / Eclosão</label>
-              <input id="nin-previsao" type="date" />
-            </div>
             <div class="form-field">
               <label>Filhotes Nascidos</label>
               <input id="nin-filhotes-qtd" type="number" min="0" value="0" />
             </div>
+            <div class="form-field">
+              <label>Ovos Bicados / Mortos no Ovo</label>
+              <input id="nin-ovos-mortos" type="number" min="0" value="0" />
+            </div>
           </div>
+
           <div class="form-field full">
             <label>Anilhas / Identificação dos Filhotes (separar por vírgula)</label>
             <input id="nin-anilhas" type="text" placeholder="Ex: BR-2026-001, BR-2026-002" />
           </div>
+
           <div class="form-grid-2">
             <div class="form-field">
               <label>Status da Ninhada</label>
               <select id="nin-status">
                 <option value="Em postura">Em postura</option>
-                <option value="Chocando">Chocando / Gestação</option>
-                <option value="Com filhotes">Com filhotes</option>
+                <option value="Chocando">Chocando / Incubação</option>
+                <option value="Com filhotes">Com filhotes no ninho</option>
                 <option value="Concluída">Concluída</option>
               </select>
             </div>
             <div class="form-field">
               <label>Observações da Ninhada</label>
-              <input id="nin-obs" type="text" placeholder="Anotações veterinárias, cuidados..." />
+              <input id="nin-obs" type="text" placeholder="Cuidados especiais, temperatura, alimentação..." />
             </div>
           </div>
         </div>
@@ -956,7 +1005,7 @@
     <input type="file" id="foto-input" accept="image/*" onchange="carregarFoto(event)" />
   </div>
 
-  <script src="js/app.js?v=3.3"></script>
+  <script src="js/app.js?v=3.4"></script>
 </body>
 
 </html>
