@@ -4944,12 +4944,11 @@ function atualizarPreviewCertificado() {
 
   setT("c-nome", a.nome, "____________________");
   setT("c-anilha", a.microchip, "____________________");
-  setT("c-especie", a.especie, "____________________");
-  setT("c-raca", a.raca, "____________________");
+  const aveVal = a.raca || a.especie || "";
+  setT("c-ave", aveVal, "____________________");
   setT("c-sexo", a.sexo, "____________________");
   setT("c-nasc", a.nasc ? fmtDate(a.nasc) : "", "____ / ____ / ________");
   setT("c-pelagem", a.pelagem, "____________________");
-  setT("c-status", a.status || "Ativo", "Ativo");
 
   const pai = a.paiNome ? animais.find((x) => x.nome.toLowerCase() === a.paiNome.toLowerCase()) : null;
   const mae = a.maeNome ? animais.find((x) => x.nome.toLowerCase() === a.maeNome.toLowerCase()) : null;
@@ -4960,8 +4959,7 @@ function atualizarPreviewCertificado() {
   setT("c-mae-nome", a.maeNome, "________________________________");
   setT("c-mae-anilha", mae?.microchip ? `Anilha: ${mae.microchip}` : "", "Anilha: ________________________");
 
-  setT("c-tutor-nome", "", "________________________________________________");
-  setT("c-tutor-doc", "", "________________________________");
+  setT("c-tutor-nome", "", "________________________________");
   setT("c-data-transf", "", "____ / ____ / ________");
   setT("c-ass-nome", cNome, "________________________________");
 }

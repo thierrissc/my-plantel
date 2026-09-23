@@ -4457,21 +4457,21 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: var(--c-surface);
+  background: var(--c-card);
   color: var(--c-text-1);
-  border: 1.5px solid var(--c-border);
-  padding: 8px 14px;
+  border: 1px solid var(--c-border);
+  padding: 8px 18px;
   border-radius: var(--r-md);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
+  font-family: var(--font-body);
   cursor: pointer;
-  transition: all 0.18s ease;
+  transition: all var(--t);
 }
 .btn-cert:hover {
   border-color: var(--c-accent);
   color: var(--c-accent);
   background: var(--c-accent-bg);
-  transform: translateY(-1px);
 }
 
 .modal-cert-box {
@@ -4487,6 +4487,9 @@ body {
   overflow-y: auto;
   padding: 16px 20px 40px;
   background: #f1f5f4;
+}
+[data-theme="dark"] .cert-modal-body {
+  background: #000000;
 }
 .cert-controls {
   background: var(--c-surface);
