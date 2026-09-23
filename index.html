@@ -947,6 +947,35 @@
       </div>
     </div>
 
+    <div class="modal-overlay" id="modal-gerenciar-ninhadas" style="display: none;" onclick="fecharModalGerenciarNinhadasExterno(event)">
+      <div class="modal-box modal-gerenciar-ninhadas-box">
+        <div class="modal-header">
+          <div class="modal-header-info">
+            <span class="modal-title" id="mgn-casal-nome">Ninhadas do Casal</span>
+            <span class="modal-subtitle" id="mgn-casal-sub"></span>
+          </div>
+          <button class="modal-close" onclick="fecharModalGerenciarNinhadas()">
+            <svg viewBox="0 0 20 20" fill="none">
+              <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body mgn-modal-body">
+          <div class="mgn-actions-row">
+            <div class="mgn-stats-summary" id="mgn-stats-summary"></div>
+            <button class="btn-primary btn-nova-ninhada-modal" id="btn-mgn-nova-ninhada" onclick="abrirModalNovaNinhadaDoCasal()">
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              <span id="mgn-nova-ninhada-txt">Nova Postura</span>
+            </button>
+          </div>
+          <div class="mgn-ninhadas-list" id="mgn-ninhadas-list"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-ghost" onclick="fecharModalGerenciarNinhadas()">Fechar</button>
+        </div>
+      </div>
+    </div>
+
     <div class="dialog-overlay" id="dialog-overlay" onclick="fecharDialogExterno(event)">
       <div class="dialog-box" role="alertdialog" aria-modal="true">
         <div class="dialog-icon">

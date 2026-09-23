@@ -3727,6 +3727,7 @@ body {
 #modal-perfil,
 #modal-casal,
 #modal-ninhada,
+#modal-gerenciar-ninhadas,
 #modal-certificado {
   display: none;
 }
@@ -5846,5 +5847,101 @@ body {
 }
 .btn-add-remedio:hover {
   background: #15803d;
+}
+
+.modal-gerenciar-ninhadas-box {
+  max-width: 720px;
+  width: 95vw;
+}
+.mgn-modal-body {
+  padding: 20px 24px;
+}
+.mgn-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--c-border);
+}
+.mgn-stats-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.mgn-stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--c-surface-2, rgba(0, 0, 0, 0.03));
+  border: 1px solid var(--c-border);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--c-text-2);
+}
+.mgn-stat-pill strong {
+  color: var(--c-text-1);
+}
+.mgn-stat-accent {
+  background: var(--c-accent-bg);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: var(--c-accent);
+}
+.mgn-stat-accent strong {
+  color: var(--c-accent);
+}
+.btn-nova-ninhada-modal {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 12.5px;
+  font-weight: 700;
+  border-radius: var(--r-md);
+  white-space: nowrap;
+}
+.mgn-ninhadas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.mgn-card-item {
+  border: 1.5px solid var(--c-border);
+  margin-bottom: 0;
+}
+.mgn-empty {
+  text-align: center;
+  padding: 36px 20px;
+  background: var(--c-surface-2, rgba(0, 0, 0, 0.02));
+  border: 1.5px dashed var(--c-border);
+  border-radius: var(--r-lg);
+}
+.mgn-empty-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--c-accent-bg);
+  color: var(--c-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+}
+.mgn-empty h4 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--c-text-1);
+  margin: 0 0 4px;
+}
+.mgn-empty p {
+  font-size: 12.5px;
+  color: var(--c-text-2);
+  margin: 0;
 }
 
