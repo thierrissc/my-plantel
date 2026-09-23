@@ -5913,7 +5913,13 @@ body {
 }
 .mgn-card-item {
   border: 1.5px solid var(--c-border);
+  background: var(--c-card);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
   margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 .mgn-empty {
   text-align: center;

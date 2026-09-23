@@ -3805,10 +3805,6 @@ function renderReproducao() {
                 <span>Ninhadas (${(c.ninhadas || []).length})</span>
               </button>
               <div class="casal-actions-right">
-                <button class="btn-action-primary" onclick="abrirModalNinhada(${c.id})" title="${casalAve ? 'Registrar nova postura' : 'Registrar nova ninhada'}">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-                  <span>${casalAve ? "Nova Postura" : "Nova Ninhada"}</span>
-                </button>
                 <button class="btn-action-icon" onclick="abrirModalCasal(${c.id})" title="Editar casal">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                 </button>
@@ -4054,12 +4050,12 @@ function abrirModalGerenciarNinhadas(casalId) {
       listEl.innerHTML = c.ninhadas
         .map((n, idx) => {
           const datasItems = [];
-          if (n.dataInicio) datasItems.push(`<div class="nin-date-chip"><span class="d-lbl">${casalAve ? "Acasalamento" : "Cruzamento"}</span><span class="d-val">${fmtDate(n.dataInicio)}</span></div>`);
-          if (casalAve && n.dataPostura) datasItems.push(`<div class="nin-date-chip"><span class="d-lbl">1º Ovo</span><span class="d-val">${fmtDate(n.dataPostura)}</span></div>`);
-          if (casalAve && n.dataUltimoOvo) datasItems.push(`<div class="nin-date-chip"><span class="d-lbl">Último Ovo</span><span class="d-val">${fmtDate(n.dataUltimoOvo)}</span></div>`);
-          if (casalAve && n.dataChoco) datasItems.push(`<div class="nin-date-chip"><span class="d-lbl">Início Choco</span><span class="d-val">${fmtDate(n.dataChoco)}</span></div>`);
-          if (n.previsao) datasItems.push(`<div class="nin-date-chip highlight"><span class="d-lbl">${casalAve ? "Prev. Eclosão" : "Prev. Parto"}</span><span class="d-val">${fmtDate(n.previsao)}</span></div>`);
-          if (n.dataEclosao) datasItems.push(`<div class="nin-date-chip success"><span class="d-lbl">${casalAve ? "Eclosão Real" : "Nasc. Real"}</span><span class="d-val">${fmtDate(n.dataEclosao)}</span></div>`);
+          if (n.dataInicio) datasItems.push(`<div class="ninhada-timeline-item"><span class="tl-lbl">${casalAve ? "Acasalamento" : "Cruzamento"}</span><span class="tl-val">${fmtDate(n.dataInicio)}</span></div>`);
+          if (casalAve && n.dataPostura) datasItems.push(`<div class="ninhada-timeline-item"><span class="tl-lbl">1º Ovo</span><span class="tl-val">${fmtDate(n.dataPostura)}</span></div>`);
+          if (casalAve && n.dataUltimoOvo) datasItems.push(`<div class="ninhada-timeline-item"><span class="tl-lbl">Último Ovo</span><span class="tl-val">${fmtDate(n.dataUltimoOvo)}</span></div>`);
+          if (casalAve && n.dataChoco) datasItems.push(`<div class="ninhada-timeline-item"><span class="tl-lbl">Início Choco</span><span class="tl-val">${fmtDate(n.dataChoco)}</span></div>`);
+          if (n.previsao) datasItems.push(`<div class="ninhada-timeline-item tl-destaque"><span class="tl-lbl">${casalAve ? "Prev. Eclosão" : "Prev. Parto"}</span><span class="tl-val">${fmtDate(n.previsao)}</span></div>`);
+          if (n.dataEclosao) datasItems.push(`<div class="ninhada-timeline-item tl-destaque"><span class="tl-lbl">${casalAve ? "Eclosão Real" : "Nasc. Real"}</span><span class="tl-val">${fmtDate(n.dataEclosao)}</span></div>`);
 
           const anilhasList = (n.anilhas || "")
             .split(/[,;\n]+/)
@@ -4070,10 +4066,12 @@ function abrirModalGerenciarNinhadas(casalId) {
             ? anilhasList
                 .map(
                   (anh) => `
-                <div class="filhote-tag-chip">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
-                  <span>${anh}</span>
-                  <button type="button" class="btn-reg-filhote-plantel" onclick="registrarFilhoteNoPlantel(${c.id}, ${idx}, '${anh}')" title="Cadastrar filhote automaticamente como animal no plantel">
+                <div class="filhote-card-row">
+                  <span class="filhote-anilha-tag">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+                    <span>${anh}</span>
+                  </span>
+                  <button type="button" class="btn-reg-filhote-pro" onclick="registrarFilhoteNoPlantel(${c.id}, ${idx}, '${anh}')" title="Cadastrar filhote automaticamente como animal no plantel">
                     + Adicionar ao Plantel
                   </button>
                 </div>`
@@ -4082,14 +4080,14 @@ function abrirModalGerenciarNinhadas(casalId) {
             : "";
 
           return `
-          <div class="ninhada-card-compact mgn-card-item">
-            <div class="ninhada-compact-header">
-              <div class="ninhada-title-wrap">
-                <span class="ninhada-idx-badge">#${idx + 1}</span>
-                <span class="ninhada-header-title">${casalAve ? "Postura" : "Ninhada"} ${idx + 1}</span>
+          <div class="ninhada-box mgn-card-item">
+            <div class="ninhada-box-header">
+              <div class="ninhada-box-title">
+                <span class="ninhada-num-badge">#${idx + 1}</span>
+                <strong style="font-size:13.5px;color:var(--c-text-1)">${casalAve ? "Postura" : "Ninhada"} ${idx + 1}</strong>
                 <span class="pill pill-${(n.status || "").toLowerCase().replace(/\s+/g, "-")}">${n.status || "Ativa"}</span>
               </div>
-              <div class="ninhada-actions-group">
+              <div class="ninhada-box-right">
                 <button class="btn-action-icon" onclick="editarNinhada(${c.id}, ${idx})" title="Editar dados desta ninhada">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                 </button>
