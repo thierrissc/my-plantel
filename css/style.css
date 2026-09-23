@@ -5411,21 +5411,109 @@ body {
 .btn-reg-filhote-pro {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  background: #16a34a;
+  gap: 5px;
+  background: var(--c-accent);
   color: #ffffff;
   border: none;
-  font-size: 10.5px;
-  font-weight: 700;
-  padding: 3px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
   border-radius: var(--r-sm);
   cursor: pointer;
-  transition: all 0.18s ease;
+  transition: all var(--t);
   font-family: inherit;
+  white-space: nowrap;
 }
 .btn-reg-filhote-pro:hover {
-  background: #15803d;
+  background: var(--c-accent-hover, var(--c-accent));
+  filter: brightness(1.08);
   transform: translateY(-1px);
+}
+.btn-concluir-tratamento {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: var(--r-md);
+  border: 1.5px solid var(--c-accent);
+  background: var(--c-accent-bg);
+  color: var(--c-accent-text);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--t);
+  white-space: nowrap;
+}
+.btn-concluir-tratamento:hover {
+  background: var(--c-accent);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+}
+.btn-dar-remedio {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: var(--r-sm);
+  background: var(--c-accent);
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--t);
+  white-space: nowrap;
+}
+.btn-dar-remedio:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+.btn-desfazer-dose {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  border-radius: var(--r-sm);
+  background: var(--c-raised);
+  border: 1px solid var(--c-border);
+  color: var(--c-text-2);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--t);
+  white-space: nowrap;
+}
+.btn-desfazer-dose:hover {
+  background: var(--c-hover);
+  color: var(--c-text-1);
+  border-color: var(--c-text-3);
+}
+.btn-dar-remedio-extra {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  border-radius: var(--r-sm);
+  background: transparent;
+  border: 1px dashed var(--c-border);
+  color: var(--c-text-3);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--t);
+  white-space: nowrap;
+}
+.btn-dar-remedio-extra:hover {
+  border-color: var(--c-accent);
+  color: var(--c-accent);
+  background: var(--c-accent-bg);
+}
+#modal {
+  z-index: 300;
 }
 .ninhada-obs-clean {
   font-size: 11px;

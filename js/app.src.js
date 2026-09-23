@@ -731,7 +731,7 @@ function renderSidebar() {
 }
 
 function renderFicha() {
-  const a = animais.find((x) => x.id === selecionado);
+  const a = animais.find((x) => String(x.id) === String(selecionado));
   const empty = document.getElementById("empty-state");
   const topbar = document.getElementById("topbar");
   const topbarTabs = document.querySelector(".topbar-tabs");
@@ -906,7 +906,7 @@ function renderFichaContent(a) {
           .map((rem, idx) => {
             const info = calcularInfoDose(rem);
             const freqTexto = rem.intervaloHoras
-              ? `${Math.round(24 / rem.intervaloHoras)}x ao dia (${rem.intervaloHoras}h)`
+              ? `A cada ${rem.intervaloHoras}h`
               : "Conforme prescrição";
             return `<tr>
               <td>
@@ -915,25 +915,44 @@ function renderFichaContent(a) {
               </td>
               <td>${freqTexto}</td>
               <td>
+                <div style="font-weight:600;color:var(--c-text-1)">${info.dosesHoje}</div>
+                <div style="font-size:10.5px;color:var(--c-text-3)">${info.dosesHoje === 1 ? "dose" : "doses"}</div>
+              </td>
+              <td>
+                <div style="font-weight:600;color:var(--c-text-1)">${info.dosesSemana}</div>
+                <div style="font-size:10.5px;color:var(--c-text-3)">${info.dosesSemana === 1 ? "dose" : "doses"}</div>
+              </td>
+              <td>
                 ${
-                  info.dosesHoje > 0
-                    ? `<span class="pill pill-ok">${info.dosesHoje}x administrado</span>`
-                    : `<span class="pill pill-vence">Pendente hoje</span>`
+                  !info.pendente
+                    ? `<div style="display:flex;flex-direction:column;gap:3px">
+                        <span class="pill pill-ok" style="display:inline-flex;align-items:center;gap:4px;width:fit-content;font-weight:600">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                          Concluído
+                        </span>
+                        <span style="font-size:11px;color:var(--c-text-2)">Próxima em ${info.tempoRestanteTexto}${info.horaProxima ? ` (${info.horaProxima})` : ""}</span>
+                       </div>`
+                    : `<div style="display:flex;flex-direction:column;gap:3px">
+                        <span class="pill pill-vence" style="width:fit-content;font-weight:600">Pendente</span>
+                        <span style="font-size:11px;color:var(--c-amber)">${rem.ultimaDose ? "Hora de tomar novamente" : "Aguardando 1ª dose"}</span>
+                       </div>`
                 }
               </td>
               <td>
-                <span style="font-weight:600;color:var(--c-text-1)">${info.dosesSemana}</span>
-              </td>
-              <td>
                 <div style="display:inline-flex;align-items:center;gap:6px">
-                  <button type="button" class="btn-sm btn-primary" onclick="event.stopPropagation(); marcarDoseRemedio(${a.id}, ${idx})" style="padding:4px 10px;font-size:12px;border-radius:var(--r-sm);background:var(--c-accent);color:#fff;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:4px">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                    Dar remédio
-                  </button>
                   ${
-                    info.dosesHoje > 0
-                      ? `<button type="button" onclick="event.stopPropagation(); desfazerDoseRemedio(${a.id}, ${idx})" title="Desfazer dose" style="background:none;border:none;color:var(--c-text-3);cursor:pointer;font-size:11px;text-decoration:underline">Desfazer</button>`
-                      : ""
+                    info.pendente
+                      ? `<button type="button" class="btn-dar-remedio" onclick="event.stopPropagation(); marcarDoseRemedio(${a.id}, ${idx})" title="Registrar dose administrada agora">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                          Dar remédio
+                         </button>`
+                      : `<button type="button" class="btn-dar-remedio-extra" onclick="event.stopPropagation(); marcarDoseRemedio(${a.id}, ${idx})" title="Administrar outra dose agora">
+                          + Dar dose
+                         </button>
+                         <button type="button" class="btn-desfazer-dose" onclick="event.stopPropagation(); desfazerDoseRemedio(${a.id}, ${idx})" title="Desfazer última dose registrada">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10h10a5 5 0 015 5v2M3 10l6-6M3 10l6 6"/></svg>
+                          Desfazer dose
+                         </button>`
                   }
                 </div>
               </td>
@@ -945,7 +964,7 @@ function renderFichaContent(a) {
             </tr>`;
           })
           .join("")
-      : `<tr><td colspan="${ed ? 6 : 5}" style="text-align:center;color:var(--c-text-3);padding:14px">Nenhum remédio cadastrado</td></tr>`;
+      : `<tr><td colspan="${ed ? 7 : 6}" style="text-align:center;color:var(--c-text-3);padding:14px">Nenhum remédio cadastrado</td></tr>`;
 
     const addRemForm = ed
       ? `
@@ -961,12 +980,12 @@ function renderFichaContent(a) {
         <div class="form-field">
           <label>Quantas vezes *</label>
           <select id="nv-rem-intervalo">
-            <option value="4">A cada 4h (6x ao dia)</option>
-            <option value="6">A cada 6h (4x ao dia)</option>
-            <option value="8" selected>A cada 8h (3x ao dia)</option>
-            <option value="12">A cada 12h (2x ao dia)</option>
-            <option value="24">A cada 24h (1x ao dia)</option>
-            <option value="48">A cada 48h (Dia sim, dia não)</option>
+            <option value="4">A cada 4h</option>
+            <option value="6">A cada 6h</option>
+            <option value="8" selected>A cada 8h</option>
+            <option value="12">A cada 12h</option>
+            <option value="24">A cada 24h</option>
+            <option value="48">A cada 48h</option>
           </select>
         </div>
         <button type="button" class="btn-add-vac" onclick="adicionarRemedioTratamento(${a.id})">
@@ -977,17 +996,20 @@ function renderFichaContent(a) {
 
     tratHtml = `
       <div id="card-tratamento-wrapper" class="section-card">
-        <div class="section-header">
-          <div class="section-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="8" width="18" height="8" rx="4"/>
-              <path d="M12 8v8"/>
-            </svg>
+        <div class="section-header" style="flex-wrap:wrap;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="section-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="8" width="18" height="8" rx="4"/>
+                <path d="M12 8v8"/>
+              </svg>
+            </div>
+            <span class="section-title">Tratamento</span>
+            <span class="pill pill-vence" style="font-weight:700;letter-spacing:0.04em">EM ANDAMENTO</span>
           </div>
-          <span class="section-title">Tratamento</span>
-          <span class="pill pill-vence" style="font-weight:700;letter-spacing:0.04em">EM ANDAMENTO</span>
           <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
-            <button type="button" class="btn-vac-toggle-off" onclick="concluirTratamentoAnimal(${a.id})" title="Marcar animal como tratado e retornar status para Ativo">
+            <button type="button" class="btn-concluir-tratamento" onclick="concluirTratamentoAnimal(${a.id})" title="Finalizar tratamento e retornar animal para Ativo">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
               Concluir / Tratado
             </button>
             ${
@@ -1040,6 +1062,7 @@ function renderFichaContent(a) {
                 <th>Quantas Vezes</th>
                 <th>Hoje</th>
                 <th>Na Semana</th>
+                <th>Situação</th>
                 <th>Ação</th>
                 ${ed ? "<th></th>" : ""}
               </tr>
@@ -1893,11 +1916,18 @@ function calcularInfoDose(rem) {
   const agora = Date.now();
   const hist = rem.historicoDoses || [];
 
-  const hojeStr = new Date().toDateString();
-  const dosesHoje = hist.filter((ts) => new Date(ts).toDateString() === hojeStr).length;
+  const hoje = new Date();
+  const hojeDia = hoje.getDate();
+  const hojeMes = hoje.getMonth();
+  const hojeAno = hoje.getFullYear();
+
+  const dosesHoje = hist.filter((ts) => {
+    const d = new Date(Number(ts));
+    return d.getDate() === hojeDia && d.getMonth() === hojeMes && d.getFullYear() === hojeAno;
+  }).length;
 
   const seteDiasAtras = agora - 7 * 24 * 3600 * 1000;
-  const dosesSemana = hist.filter((ts) => ts >= seteDiasAtras).length;
+  const dosesSemana = hist.filter((ts) => Number(ts) >= seteDiasAtras).length;
 
   const intervaloHoras = parseFloat(rem.intervaloHoras) || 8;
   const intervaloMs = intervaloHoras * 3600 * 1000;
@@ -1907,7 +1937,7 @@ function calcularInfoDose(rem) {
   let proximaDoseTs = null;
 
   if (rem.ultimaDose) {
-    proximaDoseTs = rem.ultimaDose + intervaloMs;
+    proximaDoseTs = Number(rem.ultimaDose) + intervaloMs;
     tempoRestanteMs = proximaDoseTs - agora;
     if (tempoRestanteMs > 0) {
       pendente = false;
@@ -1930,7 +1960,7 @@ function calcularInfoDose(rem) {
     ? new Date(proximaDoseTs).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
     : "";
   const horaUltima = rem.ultimaDose
-    ? new Date(rem.ultimaDose).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    ? new Date(Number(rem.ultimaDose)).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
     : "";
 
   return {
@@ -2027,6 +2057,7 @@ function marcarDoseRemedio(animalId, idx) {
   rem.ultimaDose = agora;
 
   salvarAnimais();
+  selecionado = a.id;
   renderFicha();
 }
 
@@ -2040,13 +2071,14 @@ function desfazerDoseRemedio(animalId, idx) {
   rem.ultimaDose = rem.historicoDoses.length ? rem.historicoDoses[rem.historicoDoses.length - 1] : null;
 
   salvarAnimais();
+  selecionado = a.id;
   renderFicha();
 }
 
 if (!window._tratamentoTimer) {
   window._tratamentoTimer = setInterval(() => {
     if (abaAtiva === "ficha" && selecionado && !editando) {
-      const a = animais.find((x) => x.id === selecionado);
+      const a = animais.find((x) => String(x.id) === String(selecionado));
       if (a && a.status === "Em tratamento") {
         renderFicha();
       }
@@ -4123,18 +4155,31 @@ function abrirModalGerenciarNinhadas(casalId) {
 
           const filhotesBadges = anilhasList.length
             ? anilhasList
-                .map(
-                  (anh) => `
+                .map((anh) => {
+                  const cleanAnh = anh.trim().toLowerCase();
+                  const jaCadastrado = animais.some((am) => {
+                    const chip = (am.microchip || "").trim().toLowerCase();
+                    const nm = (am.nome || "").trim().toLowerCase();
+                    return chip === cleanAnh || nm === cleanAnh || nm === `filhote ${cleanAnh}`;
+                  });
+                  return `
                 <div class="filhote-card-row">
                   <span class="filhote-anilha-tag">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
                     <span>${anh}</span>
                   </span>
-                  <button type="button" class="btn-reg-filhote-pro" onclick="registrarFilhoteNoPlantel(${c.id}, ${idx}, '${anh}')" title="Cadastrar filhote automaticamente como animal no plantel">
-                    + Adicionar ao Plantel
-                  </button>
-                </div>`
-                )
+                  ${
+                    jaCadastrado
+                      ? `<span class="pill pill-ok" style="font-weight:600;display:inline-flex;align-items:center;gap:4px">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                          No Plantel
+                         </span>`
+                      : `<button type="button" class="btn-reg-filhote-pro" onclick="registrarFilhoteNoPlantel(${c.id}, ${idx}, '${anh}')" title="Cadastrar filhote diretamente como animal no plantel com pais e avós">
+                          + Adicionar ao Plantel
+                         </button>`
+                  }
+                </div>`;
+                })
                 .join("")
             : "";
 
@@ -4543,45 +4588,117 @@ function excluirNinhada(casalId, idx) {
 }
 
 function registrarFilhoteNoPlantel(casalId, idx, anilha) {
-  const c = casais.find((x) => x.id === casalId);
+  const c = casais.find((x) => String(x.id) === String(casalId));
   if (!c) return;
   const n = c.ninhadas ? c.ninhadas[idx] : null;
 
-  const macho = c.machoId ? animais.find((x) => x.id === c.machoId) : null;
-  const femea = c.femeaId ? animais.find((x) => x.id === c.femeaId) : null;
+  const macho = c.machoId ? animais.find((x) => String(x.id) === String(c.machoId)) : null;
+  const femea = c.femeaId ? animais.find((x) => String(x.id) === String(c.femeaId)) : null;
 
   const paiNome = macho ? macho.nome : (c.machoNomeManual || "");
   const paiRaca = macho?.raca || "";
   const maeNome = femea ? femea.nome : (c.femeaNomeManual || "");
   const maeRaca = femea?.raca || "";
 
-  abrirModal();
+  const avoPatNome = macho?.paiNome || "";
+  const avoPatRaca = macho?.paiRaca || "";
+  const avPatMaeNome = macho?.maeNome || "";
+  const avPatMaeRaca = macho?.maeRaca || "";
 
-  const nomeInput = document.getElementById("m-nome");
-  const espInput = document.getElementById("m-especie");
-  const racaInput = document.getElementById("m-raca");
-  const microInput = document.getElementById("m-microchip");
-  const nascInput = document.getElementById("m-nasc");
+  const avMatPaiNome = femea?.paiNome || "";
+  const avMatPaiRaca = femea?.paiRaca || "";
+  const avoMatNome = femea?.maeNome || "";
+  const avoMatRaca = femea?.maeRaca || "";
 
-  if (nomeInput) nomeInput.value = `Filhote ${anilha || ''}`.trim();
-  if (espInput) {
-    espInput.value = c.especie;
-    atualizarRacasModal();
+  const bis_pp_m_nome = macho?.avoPatNome || "";
+  const bis_pp_m_raca = macho?.avoPatRaca || "";
+  const bis_pp_f_nome = macho?.avPatMaeNome || "";
+  const bis_pp_f_raca = macho?.avPatMaeRaca || "";
+  const bis_pm_m_nome = macho?.avMatPaiNome || "";
+  const bis_pm_m_raca = macho?.avMatPaiRaca || "";
+  const bis_pm_f_nome = macho?.avoMatNome || "";
+  const bis_pm_f_raca = macho?.avoMatRaca || "";
+
+  const bis_mp_m_nome = femea?.avoPatNome || "";
+  const bis_mp_m_raca = femea?.avoPatRaca || "";
+  const bis_mp_f_nome = femea?.avPatMaeNome || "";
+  const bis_mp_f_raca = femea?.avPatMaeRaca || "";
+  const bis_mm_m_nome = femea?.avMatPaiNome || "";
+  const bis_mm_m_raca = femea?.avMatPaiRaca || "";
+  const bis_mm_f_nome = femea?.avoMatNome || "";
+  const bis_mm_f_raca = femea?.avoMatRaca || "";
+
+  const dataNasc = (n && (n.dataEclosao || n.dataPostura || n.previsao)) || new Date().toISOString().slice(0, 10);
+  const nomeAnimal = anilha ? (anilha.startsWith("BR-") || anilha.startsWith("F-") ? anilha : `Filhote ${anilha}`) : `Filhote ${c.nome} #${idx + 1}`;
+
+  const cleanAnh = (anilha || "").trim().toLowerCase();
+  const existe = cleanAnh && animais.some((a) => (a.microchip || "").trim().toLowerCase() === cleanAnh || (a.nome || "").trim().toLowerCase() === cleanAnh);
+  if (existe) {
+    mostrarDialog({
+      title: "Filhote Já Cadastrado",
+      desc: `O filhote "${anilha}" já consta no seu plantel.`
+    });
+    return;
   }
-  if (racaInput) racaInput.value = paiRaca || maeRaca || "";
-  if (microInput) microInput.value = anilha || "";
-  if (nascInput && n && n.dataPostura) nascInput.value = n.dataPostura;
-  else if (nascInput) nascInput.value = new Date().toISOString().slice(0, 10);
 
-  const pNome = document.getElementById("m-pai-nome");
-  const pRaca = document.getElementById("m-pai-raca");
-  const mNome = document.getElementById("m-mae-nome");
-  const mRaca = document.getElementById("m-mae-raca");
+  const novo = {
+    id: Date.now(),
+    nome: nomeAnimal,
+    especie: c.especie || "Ave",
+    raca: paiRaca || maeRaca || "",
+    sexo: "",
+    nasc: dataNasc,
+    pelagem: "",
+    status: "Ativo",
+    peso: "",
+    microchip: anilha || "",
+    foto: null,
+    paiNome,
+    paiRaca,
+    maeNome,
+    maeRaca,
+    avoPatNome,
+    avoPatRaca,
+    avPatMaeNome,
+    avPatMaeRaca,
+    avMatPaiNome,
+    avMatPaiRaca,
+    avoMatNome,
+    avoMatRaca,
+    bis_pp_m_nome,
+    bis_pp_m_raca,
+    bis_pp_f_nome,
+    bis_pp_f_raca,
+    bis_pm_m_nome,
+    bis_pm_m_raca,
+    bis_pm_f_nome,
+    bis_pm_f_raca,
+    bis_mp_m_nome,
+    bis_mp_m_raca,
+    bis_mp_f_nome,
+    bis_mp_f_raca,
+    bis_mm_m_nome,
+    bis_mm_m_raca,
+    bis_mm_f_nome,
+    bis_mm_f_raca,
+    vacinas: [],
+    obs: `Nascido da postura #${idx + 1} do ${c.nome}.`,
+  };
 
-  if (pNome) pNome.value = paiNome;
-  if (pRaca) pRaca.value = paiRaca;
-  if (mNome) mNome.value = maeNome;
-  if (mRaca) mRaca.value = maeRaca;
+  animais.push(novo);
+  salvarAnimais();
+  renderSidebar();
+
+  const mgn = document.getElementById("modal-gerenciar-ninhadas");
+  if (mgn && mgn.style.display === "flex") {
+    abrirModalGerenciarNinhadas(casalId);
+  }
+  renderReproducao();
+
+  mostrarDialog({
+    title: "Adicionado ao Plantel",
+    desc: `O animal "${novo.nome}" foi cadastrado no plantel com sucesso, com pais e avós vinculados automaticamente!`
+  });
 }
 
 
