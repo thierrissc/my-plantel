@@ -4944,8 +4944,11 @@ function atualizarPreviewCertificado() {
 
   setT("c-nome", a.nome, "____________________");
   setT("c-anilha", a.microchip, "____________________");
-  const aveVal = a.raca || a.especie || "";
-  setT("c-ave", aveVal, "____________________");
+  const especieLabel = (a.especie && String(a.especie).trim() ? String(a.especie).trim().toUpperCase() : "ANIMAL") + ":";
+  const especieLabelEl = document.getElementById("c-especie-label");
+  if (especieLabelEl) especieLabelEl.textContent = especieLabel;
+  const especieVal = a.raca || a.especie || "";
+  setT("c-ave", especieVal, "____________________");
   setT("c-sexo", a.sexo, "____________________");
   setT("c-nasc", a.nasc ? fmtDate(a.nasc) : "", "____ / ____ / ________");
   setT("c-pelagem", a.pelagem, "____________________");

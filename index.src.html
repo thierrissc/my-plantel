@@ -11,7 +11,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Noto+Emoji:wght@400&display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=3.9" />
+  <link rel="stylesheet" href="css/style.css?v=4.0" />
   <link rel="preload" as="image" href="img/loginicon.png" />
 </head>
 
@@ -683,31 +683,28 @@
             <div class="cert-border-outer">
               <div class="cert-border-inner">
                 <div class="cert-header">
-                  <div class="cert-logo-circle-wrap">
-                    <img id="cert-criatorio-logo" class="cert-logo-circle" src="img/loginicon.png" alt="Logo Criatório" />
-                  </div>
-                  <div class="cert-criatorio-info">
-                    <h2 class="cert-criatorio-nome" id="cert-criatorio-nome">Criatório Plantel</h2>
-                    <p class="cert-criatorio-sub">Certificado Oficial de Origem & Genealogia</p>
-                  </div>
                   <div class="cert-seal">
                     <div class="cert-seal-inner">
                       <span>ORIGEM</span>
                       <strong>CERTIFICADA</strong>
                     </div>
                   </div>
-                </div>
-
-                <div class="cert-title-wrap">
-                  <h1 class="cert-main-title">CERTIFICADO DE ORIGEM ZOOTÉCNICA</h1>
-                  <p class="cert-subtitle">REGISTRO GENEALÓGICO E TERMO DE TRANSFERÊNCIA</p>
+                  <div class="cert-header-content">
+                    <h2 class="cert-criatorio-nome" id="cert-criatorio-nome">Criatório Plantel</h2>
+                    <p class="cert-criatorio-sub">Certificado Oficial de Origem &amp; Genealogia</p>
+                    <h1 class="cert-main-title">CERTIFICADO DE ORIGEM ZOOTÉCNICA</h1>
+                    <p class="cert-subtitle">REGISTRO GENEALÓGICO E TERMO DE TRANSFERÊNCIA</p>
+                  </div>
+                  <div class="cert-logo-circle-wrap">
+                    <img id="cert-criatorio-logo" class="cert-logo-circle" src="img/loginicon.png" alt="Logo Criatório" />
+                  </div>
                 </div>
 
                 <div class="cert-section-title">DADOS DO EXEMPLAR</div>
                 <div class="cert-grid cert-animal-grid">
                   <div class="cert-field"><span class="cert-label">NOME:</span> <strong id="c-nome">____________________</strong></div>
                   <div class="cert-field"><span class="cert-label">ANILHA / REGISTRO:</span> <strong id="c-anilha" class="cert-highlight">____________________</strong></div>
-                  <div class="cert-field"><span class="cert-label">AVE:</span> <strong id="c-ave">____________________</strong></div>
+                  <div class="cert-field"><span class="cert-label" id="c-especie-label">AVE:</span> <strong id="c-ave">____________________</strong></div>
                   <div class="cert-field"><span class="cert-label">SEXO:</span> <strong id="c-sexo">____________________</strong></div>
                   <div class="cert-field"><span class="cert-label">NASCIMENTO:</span> <strong id="c-nasc">____________________</strong></div>
                   <div class="cert-field"><span class="cert-label">PELAGEM / COR:</span> <strong id="c-pelagem">____________________</strong></div>
@@ -1036,7 +1033,7 @@
     <input type="file" id="foto-input" aria-label="Upload de foto do animal" accept="image/*" onchange="carregarFoto(event)" />
   </div>
 
-  <script src="js/app.js?v=3.9"></script>
+  <script src="js/app.js?v=4.0"></script>
 </body>
 
 </html>
