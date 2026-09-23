@@ -38,13 +38,13 @@ if (fs.existsSync(srcHtmlFile)) {
   <link
     href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Noto+Emoji:wght@400&display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=3.7" />
+  <link rel="stylesheet" href="css/style.css?v=3.8" />
   <link rel="preload" as="image" href="img/loginicon.png" />
 </head>
 
 <body>
   <div id="app-root"></div>
-  <script src="js/app.js?v=3.7"></script>
+  <script src="js/app.js?v=3.8"></script>
 </body>
 
 </html>`;

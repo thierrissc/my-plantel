@@ -756,6 +756,7 @@ body {
 
   --c-bg: #f4f6f5;
   --c-surface: #eef2ef;
+  --c-surface-2: rgba(0, 0, 0, 0.03);
   --c-card: #ffffff;
   --c-raised: #e8eeea;
   --c-hover: #deeae1;
@@ -791,64 +792,195 @@ body {
 }
 
 [data-theme="dark"] {
-  --c-bg: #0b1310;
-  --c-surface: #101c17;
-  --c-card: #15241e;
-  --c-raised: #1c3028;
-  --c-hover: #233c32;
+  --c-bg: #000000;
+  --c-surface: #09090b;
+  --c-surface-2: rgba(255, 255, 255, 0.05);
+  --c-card: #121215;
+  --c-raised: #18181c;
+  --c-hover: #222226;
 
   --c-accent: #22c55e;
-  --c-accent-soft: #34d399;
-  --c-accent-bg: rgba(34, 197, 94, 0.16);
+  --c-accent-soft: #4ade80;
+  --c-accent-bg: rgba(34, 197, 94, 0.12);
   --c-accent-text: #4ade80;
 
-  --c-border: rgba(52, 211, 153, 0.18);
-  --c-border-soft: rgba(255, 255, 255, 0.06);
+  --c-border: #222226;
+  --c-border-soft: rgba(255, 255, 255, 0.07);
 
-  --c-text-1: #f2f7f4;
-  --c-text-2: #a1c2b0;
-  --c-text-3: #6d8e7d;
+  --c-text-1: #ffffff;
+  --c-text-2: #a1a1aa;
+  --c-text-3: #71717a;
 
   --c-amber: #fbbf24;
-  --c-amber-bg: rgba(251, 191, 36, 0.15);
+  --c-amber-bg: rgba(251, 191, 36, 0.12);
   --c-red: #f87171;
-  --c-red-bg: rgba(248, 113, 113, 0.15);
+  --c-red-bg: rgba(248, 113, 113, 0.12);
   --c-blue: #60a5fa;
-  --c-blue-bg: rgba(96, 165, 250, 0.15);
+  --c-blue-bg: rgba(96, 165, 250, 0.12);
 
-  --c-shadow: rgba(0, 0, 0, 0.65);
+  --c-shadow: rgba(0, 0, 0, 0.85);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: #27272a;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
+}
+
+[data-theme="dark"] .sidebar {
+  background: #09090b;
+  border-right-color: #222226;
+}
+
+[data-theme="dark"] .sidebar-search input {
+  background: #121215;
+  border-color: #222226;
+  color: #ffffff;
+}
+
+[data-theme="dark"] .sidebar-search input:focus {
+  background: #141418;
+  border-color: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.16);
+}
+
+[data-theme="dark"] .form-field input,
+[data-theme="dark"] .form-field select,
+[data-theme="dark"] .form-field textarea {
+  background: #121215;
+  border-color: #27272a;
+  color: #ffffff;
+}
+
+[data-theme="dark"] .form-field input:focus,
+[data-theme="dark"] .form-field select:focus,
+[data-theme="dark"] .form-field textarea:focus {
+  background: #141418;
+  border-color: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.18);
 }
 
 [data-theme="dark"] .btn-primary,
 [data-theme="dark"] .btn-new-animal,
 [data-theme="dark"] .lp-btn {
-  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  background: #16a34a;
   box-shadow: 0 2px 14px rgba(22, 163, 74, 0.35);
+}
+
+[data-theme="dark"] .btn-primary:hover,
+[data-theme="dark"] .btn-new-animal:hover,
+[data-theme="dark"] .lp-btn:hover {
+  background: #15803d;
 }
 
 [data-theme="dark"] .brand-icon {
   background: #16a34a;
 }
 
-[data-theme="dark"] .sidebar {
-  background: #0d1713;
-  border-right-color: rgba(52, 211, 153, 0.12);
-}
-
 [data-theme="dark"] .gene-node.focal {
   border-color: #22c55e;
-  background: rgba(34, 197, 94, 0.15);
+  background: rgba(34, 197, 94, 0.14);
 }
 
 [data-theme="dark"] .animal-item.active {
-  background: rgba(34, 197, 94, 0.15);
+  background: rgba(34, 197, 94, 0.12);
 }
 
 [data-theme="dark"] .ftab.active,
 [data-theme="dark"] .area-tab.active {
-  background: rgba(34, 197, 94, 0.18);
+  background: rgba(34, 197, 94, 0.14);
   border-color: #22c55e;
   color: #4ade80;
+}
+
+[data-theme="dark"] .timing-pendente {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.28);
+}
+
+[data-theme="dark"] .timing-ok {
+  background: rgba(34, 197, 94, 0.12);
+  color: #4ade80;
+  border-color: rgba(34, 197, 94, 0.28);
+}
+
+[data-theme="dark"] .pulse-dot {
+  background: #f87171;
+}
+
+[data-theme="dark"] .casal-badge.badge-formado {
+  background: rgba(59, 130, 246, 0.12);
+  color: #60a5fa;
+  border-color: rgba(59, 130, 246, 0.28);
+}
+
+[data-theme="dark"] .casal-badge.badge-postura {
+  background: rgba(245, 158, 11, 0.12);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.28);
+}
+
+[data-theme="dark"] .casal-badge.badge-chocando {
+  background: rgba(168, 85, 247, 0.12);
+  color: #c084fc;
+  border-color: rgba(168, 85, 247, 0.28);
+}
+
+[data-theme="dark"] .casal-badge.badge-filhotes {
+  background: rgba(34, 197, 94, 0.12);
+  color: #4ade80;
+  border-color: rgba(34, 197, 94, 0.28);
+}
+
+[data-theme="dark"] .casal-badge.badge-descanso {
+  background: rgba(113, 113, 122, 0.12);
+  color: #a1a1aa;
+  border-color: rgba(113, 113, 122, 0.28);
+}
+
+[data-theme="dark"] .pill-com-filhotes,
+[data-theme="dark"] .pill-ativa {
+  background: rgba(34, 197, 94, 0.12) !important;
+  color: #4ade80 !important;
+  border-color: rgba(34, 197, 94, 0.28) !important;
+}
+
+[data-theme="dark"] .pill-em-postura {
+  background: rgba(245, 158, 11, 0.12) !important;
+  color: #fbbf24 !important;
+  border-color: rgba(245, 158, 11, 0.28) !important;
+}
+
+[data-theme="dark"] .pill-chocando {
+  background: rgba(59, 130, 246, 0.12) !important;
+  color: #60a5fa !important;
+  border-color: rgba(59, 130, 246, 0.28) !important;
+}
+
+[data-theme="dark"] .pill-concluida,
+[data-theme="dark"] .pill-descanso {
+  background: rgba(113, 113, 122, 0.12) !important;
+  color: #a1a1aa !important;
+  border-color: rgba(113, 113, 122, 0.28) !important;
+}
+
+[data-theme="dark"] .btn-action-icon.btn-danger:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #f87171;
+}
+
+[data-theme="dark"] .remedio-card.dose-pendente {
+  border-color: rgba(245, 158, 11, 0.35);
+  background: rgba(245, 158, 11, 0.04);
+}
+
+[data-theme="dark"] .remedio-card.dose-ok {
+  border-color: rgba(34, 197, 94, 0.25);
+  background: var(--c-card);
 }
 
 html,
@@ -1519,8 +1651,8 @@ body {
 [data-theme="dark"] .ficha-hero::after {
   background: radial-gradient(
     circle at center,
-    rgba(34, 197, 94, 0.18) 0%,
-    rgba(34, 197, 94, 0.06) 50%,
+    rgba(34, 197, 94, 0.12) 0%,
+    rgba(34, 197, 94, 0.03) 50%,
     transparent 72%
   );
 }
