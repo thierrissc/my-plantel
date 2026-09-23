@@ -846,6 +846,80 @@ function atualizarMobileBottombar(temAnimal) {
   });
 }
 
+function gerarLinhasRemediosHtml(a, ed = editando) {
+  const trat = a.tratamento || { motivo: "", inicio: "", fim: "", obs: "", remedios: [] };
+  const remedios = trat.remedios || [];
+  if (!remedios.length) {
+    return `<tr><td colspan="${ed ? 7 : 6}" style="text-align:center;color:var(--c-text-3);padding:14px">Nenhum remédio cadastrado</td></tr>`;
+  }
+  return remedios
+    .map((rem, idx) => {
+      const info = calcularInfoDose(rem);
+      const freqTexto = rem.intervaloHoras
+        ? `A cada ${rem.intervaloHoras}h`
+        : "Conforme prescrição";
+      return `<tr>
+        <td>
+          <div style="font-weight:600;color:var(--c-text-1)">${rem.nome}</div>
+          ${rem.dose ? `<div style="font-size:11px;color:var(--c-text-3)">${rem.dose}</div>` : ""}
+        </td>
+        <td>${freqTexto}</td>
+        <td>
+          <div style="font-weight:600;color:var(--c-text-1)">${info.dosesHoje}</div>
+          <div style="font-size:10.5px;color:var(--c-text-3)">${info.dosesHoje === 1 ? "dose" : "doses"}</div>
+        </td>
+        <td>
+          <div style="font-weight:600;color:var(--c-text-1)">${info.dosesSemana}</div>
+          <div style="font-size:10.5px;color:var(--c-text-3)">${info.dosesSemana === 1 ? "dose" : "doses"}</div>
+        </td>
+        <td>
+          ${
+            !info.pendente
+              ? `<div style="display:flex;flex-direction:column;gap:3px">
+                  <span class="pill pill-ok" style="display:inline-flex;align-items:center;gap:4px;width:fit-content;font-weight:600">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    Concluído
+                  </span>
+                  <span style="font-size:11px;color:var(--c-text-2)">Próxima em ${info.tempoRestanteTexto}${info.horaProxima ? ` (${info.horaProxima})` : ""}</span>
+                 </div>`
+              : `<div style="display:flex;flex-direction:column;gap:3px">
+                  <span class="pill pill-vence" style="width:fit-content;font-weight:600">Pendente</span>
+                  <span style="font-size:11px;color:var(--c-amber)">${rem.ultimaDose ? "Hora de tomar novamente" : "Aguardando 1ª dose"}</span>
+                 </div>`
+          }
+        </td>
+        <td>
+          <div style="display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap">
+            ${
+              info.pendente
+                ? `<button type="button" class="btn-dar-remedio" onclick="event.stopPropagation(); marcarDoseRemedio(${a.id}, ${idx})" title="Registrar dose administrada agora">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    Dar remédio
+                   </button>`
+                : `<button type="button" class="btn-dar-remedio-extra" onclick="event.stopPropagation(); marcarDoseRemedio(${a.id}, ${idx})" title="Administrar outra dose agora">
+                    + Dar dose
+                   </button>
+                   <button type="button" class="btn-desfazer-dose" onclick="event.stopPropagation(); desfazerDoseRemedio(${a.id}, ${idx})" title="Desfazer última dose registrada">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10h10a5 5 0 015 5v2M3 10l6-6M3 10l6 6"/></svg>
+                    Desfazer dose
+                   </button>`
+            }
+            <button type="button" class="btn-edit-remedio" onclick="event.stopPropagation(); abrirModalEditarRemedio(${a.id}, ${idx})" title="Editar informações do medicamento">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              Editar
+            </button>
+          </div>
+        </td>
+        ${
+          ed
+            ? `<td><span class="vac-remove" onclick="event.stopPropagation(); removerRemedioTratamento(${a.id}, ${idx})" title="Remover">✕</span></td>`
+            : ""
+        }
+      </tr>`;
+    })
+    .join("");
+}
+
 function renderFichaContent(a) {
   const ed = editando;
 
@@ -913,72 +987,7 @@ function renderFichaContent(a) {
   const emTratamento = a.status === "Em tratamento";
 
   const trat = a.tratamento || { motivo: "", inicio: "", fim: "", obs: "", remedios: [] };
-  const remedios = trat.remedios || [];
-
-  const remediosRows = remedios.length
-    ? remedios
-        .map((rem, idx) => {
-          const info = calcularInfoDose(rem);
-          const freqTexto = rem.intervaloHoras
-            ? `A cada ${rem.intervaloHoras}h`
-            : "Conforme prescrição";
-          return `<tr>
-            <td>
-              <div style="font-weight:600;color:var(--c-text-1)">${rem.nome}</div>
-              ${rem.dose ? `<div style="font-size:11px;color:var(--c-text-3)">${rem.dose}</div>` : ""}
-            </td>
-            <td>${freqTexto}</td>
-            <td>
-              <div style="font-weight:600;color:var(--c-text-1)">${info.dosesHoje}</div>
-              <div style="font-size:10.5px;color:var(--c-text-3)">${info.dosesHoje === 1 ? "dose" : "doses"}</div>
-            </td>
-            <td>
-              <div style="font-weight:600;color:var(--c-text-1)">${info.dosesSemana}</div>
-              <div style="font-size:10.5px;color:var(--c-text-3)">${info.dosesSemana === 1 ? "dose" : "doses"}</div>
-            </td>
-            <td>
-              ${
-                !info.pendente
-                  ? `<div style="display:flex;flex-direction:column;gap:3px">
-                      <span class="pill pill-ok" style="display:inline-flex;align-items:center;gap:4px;width:fit-content;font-weight:600">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                        Concluído
-                      </span>
-                      <span style="font-size:11px;color:var(--c-text-2)">Próxima em ${info.tempoRestanteTexto}${info.horaProxima ? ` (${info.horaProxima})` : ""}</span>
-                     </div>`
-                  : `<div style="display:flex;flex-direction:column;gap:3px">
-                      <span class="pill pill-vence" style="width:fit-content;font-weight:600">Pendente</span>
-                      <span style="font-size:11px;color:var(--c-amber)">${rem.ultimaDose ? "Hora de tomar novamente" : "Aguardando 1ª dose"}</span>
-                     </div>`
-              }
-            </td>
-            <td>
-              <div style="display:inline-flex;align-items:center;gap:6px">
-                ${
-                  info.pendente
-                    ? `<button type="button" class="btn-dar-remedio" onclick="event.stopPropagation(); marcarDoseRemedio(${a.id}, ${idx})" title="Registrar dose administrada agora">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                        Dar remédio
-                       </button>`
-                    : `<button type="button" class="btn-dar-remedio-extra" onclick="event.stopPropagation(); marcarDoseRemedio(${a.id}, ${idx})" title="Administrar outra dose agora">
-                        + Dar dose
-                       </button>
-                       <button type="button" class="btn-desfazer-dose" onclick="event.stopPropagation(); desfazerDoseRemedio(${a.id}, ${idx})" title="Desfazer última dose registrada">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10h10a5 5 0 015 5v2M3 10l6-6M3 10l6 6"/></svg>
-                        Desfazer dose
-                       </button>`
-                }
-              </div>
-            </td>
-            ${
-              ed
-                ? `<td><span class="vac-remove" onclick="event.stopPropagation(); removerRemedioTratamento(${a.id}, ${idx})" title="Remover">✕</span></td>`
-                : ""
-            }
-          </tr>`;
-        })
-        .join("")
-    : `<tr><td colspan="${ed ? 7 : 6}" style="text-align:center;color:var(--c-text-3);padding:14px">Nenhum remédio cadastrado</td></tr>`;
+  const remediosRows = gerarLinhasRemediosHtml(a, ed);
 
   const addRemForm = ed
     ? `
@@ -1081,7 +1090,7 @@ function renderFichaContent(a) {
               ${ed ? "<th></th>" : ""}
             </tr>
           </thead>
-          <tbody>
+          <tbody id="tabela-remedios-body">
             ${remediosRows}
           </tbody>
         </table>
@@ -2055,7 +2064,7 @@ function marcarDoseRemedio(animalId, idx) {
 
   salvarAnimais();
   selecionado = a.id;
-  renderFicha();
+  atualizarTabelaRemediosInPlace(a);
 }
 
 function desfazerDoseRemedio(animalId, idx) {
@@ -2069,7 +2078,79 @@ function desfazerDoseRemedio(animalId, idx) {
 
   salvarAnimais();
   selecionado = a.id;
-  renderFicha();
+  atualizarTabelaRemediosInPlace(a);
+}
+
+function atualizarTabelaRemediosInPlace(a) {
+  if (!a) return;
+  const tbody = document.getElementById("tabela-remedios-body");
+  if (tbody) {
+    tbody.innerHTML = gerarLinhasRemediosHtml(a, editando);
+  } else {
+    renderFicha();
+  }
+}
+
+function abrirModalEditarRemedio(animalId, idx) {
+  const a = animais.find((x) => String(x.id) === String(animalId));
+  if (!a || !a.tratamento || !a.tratamento.remedios) return;
+  const rem = a.tratamento.remedios[idx];
+  if (!rem) return;
+
+  const idInput = document.getElementById("edit-rem-animal-id");
+  const idxInput = document.getElementById("edit-rem-idx");
+  const nomeInput = document.getElementById("edit-rem-nome");
+  const doseInput = document.getElementById("edit-rem-dose");
+  const intInput = document.getElementById("edit-rem-intervalo");
+
+  if (idInput) idInput.value = animalId;
+  if (idxInput) idxInput.value = idx;
+  if (nomeInput) nomeInput.value = rem.nome || "";
+  if (doseInput) doseInput.value = rem.dose || "";
+  if (intInput) intInput.value = String(rem.intervaloHoras || 8);
+
+  const modalEl = document.getElementById("modal-editar-remedio");
+  if (modalEl) modalEl.style.display = "flex";
+}
+
+function fecharModalEditarRemedio() {
+  const modalEl = document.getElementById("modal-editar-remedio");
+  if (modalEl) modalEl.style.display = "none";
+}
+
+function fecharModalEditarRemedioExterno(e) {
+  if (e.target === document.getElementById("modal-editar-remedio")) {
+    fecharModalEditarRemedio();
+  }
+}
+
+function salvarEdicaoRemedio() {
+  const animalId = document.getElementById("edit-rem-animal-id")?.value;
+  const idx = parseInt(document.getElementById("edit-rem-idx")?.value, 10);
+  const nome = (document.getElementById("edit-rem-nome")?.value || "").trim();
+  const dose = (document.getElementById("edit-rem-dose")?.value || "").trim();
+  const intervalo = parseInt(document.getElementById("edit-rem-intervalo")?.value, 10) || 8;
+
+  if (!nome) {
+    mostrarDialog({
+      title: "Campo Obrigatório",
+      desc: "Informe o nome do remédio para atualizar.",
+    });
+    return;
+  }
+
+  const a = animais.find((x) => String(x.id) === String(animalId));
+  if (!a || !a.tratamento || !a.tratamento.remedios) return;
+  const rem = a.tratamento.remedios[idx];
+  if (!rem) return;
+
+  rem.nome = nome;
+  rem.dose = dose;
+  rem.intervaloHoras = intervalo;
+
+  salvarAnimais();
+  fecharModalEditarRemedio();
+  atualizarTabelaRemediosInPlace(a);
 }
 
 if (!window._tratamentoTimer) {
@@ -2077,7 +2158,7 @@ if (!window._tratamentoTimer) {
     if (abaAtiva === "ficha" && selecionado && !editando) {
       const a = animais.find((x) => String(x.id) === String(selecionado));
       if (a && a.status === "Em tratamento") {
-        renderFicha();
+        atualizarTabelaRemediosInPlace(a);
       }
     }
   }, 20000);
@@ -2400,6 +2481,7 @@ function fecharCropModal() {
 }
 
 function abrirModal() {
+  popularSelectAreas();
   document.getElementById("modal").style.display = "flex";
 }
 function fecharModal() {
@@ -3190,6 +3272,9 @@ function toggleModalCombo(id, e) {
     return;
   }
   closeAllModalCombos();
+  if (id === "area") {
+    popularSelectAreas();
+  }
   const wrap = document.getElementById(id + "-modal-wrap");
   if (!wrap) return;
 
@@ -3211,7 +3296,7 @@ function toggleModalCombo(id, e) {
   dd.style.top = rect.bottom + 4 + "px";
   dd.style.left = rect.left + "px";
   dd.style.width = rect.width + "px";
-  dd.style.zIndex = "9999";
+  dd.style.zIndex = "25000";
   dd.classList.add("open");
   wrap.classList.add("raca-combo-open");
   _openModalComboId = id;
@@ -4245,7 +4330,7 @@ function abrirModalGerenciarNinhadas(casalId) {
               <div class="ninhada-box-title">
                 <span class="ninhada-num-badge">#${idx + 1}</span>
                 <strong style="font-size:13.5px;color:var(--c-text-1)">${casalAve ? "Postura" : "Ninhada"} ${idx + 1}</strong>
-                <span class="pill pill-${(n.status || "").toLowerCase().replace(/\s+/g, "-")}">${n.status || "Ativa"}</span>
+                <span class="pill pill-${(n.status || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "-")}">${n.status || "Ativa"}</span>
               </div>
               <div class="ninhada-box-right">
                 <button class="btn-action-icon" onclick="editarNinhada(${c.id}, ${idx})" title="Editar dados desta ninhada">

@@ -11,7 +11,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Noto+Emoji:wght@400&display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=3.3" />
+  <link rel="stylesheet" href="css/style.css?v=3.5" />
   <link rel="preload" as="image" href="img/loginicon.png" />
 </head>
 
@@ -976,6 +976,46 @@
       </div>
     </div>
 
+    <div class="modal-overlay" id="modal-editar-remedio" style="display: none;" onclick="fecharModalEditarRemedioExterno(event)">
+      <div class="modal-box" style="max-width: 440px;">
+        <div class="modal-header">
+          <span class="modal-title">Editar Medicamento</span>
+          <button class="modal-close" onclick="fecharModalEditarRemedio()">
+            <svg viewBox="0 0 20 20" fill="none">
+              <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="edit-rem-animal-id" />
+          <input type="hidden" id="edit-rem-idx" />
+          <div class="form-field full">
+            <label for="edit-rem-nome">Nome do Remédio *</label>
+            <input id="edit-rem-nome" type="text" placeholder="Ex: Baytril, Nalyt..." />
+          </div>
+          <div class="form-field full">
+            <label for="edit-rem-dose">Dose (opcional)</label>
+            <input id="edit-rem-dose" type="text" placeholder="Ex: 2 gotas, 0.5ml" />
+          </div>
+          <div class="form-field full">
+            <label for="edit-rem-intervalo">Quantas vezes *</label>
+            <select id="edit-rem-intervalo">
+              <option value="4">A cada 4h</option>
+              <option value="6">A cada 6h</option>
+              <option value="8">A cada 8h</option>
+              <option value="12">A cada 12h</option>
+              <option value="24">A cada 24h</option>
+              <option value="48">A cada 48h</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-ghost" onclick="fecharModalEditarRemedio()">Cancelar</button>
+          <button class="btn-primary" onclick="salvarEdicaoRemedio()">Salvar Alterações</button>
+        </div>
+      </div>
+    </div>
+
     <div class="dialog-overlay" id="dialog-overlay" onclick="fecharDialogExterno(event)">
       <div class="dialog-box" role="alertdialog" aria-modal="true">
         <div class="dialog-icon">
@@ -997,7 +1037,7 @@
     <input type="file" id="foto-input" aria-label="Upload de foto do animal" accept="image/*" onchange="carregarFoto(event)" />
   </div>
 
-  <script src="js/app.js?v=3.4"></script>
+  <script src="js/app.js?v=3.5"></script>
 </body>
 
 </html>
