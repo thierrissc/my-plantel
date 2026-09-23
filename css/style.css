@@ -3360,7 +3360,7 @@ body {
   inset: 0;
   background: rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(3px);
-  z-index: 200;
+  z-index: 12000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -5471,49 +5471,73 @@ body {
   filter: brightness(1.1);
   transform: translateY(-1px);
 }
-.btn-desfazer-dose {
+.btn-desfazer-dose,
+.btn-dar-remedio-extra {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 5px 10px;
+  justify-content: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 12px;
   font-size: 11.5px;
   font-weight: 600;
   border-radius: var(--r-sm);
-  background: var(--c-raised);
-  border: 1px solid var(--c-border);
-  color: var(--c-text-2);
   cursor: pointer;
   font-family: inherit;
   transition: all var(--t);
   white-space: nowrap;
+  box-sizing: border-box;
+}
+.btn-dar-remedio-extra {
+  background: var(--c-accent-bg);
+  border: 1px solid var(--c-border);
+  color: var(--c-accent);
+}
+.btn-dar-remedio-extra:hover {
+  border-color: var(--c-accent);
+  background: var(--c-accent);
+  color: #ffffff;
+}
+.btn-desfazer-dose {
+  background: var(--c-raised);
+  border: 1px solid var(--c-border);
+  color: var(--c-text-2);
 }
 .btn-desfazer-dose:hover {
   background: var(--c-hover);
   color: var(--c-text-1);
   border-color: var(--c-text-3);
 }
-.btn-dar-remedio-extra {
-  display: inline-flex;
-  align-items: center;
-  padding: 5px 8px;
-  font-size: 11.5px;
-  font-weight: 600;
-  border-radius: var(--r-sm);
-  background: transparent;
-  border: 1px dashed var(--c-border);
-  color: var(--c-text-3);
-  cursor: pointer;
-  font-family: inherit;
-  transition: all var(--t);
-  white-space: nowrap;
-}
-.btn-dar-remedio-extra:hover {
-  border-color: var(--c-accent);
-  color: var(--c-accent);
-  background: var(--c-accent-bg);
-}
 #modal {
   z-index: 300;
+}
+#modal.modal-on-top {
+  z-index: 10500 !important;
+}
+.modal-header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.mgn-header-tags {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}
+.mgn-header-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: var(--r-full, 9999px);
+  background: var(--c-bg-subtle, rgba(0, 0, 0, 0.04));
+  color: var(--c-text-2);
+  border: 1px solid var(--c-border);
 }
 .ninhada-obs-clean {
   font-size: 11px;

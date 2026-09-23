@@ -45,11 +45,11 @@
           </div>
           <div class="lp-alert err" id="lp-login-err"></div>
           <div class="lp-field">
-            <label>E-mail</label>
+            <label for="lp-email">E-mail</label>
             <input id="lp-email" type="email" placeholder="seu@email.com" autocomplete="email" />
           </div>
           <div class="lp-field">
-            <label>Senha</label>
+            <label for="lp-senha">Senha</label>
             <div class="lp-input-wrap">
               <input id="lp-senha" type="password" placeholder="Sua senha" autocomplete="current-password" />
               <button class="lp-eye" onclick="lpToggleSenha('lp-senha','lp-eye1')" type="button">
@@ -95,15 +95,15 @@
           <div class="lp-alert ok" id="lp-reg-ok"></div>
           <div class="lp-fields-gap">
             <div class="lp-field">
-              <label>Nome do Plantel / Usuário</label>
+              <label for="lp-reg-nome">Nome do Plantel / Usuário</label>
               <input id="lp-reg-nome" type="text" placeholder="Ex: Haras Bela Vista" />
             </div>
             <div class="lp-field">
-              <label>E-mail</label>
+              <label for="lp-reg-email">E-mail</label>
               <input id="lp-reg-email" type="email" placeholder="seu@email.com" />
             </div>
             <div class="lp-field">
-              <label>Senha</label>
+              <label for="lp-reg-senha">Senha</label>
               <div class="lp-input-wrap">
                 <input id="lp-reg-senha" type="password" placeholder="Mínimo 6 caracteres" oninput="lpForca()"
                   autocomplete="new-password" />
@@ -120,7 +120,7 @@
               </div>
             </div>
             <div class="lp-field">
-              <label>Confirmar Senha</label>
+              <label for="lp-reg-confirm">Confirmar Senha</label>
               <input id="lp-reg-confirm" type="password" placeholder="Repita a senha" autocomplete="new-password" />
             </div>
           </div>
@@ -147,7 +147,7 @@
           <div class="lp-alert err" id="lp-rec-err"></div>
           <div class="lp-alert ok" id="lp-rec-ok"></div>
           <div class="lp-field">
-            <label>E-mail cadastrado</label>
+            <label for="lp-rec-email">E-mail cadastrado</label>
             <input id="lp-rec-email" type="email" placeholder="seu@email.com" />
           </div>
           <button class="lp-btn lp-btn-rec-submit" onclick="lpRecuperar()">Enviar instruções</button>
@@ -268,7 +268,7 @@
           <circle cx="9" cy="9" r="5.5" stroke="currentColor" stroke-width="1.5" />
           <path d="M14 14l2.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
         </svg>
-        <input type="text" id="search-input" placeholder="Buscar por nome ou raça..." oninput="filtrarAnimais()" />
+        <input type="text" id="search-input" aria-label="Buscar animais por nome ou raça" placeholder="Buscar por nome ou raça..." oninput="filtrarAnimais()" />
       </div>
 
       <div class="sidebar-control-row" id="area-bar-wrap">
@@ -444,12 +444,12 @@
         </div>
         <div class="modal-body">
           <div class="form-field full">
-            <label>Nome *</label>
+            <label for="m-nome">Nome *</label>
             <input id="m-nome" type="text" placeholder="Nome do animal" />
           </div>
           <div class="form-grid-2">
             <div class="form-field">
-              <label>Espécie *</label>
+              <label for="casal-especie">Espécie *</label>
               <div class="raca-combo-wrap" id="especie-modal-wrap" onmousedown="toggleEspecieDropdown(event)">
                 <span class="especie-combo-label" id="especie-modal-label"
                   style="flex:1;padding:0 10px;font-size:14px;color:var(--c-text-1,#1a2e1a);line-height:1;pointer-events:none;">Selecione</span>
@@ -464,7 +464,7 @@
               <input type="hidden" id="m-especie" />
             </div>
             <div class="form-field">
-              <label>Raça</label>
+              <label for="m-raca">Raça</label>
               <div class="raca-combo-wrap">
                 <input id="m-raca" type="text" placeholder="Ex: Labrador" autocomplete="off"
                   oninput="filtrarRacaDropdown()" onfocus="abrirRacaDropdown()" onblur="fecharRacaDropdownDelay()" />
@@ -494,20 +494,20 @@
               <input type="hidden" id="m-sexo" value="" />
             </div>
             <div class="form-field">
-              <label>Data de Nascimento</label>
+              <label for="m-nasc">Data de Nascimento</label>
               <input id="m-nasc" type="date" />
             </div>
           </div>
           <div class="form-grid-2">
             <div class="form-field">
-              <label>Pelagem / Cor</label>
+              <label for="m-pelagem">Pelagem / Cor</label>
               <input id="m-pelagem" type="text" placeholder="Ex: Branco e preto" />
             </div>
             <div class="form-field">
-              <label>Peso</label>
+              <label for="m-peso-val">Peso</label>
               <div class="peso-input-wrap">
                 <input id="m-peso-val" type="number" step="0.01" min="0" placeholder="0.00" />
-                <select id="m-peso-unit">
+                <select id="m-peso-unit" aria-label="Unidade de peso">
                   <option value="kg" selected>kg</option>
                   <option value="g">g</option>
                 </select>
@@ -530,7 +530,7 @@
               <input type="hidden" id="m-status" value="Ativo" />
             </div>
             <div class="form-field">
-              <label>Nº de identificação / Microchip</label>
+              <label for="m-id">Nº de identificação / Microchip</label>
               <input id="m-id" type="text" placeholder="Ex: 985112345678901" />
             </div>
           </div>
@@ -568,7 +568,7 @@
         <div class="modal-body">
           <p class="areas-modal-desc">Crie áreas personalizadas como viveiros, haras, baias, canis, etc.</p>
           <div class="area-add-row-centered">
-            <label class="area-add-label">Nome da Área</label>
+            <label for="area-nome-input" class="area-add-label">Nome da Área</label>
             <div class="area-add-input-row">
               <input id="area-nome-input" type="text" placeholder="Ex: Viveiro Norte, Haras 1..."
                 class="area-add-input" />
@@ -606,18 +606,18 @@
                 <span>Logo do Criatório</span>
               </div>
             </div>
-            <input type="file" id="perfil-foto-input" accept="image/*" onchange="carregarFotoPerfil(event)" />
+            <input type="file" id="perfil-foto-input" aria-label="Foto de perfil" accept="image/*" onchange="carregarFotoPerfil(event)" />
           </div>
           <div class="form-field full">
-            <label>Nome do Criatório / Plantel</label>
+            <label for="perfil-nome">Nome do Criatório / Plantel</label>
             <input id="perfil-nome" type="text" placeholder="Nome do seu criatório ou plantel" />
           </div>
           <div class="form-field full">
-            <label>E-mail</label>
+            <label for="perfil-email">E-mail</label>
             <input id="perfil-email" type="email" readonly class="field-readonly" />
           </div>
           <div class="form-field full">
-            <label>ID do Plantel</label>
+            <label for="perfil-plantel-id">ID do Plantel</label>
             <input id="perfil-plantel-id" type="text" readonly class="field-readonly field-monospace" />
           </div>
         </div>
@@ -778,7 +778,7 @@
           <input type="hidden" id="casal-id" />
           <div class="form-grid-2">
             <div class="form-field">
-              <label>Nome do Casal *</label>
+              <label for="casal-nome">Nome do Casal *</label>
               <input id="casal-nome" type="text" placeholder="Ex: Casal 01 - Curiós Ouro" />
             </div>
             <div class="form-field">
@@ -799,13 +799,13 @@
           </div>
           <div class="form-grid-2">
             <div class="form-field">
-              <label>Macho (Pai) *</label>
+              <label for="casal-macho">Macho (Pai) *</label>
               <select id="casal-macho">
                 <option value="">Selecione o macho...</option>
               </select>
             </div>
             <div class="form-field">
-              <label>Fêmea (Mãe) *</label>
+              <label for="casal-femea">Fêmea (Mãe) *</label>
               <select id="casal-femea">
                 <option value="">Selecione a fêmea...</option>
               </select>
@@ -813,11 +813,11 @@
           </div>
           <div class="form-grid-2">
             <div class="form-field">
-              <label>Acomodação (Gaiola / Baia)</label>
+              <label for="casal-local">Acomodação (Gaiola / Baia)</label>
               <input id="casal-local" type="text" placeholder="Ex: Gaiola 04 / Viveiro 2" />
             </div>
             <div class="form-field">
-              <label>Status do Casal</label>
+              <label for="casal-status">Status do Casal</label>
               <select id="casal-status">
                 <option value="Formado">Formado</option>
                 <option value="Em postura">Em postura</option>
@@ -829,11 +829,11 @@
           </div>
           <div class="form-grid-2">
             <div class="form-field">
-              <label>Data de Início</label>
+              <label for="casal-inicio">Data de Início</label>
               <input id="casal-inicio" type="date" />
             </div>
             <div class="form-field">
-              <label>Observações</label>
+              <label for="casal-obs">Observações</label>
               <input id="casal-obs" type="text" placeholder="Ex: Casal fértil, boa alimentação..." />
             </div>
           </div>
@@ -862,71 +862,71 @@
           
           <div class="form-grid-2">
             <div class="form-field">
-              <label id="nin-label-inicio">Data de Acasalamento</label>
+              <label for="nin-data-inicio" id="nin-label-inicio">Data de Acasalamento</label>
               <input id="nin-data-inicio" type="date" />
             </div>
             <div class="form-field nin-campo-ave" id="nin-campo-postura">
-              <label>Data do 1º Ovo (Início da Postura)</label>
+              <label for="nin-data-postura">Data do 1º Ovo (Início da Postura)</label>
               <input id="nin-data-postura" type="date" />
             </div>
           </div>
 
           <div class="form-grid-2 nin-campo-ave" id="nin-grid-choco">
             <div class="form-field">
-              <label>Data do Último Ovo</label>
+              <label for="nin-data-ultimo-ovo">Data do Último Ovo</label>
               <input id="nin-data-ultimo-ovo" type="date" />
             </div>
             <div class="form-field">
-              <label>Início do Choco / Incubação</label>
+              <label for="nin-data-choco">Início do Choco / Incubação</label>
               <input id="nin-data-choco" type="date" />
             </div>
           </div>
 
           <div class="form-grid-2">
             <div class="form-field">
-              <label id="nin-label-previsao">Previsão de Eclosão</label>
+              <label for="nin-previsao" id="nin-label-previsao">Previsão de Eclosão</label>
               <input id="nin-previsao" type="date" />
             </div>
             <div class="form-field">
-              <label id="nin-label-eclosao">Data Real da Eclosão</label>
+              <label for="nin-data-eclosao" id="nin-label-eclosao">Data Real da Eclosão</label>
               <input id="nin-data-eclosao" type="date" />
             </div>
           </div>
 
           <div class="form-grid-3 nin-campo-ave" id="nin-grid-ovos-balanco">
             <div class="form-field">
-              <label>Total de Ovos</label>
+              <label for="nin-ovos-total">Total de Ovos</label>
               <input id="nin-ovos-total" type="number" min="0" value="0" />
             </div>
             <div class="form-field">
-              <label>Ovos Férteis (Galados)</label>
+              <label for="nin-ovos-ferteis">Ovos Férteis (Galados)</label>
               <input id="nin-ovos-ferteis" type="number" min="0" value="0" />
             </div>
             <div class="form-field">
-              <label>Ovos Goros (Inférteis)</label>
+              <label for="nin-ovos-goros">Ovos Goros (Inférteis)</label>
               <input id="nin-ovos-goros" type="number" min="0" value="0" />
             </div>
           </div>
 
           <div class="form-grid-2">
             <div class="form-field">
-              <label>Filhotes Nascidos</label>
+              <label for="nin-filhotes-qtd">Filhotes Nascidos</label>
               <input id="nin-filhotes-qtd" type="number" min="0" value="0" />
             </div>
             <div class="form-field nin-campo-ave" id="nin-campo-ovos-mortos">
-              <label>Ovos Bicados / Mortos no Ovo</label>
+              <label for="nin-ovos-mortos">Ovos Bicados / Mortos no Ovo</label>
               <input id="nin-ovos-mortos" type="number" min="0" value="0" />
             </div>
           </div>
 
           <div class="form-field full">
-            <label>Anilhas / Identificação dos Filhotes (separar por vírgula)</label>
+            <label for="nin-anilhas">Anilhas / Identificação dos Filhotes (separar por vírgula)</label>
             <input id="nin-anilhas" type="text" placeholder="Ex: BR-2026-001, BR-2026-002" />
           </div>
 
           <div class="form-grid-2">
             <div class="form-field">
-              <label>Status da Ninhada</label>
+              <label for="nin-status">Status da Ninhada</label>
               <select id="nin-status">
                 <option value="Em postura">Em postura</option>
                 <option value="Chocando">Chocando / Incubação</option>
@@ -935,7 +935,7 @@
               </select>
             </div>
             <div class="form-field">
-              <label>Observações da Ninhada</label>
+              <label for="nin-obs">Observações da Ninhada</label>
               <input id="nin-obs" type="text" placeholder="Cuidados especiais, temperatura, alimentação..." />
             </div>
           </div>
@@ -994,7 +994,7 @@
       </div>
     </div>
 
-    <input type="file" id="foto-input" accept="image/*" onchange="carregarFoto(event)" />
+    <input type="file" id="foto-input" aria-label="Upload de foto do animal" accept="image/*" onchange="carregarFoto(event)" />
   </div>
 
   <script src="js/app.js?v=3.4"></script>

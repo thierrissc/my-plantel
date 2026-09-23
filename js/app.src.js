@@ -419,14 +419,15 @@ const SEED_ANIMAIS = [
 ];
 
 let _realtimeTimer = null;
+let _isSyncingToCloud = false;
 
 function startRealtimeSync() {
   if (_realtimeTimer) clearInterval(_realtimeTimer);
   _realtimeTimer = setInterval(() => {
-    if (currentUser && document.visibilityState !== "hidden") {
+    if (currentUser && document.visibilityState !== "hidden" && !editando && !_isSyncingToCloud) {
       syncFromCloud();
     }
-  }, 2500);
+  }, 4000);
 }
 
 function stopRealtimeSync() {
@@ -497,6 +498,7 @@ window.addEventListener("focus", () => {
 
 async function syncToCloud() {
   if (!currentUser) return;
+  _isSyncingToCloud = true;
   try {
     const areas = getAreas();
     const theme = document.documentElement.getAttribute("data-theme") || "light";
@@ -505,7 +507,12 @@ async function syncToCloud() {
       headers: { "Content-Type": "application/json", ...getAuthHeaders() },
       body: JSON.stringify({ animais, areas, theme }),
     });
-  } catch (e) {}
+  } catch (e) {
+  } finally {
+    setTimeout(() => {
+      _isSyncingToCloud = false;
+    }, 600);
+  }
 }
 
 function getAnimaisStorageKey() {
@@ -731,6 +738,10 @@ function renderSidebar() {
 }
 
 function renderFicha() {
+  const mainEl = document.querySelector(".main");
+  const tabFichaEl = document.getElementById("tab-ficha");
+  const prevScroll = mainEl ? mainEl.scrollTop : (tabFichaEl ? tabFichaEl.scrollTop : 0);
+
   const a = animais.find((x) => String(x.id) === String(selecionado));
   const empty = document.getElementById("empty-state");
   const topbar = document.getElementById("topbar");
@@ -815,6 +826,11 @@ function renderFicha() {
 
   if (abaAtiva === "ficha") renderFichaContent(a);
   if (abaAtiva === "genealogia") renderGenealogia(a);
+
+  if (prevScroll > 0) {
+    if (mainEl) mainEl.scrollTop = prevScroll;
+    if (tabFichaEl) tabFichaEl.scrollTop = prevScroll;
+  }
 }
 
 function atualizarMobileBottombar(temAnimal) {
@@ -842,10 +858,10 @@ function renderFichaContent(a) {
       if (ed) {
         const parsed = parsePeso(val);
         return `<div class="form-field">
-          <label>${label}</label>
+          <label for="f-peso-val">${label}</label>
           <div class="peso-input-wrap">
-            <input type="number" step="0.01" min="0" id="f-peso-val" value="${parsed.valor}" placeholder="0.00" />
-            <select id="f-peso-unit">
+            <input type="number" step="0.01" min="0" id="f-peso-val" value="${parsed.valor}" placeholder="0.00" aria-label="Valor do peso" />
+            <select id="f-peso-unit" aria-label="Unidade do peso">
               <option value="kg"${parsed.unidade === "kg" ? " selected" : ""}>kg</option>
               <option value="g"${parsed.unidade === "g" ? " selected" : ""}>g</option>
             </select>
@@ -861,7 +877,7 @@ function renderFichaContent(a) {
       if (ed) {
         const optsArea = opts || [];
         return `<div class="form-field">
-          <label>${label}</label>
+          <label for="f-area">${label}</label>
           <select id="f-area">
             <option value=""${!val ? " selected" : ""}>Sem área definida</option>
             ${optsArea.filter(Boolean).map((o) => `<option value="${o}"${val === o ? " selected" : ""}>${o}</option>`).join("")}
@@ -877,12 +893,12 @@ function renderFichaContent(a) {
       if (opts) {
         const onchange = id === "status" ? ` onchange="aoMudarStatusFicha(this.value, ${a.id})"` : "";
         return `<div class="form-field">
-        <label>${label}</label>
+        <label for="f-${id}">${label}</label>
         <select id="f-${id}"${onchange}>${opts.map((o) => `<option${val === o ? " selected" : ""}>${o}</option>`).join("")}</select>
       </div>`;
       }
       return `<div class="form-field">
-        <label>${label}</label>
+        <label for="f-${id}">${label}</label>
         <input type="${type}" id="f-${id}" value="${val || ""}" />
       </div>`;
     }
@@ -895,188 +911,184 @@ function renderFichaContent(a) {
   const areasDisponiveis = ["", ...getAreas().filter((x) => x !== "Todos")];
   const temVacinas = Boolean((a.vacinas && a.vacinas.length > 0) || a.exibirVacinacao);
   const emTratamento = a.status === "Em tratamento";
-  let tratHtml = "";
 
-  if (emTratamento) {
-    const trat = a.tratamento || { motivo: "", inicio: "", fim: "", obs: "", remedios: [] };
-    const remedios = trat.remedios || [];
+  const trat = a.tratamento || { motivo: "", inicio: "", fim: "", obs: "", remedios: [] };
+  const remedios = trat.remedios || [];
 
-    const remediosRows = remedios.length
-      ? remedios
-          .map((rem, idx) => {
-            const info = calcularInfoDose(rem);
-            const freqTexto = rem.intervaloHoras
-              ? `A cada ${rem.intervaloHoras}h`
-              : "Conforme prescrição";
-            return `<tr>
-              <td>
-                <div style="font-weight:600;color:var(--c-text-1)">${rem.nome}</div>
-                ${rem.dose ? `<div style="font-size:11px;color:var(--c-text-3)">${rem.dose}</div>` : ""}
-              </td>
-              <td>${freqTexto}</td>
-              <td>
-                <div style="font-weight:600;color:var(--c-text-1)">${info.dosesHoje}</div>
-                <div style="font-size:10.5px;color:var(--c-text-3)">${info.dosesHoje === 1 ? "dose" : "doses"}</div>
-              </td>
-              <td>
-                <div style="font-weight:600;color:var(--c-text-1)">${info.dosesSemana}</div>
-                <div style="font-size:10.5px;color:var(--c-text-3)">${info.dosesSemana === 1 ? "dose" : "doses"}</div>
-              </td>
-              <td>
-                ${
-                  !info.pendente
-                    ? `<div style="display:flex;flex-direction:column;gap:3px">
-                        <span class="pill pill-ok" style="display:inline-flex;align-items:center;gap:4px;width:fit-content;font-weight:600">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                          Concluído
-                        </span>
-                        <span style="font-size:11px;color:var(--c-text-2)">Próxima em ${info.tempoRestanteTexto}${info.horaProxima ? ` (${info.horaProxima})` : ""}</span>
-                       </div>`
-                    : `<div style="display:flex;flex-direction:column;gap:3px">
-                        <span class="pill pill-vence" style="width:fit-content;font-weight:600">Pendente</span>
-                        <span style="font-size:11px;color:var(--c-amber)">${rem.ultimaDose ? "Hora de tomar novamente" : "Aguardando 1ª dose"}</span>
-                       </div>`
-                }
-              </td>
-              <td>
-                <div style="display:inline-flex;align-items:center;gap:6px">
-                  ${
-                    info.pendente
-                      ? `<button type="button" class="btn-dar-remedio" onclick="event.stopPropagation(); marcarDoseRemedio(${a.id}, ${idx})" title="Registrar dose administrada agora">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                          Dar remédio
-                         </button>`
-                      : `<button type="button" class="btn-dar-remedio-extra" onclick="event.stopPropagation(); marcarDoseRemedio(${a.id}, ${idx})" title="Administrar outra dose agora">
-                          + Dar dose
-                         </button>
-                         <button type="button" class="btn-desfazer-dose" onclick="event.stopPropagation(); desfazerDoseRemedio(${a.id}, ${idx})" title="Desfazer última dose registrada">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10h10a5 5 0 015 5v2M3 10l6-6M3 10l6 6"/></svg>
-                          Desfazer dose
-                         </button>`
-                  }
-                </div>
-              </td>
+  const remediosRows = remedios.length
+    ? remedios
+        .map((rem, idx) => {
+          const info = calcularInfoDose(rem);
+          const freqTexto = rem.intervaloHoras
+            ? `A cada ${rem.intervaloHoras}h`
+            : "Conforme prescrição";
+          return `<tr>
+            <td>
+              <div style="font-weight:600;color:var(--c-text-1)">${rem.nome}</div>
+              ${rem.dose ? `<div style="font-size:11px;color:var(--c-text-3)">${rem.dose}</div>` : ""}
+            </td>
+            <td>${freqTexto}</td>
+            <td>
+              <div style="font-weight:600;color:var(--c-text-1)">${info.dosesHoje}</div>
+              <div style="font-size:10.5px;color:var(--c-text-3)">${info.dosesHoje === 1 ? "dose" : "doses"}</div>
+            </td>
+            <td>
+              <div style="font-weight:600;color:var(--c-text-1)">${info.dosesSemana}</div>
+              <div style="font-size:10.5px;color:var(--c-text-3)">${info.dosesSemana === 1 ? "dose" : "doses"}</div>
+            </td>
+            <td>
               ${
-                ed
-                  ? `<td><span class="vac-remove" onclick="event.stopPropagation(); removerRemedioTratamento(${a.id}, ${idx})" title="Remover">✕</span></td>`
-                  : ""
+                !info.pendente
+                  ? `<div style="display:flex;flex-direction:column;gap:3px">
+                      <span class="pill pill-ok" style="display:inline-flex;align-items:center;gap:4px;width:fit-content;font-weight:600">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                        Concluído
+                      </span>
+                      <span style="font-size:11px;color:var(--c-text-2)">Próxima em ${info.tempoRestanteTexto}${info.horaProxima ? ` (${info.horaProxima})` : ""}</span>
+                     </div>`
+                  : `<div style="display:flex;flex-direction:column;gap:3px">
+                      <span class="pill pill-vence" style="width:fit-content;font-weight:600">Pendente</span>
+                      <span style="font-size:11px;color:var(--c-amber)">${rem.ultimaDose ? "Hora de tomar novamente" : "Aguardando 1ª dose"}</span>
+                     </div>`
               }
-            </tr>`;
-          })
-          .join("")
-      : `<tr><td colspan="${ed ? 7 : 6}" style="text-align:center;color:var(--c-text-3);padding:14px">Nenhum remédio cadastrado</td></tr>`;
-
-    const addRemForm = ed
-      ? `
-      <div class="add-vac-form">
-        <div class="form-field">
-          <label>Nome do Remédio *</label>
-          <input id="nv-rem-nome" type="text" placeholder="Ex: Baytril, Nalyt..." />
-        </div>
-        <div class="form-field">
-          <label>Dose (opcional)</label>
-          <input id="nv-rem-dose" type="text" placeholder="Ex: 2 gotas, 0.5ml" />
-        </div>
-        <div class="form-field">
-          <label>Quantas vezes *</label>
-          <select id="nv-rem-intervalo">
-            <option value="4">A cada 4h</option>
-            <option value="6">A cada 6h</option>
-            <option value="8" selected>A cada 8h</option>
-            <option value="12">A cada 12h</option>
-            <option value="24">A cada 24h</option>
-            <option value="48">A cada 48h</option>
-          </select>
-        </div>
-        <button type="button" class="btn-add-vac" onclick="adicionarRemedioTratamento(${a.id})">
-          + Adicionar Remédio
-        </button>
-      </div>`
-      : "";
-
-    tratHtml = `
-      <div id="card-tratamento-wrapper" class="section-card">
-        <div class="section-header" style="flex-wrap:wrap;gap:10px">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div class="section-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="8" width="18" height="8" rx="4"/>
-                <path d="M12 8v8"/>
-              </svg>
-            </div>
-            <span class="section-title">Tratamento</span>
-            <span class="pill pill-vence" style="font-weight:700;letter-spacing:0.04em">EM ANDAMENTO</span>
-          </div>
-          <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
-            <button type="button" class="btn-concluir-tratamento" onclick="concluirTratamentoAnimal(${a.id})" title="Finalizar tratamento e retornar animal para Ativo">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              Concluir / Tratado
-            </button>
+            </td>
+            <td>
+              <div style="display:inline-flex;align-items:center;gap:6px">
+                ${
+                  info.pendente
+                    ? `<button type="button" class="btn-dar-remedio" onclick="event.stopPropagation(); marcarDoseRemedio(${a.id}, ${idx})" title="Registrar dose administrada agora">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                        Dar remédio
+                       </button>`
+                    : `<button type="button" class="btn-dar-remedio-extra" onclick="event.stopPropagation(); marcarDoseRemedio(${a.id}, ${idx})" title="Administrar outra dose agora">
+                        + Dar dose
+                       </button>
+                       <button type="button" class="btn-desfazer-dose" onclick="event.stopPropagation(); desfazerDoseRemedio(${a.id}, ${idx})" title="Desfazer última dose registrada">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10h10a5 5 0 015 5v2M3 10l6-6M3 10l6 6"/></svg>
+                        Desfazer dose
+                       </button>`
+                }
+              </div>
+            </td>
             ${
               ed
-                ? `<button type="button" class="btn-action-icon btn-danger" onclick="limparTratamentoAnimal(${a.id})" title="Limpar dados do tratamento">
-                    <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><path d="M4 6h12M8 6V4h4v2M6 6v10h8V6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-                   </button>`
+                ? `<td><span class="vac-remove" onclick="event.stopPropagation(); removerRemedioTratamento(${a.id}, ${idx})" title="Remover">✕</span></td>`
                 : ""
             }
-          </div>
-        </div>
+          </tr>`;
+        })
+        .join("")
+    : `<tr><td colspan="${ed ? 7 : 6}" style="text-align:center;color:var(--c-text-3);padding:14px">Nenhum remédio cadastrado</td></tr>`;
 
-        <div class="grid-3 mt">
+  const addRemForm = ed
+    ? `
+    <div class="add-vac-form">
+      <div class="form-field">
+        <label for="nv-rem-nome">Nome do Remédio *</label>
+        <input id="nv-rem-nome" type="text" placeholder="Ex: Baytril, Nalyt..." />
+      </div>
+      <div class="form-field">
+        <label for="nv-rem-dose">Dose (opcional)</label>
+        <input id="nv-rem-dose" type="text" placeholder="Ex: 2 gotas, 0.5ml" />
+      </div>
+      <div class="form-field">
+        <label for="nv-rem-intervalo">Quantas vezes *</label>
+        <select id="nv-rem-intervalo">
+          <option value="4">A cada 4h</option>
+          <option value="6">A cada 6h</option>
+          <option value="8" selected>A cada 8h</option>
+          <option value="12">A cada 12h</option>
+          <option value="24">A cada 24h</option>
+          <option value="48">A cada 48h</option>
+        </select>
+      </div>
+      <button type="button" class="btn-add-vac" onclick="adicionarRemedioTratamento(${a.id})">
+        + Adicionar Remédio
+      </button>
+    </div>`
+    : "";
+
+  const tratHtml = `
+    <div id="card-tratamento-wrapper" class="section-card" style="display: ${emTratamento ? "" : "none"};">
+      <div class="section-header" style="flex-wrap:wrap;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="section-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="8" width="18" height="8" rx="4"/>
+              <path d="M12 8v8"/>
+            </svg>
+          </div>
+          <span class="section-title">Tratamento</span>
+          <span class="pill pill-vence" style="font-weight:700;letter-spacing:0.04em">EM ANDAMENTO</span>
+        </div>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+          <button type="button" class="btn-concluir-tratamento" onclick="concluirTratamentoAnimal(${a.id})" title="Finalizar tratamento e retornar animal para Ativo">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Concluir / Tratado
+          </button>
           ${
             ed
-              ? `
-              <div class="form-field">
-                <label>Motivo / Diagnóstico</label>
-                <input id="tr-motivo" type="text" placeholder="Ex: Coccidiose, Infecção..." value="${trat.motivo || ""}" />
-              </div>
-              <div class="form-field">
-                <label>Início</label>
-                <input id="tr-inicio" type="date" value="${trat.inicio || ""}" />
-              </div>
-              <div class="form-field">
-                <label>Previsão de Término</label>
-                <input id="tr-fim" type="date" value="${trat.fim || ""}" />
-              </div>`
-              : `
-              <div class="form-field">
-                <label>Motivo / Diagnóstico</label>
-                <div class="field-value">${trat.motivo || "Tratamento em andamento"}</div>
-              </div>
-              <div class="form-field">
-                <label>Início</label>
-                <div class="field-value">${trat.inicio ? fmtDate(trat.inicio) : "-"}</div>
-              </div>
-              <div class="form-field">
-                <label>Previsão de Término</label>
-                <div class="field-value">${trat.fim ? fmtDate(trat.fim) : "-"}</div>
-              </div>`
+              ? `<button type="button" class="btn-action-icon btn-danger" onclick="limparTratamentoAnimal(${a.id})" title="Limpar dados do tratamento">
+                  <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><path d="M4 6h12M8 6V4h4v2M6 6v10h8V6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                 </button>`
+              : ""
           }
         </div>
-
-        <div class="vac-table-wrap" style="margin-top:14px">
-          <table class="vac-table">
-            <thead>
-              <tr>
-                <th>Remédio</th>
-                <th>Quantas Vezes</th>
-                <th>Hoje</th>
-                <th>Na Semana</th>
-                <th>Situação</th>
-                <th>Ação</th>
-                ${ed ? "<th></th>" : ""}
-              </tr>
-            </thead>
-            <tbody>
-              ${remediosRows}
-            </tbody>
-          </table>
-        </div>
-        ${addRemForm}
       </div>
-    `;
-  }
 
+      <div class="grid-3 mt">
+        ${
+          ed
+            ? `
+            <div class="form-field">
+              <label for="tr-motivo">Motivo / Diagnóstico</label>
+              <input id="tr-motivo" type="text" placeholder="Ex: Coccidiose, Infecção..." value="${trat.motivo || ""}" />
+            </div>
+            <div class="form-field">
+              <label for="tr-inicio">Início</label>
+              <input id="tr-inicio" type="date" value="${trat.inicio || ""}" />
+            </div>
+            <div class="form-field">
+              <label for="tr-fim">Previsão de Término</label>
+              <input id="tr-fim" type="date" value="${trat.fim || ""}" />
+            </div>`
+            : `
+            <div class="form-field">
+              <label>Motivo / Diagnóstico</label>
+              <div class="field-value">${trat.motivo || "Tratamento em andamento"}</div>
+            </div>
+            <div class="form-field">
+              <label>Início</label>
+              <div class="field-value">${trat.inicio ? fmtDate(trat.inicio) : "-"}</div>
+            </div>
+            <div class="form-field">
+              <label>Previsão de Término</label>
+              <div class="field-value">${trat.fim ? fmtDate(trat.fim) : "-"}</div>
+            </div>`
+        }
+      </div>
+
+      <div class="vac-table-wrap" style="margin-top:14px">
+        <table class="vac-table">
+          <thead>
+            <tr>
+              <th>Remédio</th>
+              <th>Quantas Vezes</th>
+              <th>Hoje</th>
+              <th>Na Semana</th>
+              <th>Situação</th>
+              <th>Ação</th>
+              ${ed ? "<th></th>" : ""}
+            </tr>
+          </thead>
+          <tbody>
+            ${remediosRows}
+          </tbody>
+        </table>
+      </div>
+      ${addRemForm}
+    </div>
+  `;
 
   const vacRows = (a.vacinas || [])
     .map((v, i) => {
@@ -1094,9 +1106,9 @@ function renderFichaContent(a) {
   const addVacForm = ed
     ? `
     <div class="add-vac-form">
-      <div class="form-field"><label>Vacina</label><input id="nv-nome" type="text" placeholder="Nome da vacina" /></div>
-      <div class="form-field"><label>Aplicação</label><input id="nv-data" type="date" /></div>
-      <div class="form-field"><label>Próxima dose</label><input id="nv-prox" type="date" /></div>
+      <div class="form-field"><label for="nv-nome">Vacina</label><input id="nv-nome" type="text" placeholder="Nome da vacina" /></div>
+      <div class="form-field"><label for="nv-data">Aplicação</label><input id="nv-data" type="date" /></div>
+      <div class="form-field"><label for="nv-prox">Próxima dose</label><input id="nv-prox" type="date" /></div>
       <button class="btn-add-vac" onclick="adicionarVacina()">+ Adicionar Vacinas</button>
     </div>`
     : "";
@@ -1976,23 +1988,8 @@ function calcularInfoDose(rem) {
 
 function aoMudarStatusFicha(statusVal, animalId) {
   const card = document.getElementById("card-tratamento-wrapper");
-  if (statusVal === "Em tratamento") {
-    if (card) {
-      card.style.display = "";
-    } else {
-      const a = animais.find((x) => String(x.id) === String(animalId));
-      if (a) {
-        a.status = "Em tratamento";
-        if (!a.tratamento) {
-          a.tratamento = { motivo: "", inicio: new Date().toISOString().slice(0, 10), fim: "", obs: "", remedios: [] };
-        }
-        renderFicha();
-      }
-    }
-  } else {
-    if (card) {
-      card.style.display = "none";
-    }
+  if (card) {
+    card.style.display = statusVal === "Em tratamento" ? "" : "none";
   }
 }
 
@@ -2406,7 +2403,14 @@ function abrirModal() {
   document.getElementById("modal").style.display = "flex";
 }
 function fecharModal() {
-  document.getElementById("modal").style.display = "none";
+  const modalEl = document.getElementById("modal");
+  if (modalEl) {
+    modalEl.style.display = "none";
+    modalEl.classList.remove("modal-on-top");
+    modalEl.style.zIndex = "";
+  }
+  window._filhoteGenealogiaTemp = null;
+
   ["m-nome", "m-raca", "m-id", "m-pelagem", "m-nasc", "m-peso-val"].forEach((id) => {
     const el = document.getElementById(id);
     if (el) el.value = "";
@@ -2452,6 +2456,9 @@ function salvarNovoAnimal() {
   const pUnit = document.getElementById("m-peso-unit")?.value || "kg";
   const peso = pVal ? `${pVal.replace(",", ".")} ${pUnit}` : "";
 
+  const tempGen = window._filhoteGenealogiaTemp;
+  const origemCasalId = tempGen?.casalId;
+
   const novo = {
     id: Date.now(),
     nome,
@@ -2464,24 +2471,50 @@ function salvarNovoAnimal() {
     peso: peso,
     microchip: document.getElementById("m-id")?.value || "",
     foto: null,
-    paiNome: "",
-    paiRaca: "",
-    maeNome: "",
-    maeRaca: "",
-    avoPatNome: "",
-    avoPatRaca: "",
-    avoMatNome: "",
-    avoMatRaca: "",
+    paiNome: tempGen?.paiNome || "",
+    paiRaca: tempGen?.paiRaca || "",
+    maeNome: tempGen?.maeNome || "",
+    maeRaca: tempGen?.maeRaca || "",
+    avoPatNome: tempGen?.avoPatNome || "",
+    avoPatRaca: tempGen?.avoPatRaca || "",
+    avPatMaeNome: tempGen?.avPatMaeNome || "",
+    avPatMaeRaca: tempGen?.avPatMaeRaca || "",
+    avMatPaiNome: tempGen?.avMatPaiNome || "",
+    avMatPaiRaca: tempGen?.avMatPaiRaca || "",
+    avoMatNome: tempGen?.avoMatNome || "",
+    avoMatRaca: tempGen?.avoMatRaca || "",
+    bis_pp_m_nome: tempGen?.bis_pp_m_nome || "",
+    bis_pp_m_raca: tempGen?.bis_pp_m_raca || "",
+    bis_pp_f_nome: tempGen?.bis_pp_f_nome || "",
+    bis_pp_f_raca: tempGen?.bis_pp_f_raca || "",
+    bis_pm_m_nome: tempGen?.bis_pm_m_nome || "",
+    bis_pm_m_raca: tempGen?.bis_pm_m_raca || "",
+    bis_pm_f_nome: tempGen?.bis_pm_f_nome || "",
+    bis_pm_f_raca: tempGen?.bis_pm_f_raca || "",
+    bis_mp_m_nome: tempGen?.bis_mp_m_nome || "",
+    bis_mp_m_raca: tempGen?.bis_mp_m_raca || "",
+    bis_mp_f_nome: tempGen?.bis_mp_f_nome || "",
+    bis_mp_f_raca: tempGen?.bis_mp_f_raca || "",
+    bis_mm_m_nome: tempGen?.bis_mm_m_nome || "",
+    bis_mm_m_raca: tempGen?.bis_mm_m_raca || "",
+    bis_mm_f_nome: tempGen?.bis_mm_f_nome || "",
+    bis_mm_f_raca: tempGen?.bis_mm_f_raca || "",
     vacinas: [],
-    obs: "",
+    obs: tempGen?.obs || "",
   };
+
+  window._filhoteGenealogiaTemp = null;
+  fecharModal();
   animais.push(novo);
   salvarAnimais();
-  fecharModal();
   selecionado = novo.id;
   editando = false;
   renderSidebar();
   renderFicha();
+  if (origemCasalId) {
+    abrirModalGerenciarNinhadas(origemCasalId);
+  }
+  renderReproducao();
 }
 
 function confirmarExclusao(id) {
@@ -4079,7 +4112,7 @@ function renderReproducao() {
 let casalGerenciarNinhadasId = null;
 
 function abrirModalGerenciarNinhadas(casalId) {
-  const c = casais.find((x) => x.id === casalId);
+  const c = casais.find((x) => String(x.id) === String(casalId));
   if (!c) return;
 
   casalGerenciarNinhadasId = casalId;
@@ -4092,7 +4125,30 @@ function abrirModalGerenciarNinhadas(casalId) {
   const btnTxt = document.getElementById("mgn-nova-ninhada-txt");
 
   if (nomeEl) nomeEl.textContent = `Ninhadas · ${c.nome}`;
-  if (subEl) subEl.textContent = `${c.especie} · ${c.local || "Sem acomodação informada"}`;
+  if (subEl) {
+    subEl.innerHTML = `
+      <div class="mgn-header-tags">
+        <span class="mgn-header-tag">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a5 5 0 0 1 5 5v3a5 5 0 0 1-10 0V7a5 5 0 0 1 5-5z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+          ${c.especie || "Ave"}
+        </span>
+        ${
+          c.local
+            ? `<span class="mgn-header-tag">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                ${c.local}
+               </span>`
+            : ""
+        }
+        ${
+          c.status
+            ? `<span class="mgn-header-tag">
+                ${c.status}
+               </span>`
+            : ""
+        }
+      </div>`;
+  }
   if (btnTxt) btnTxt.textContent = casalAve ? "Nova Postura" : "Nova Ninhada";
 
   const totalNinhadas = (c.ninhadas || []).length;
@@ -4641,18 +4697,8 @@ function registrarFilhoteNoPlantel(casalId, idx, anilha) {
     return;
   }
 
-  const novo = {
-    id: Date.now(),
-    nome: nomeAnimal,
-    especie: c.especie || "Ave",
-    raca: paiRaca || maeRaca || "",
-    sexo: "",
-    nasc: dataNasc,
-    pelagem: "",
-    status: "Ativo",
-    peso: "",
-    microchip: anilha || "",
-    foto: null,
+  window._filhoteGenealogiaTemp = {
+    casalId: c.id,
     paiNome,
     paiRaca,
     maeNome,
@@ -4681,24 +4727,33 @@ function registrarFilhoteNoPlantel(casalId, idx, anilha) {
     bis_mm_m_raca,
     bis_mm_f_nome,
     bis_mm_f_raca,
-    vacinas: [],
     obs: `Nascido da postura #${idx + 1} do ${c.nome}.`,
   };
 
-  animais.push(novo);
-  salvarAnimais();
-  renderSidebar();
-
-  const mgn = document.getElementById("modal-gerenciar-ninhadas");
-  if (mgn && mgn.style.display === "flex") {
-    abrirModalGerenciarNinhadas(casalId);
+  abrirModal();
+  const modalEl = document.getElementById("modal");
+  if (modalEl) {
+    modalEl.classList.add("modal-on-top");
+    modalEl.style.zIndex = "10500";
   }
-  renderReproducao();
 
-  mostrarDialog({
-    title: "Adicionado ao Plantel",
-    desc: `O animal "${novo.nome}" foi cadastrado no plantel com sucesso, com pais e avós vinculados automaticamente!`
-  });
+  const mNome = document.getElementById("m-nome");
+  if (mNome) mNome.value = nomeAnimal;
+
+  const mEsp = document.getElementById("m-especie");
+  const mEspLabel = document.getElementById("especie-modal-label");
+  if (mEsp) mEsp.value = c.especie || "Ave";
+  if (mEspLabel) mEspLabel.textContent = c.especie || "Ave";
+  atualizarRacasModal();
+
+  const mRaca = document.getElementById("m-raca");
+  if (mRaca) mRaca.value = paiRaca || maeRaca || "";
+
+  const mMicro = document.getElementById("m-id");
+  if (mMicro) mMicro.value = anilha || "";
+
+  const mNasc = document.getElementById("m-nasc");
+  if (mNasc) mNasc.value = dataNasc;
 }
 
 
