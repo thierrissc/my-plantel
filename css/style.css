@@ -5945,3 +5945,84 @@ body {
   margin: 0;
 }
 
+@media (max-width: 768px) {
+  .app-header {
+    height: 56px;
+    padding: 0 10px;
+  }
+  .demo-tag {
+    display: none;
+  }
+  .btn-header-login,
+  .btn-header-register {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  .topbar {
+    min-height: 48px;
+    height: 48px;
+    padding: 0 8px;
+    display: flex !important;
+    align-items: center;
+  }
+  .topbar-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    width: 100%;
+    min-width: 0;
+    gap: 4px;
+    padding-top: 0;
+  }
+  .topbar-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .tab-btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 8px 12px;
+    font-size: 13px;
+    gap: 6px;
+  }
+  .topbar-tab-divider {
+    flex-shrink: 0;
+    height: 16px;
+    margin: 0 2px;
+  }
+  .trat-overview-grid {
+    grid-template-columns: 1fr;
+  }
+  .trat-dates-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+  .remedio-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .remedio-card-action {
+    justify-content: flex-end;
+  }
+  .add-remedio-form {
+    grid-template-columns: 1fr;
+  }
+  .mgn-actions-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .modal-gerenciar-ninhadas-box {
+    max-width: 100%;
+    width: 100vw;
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
+    max-height: 90vh;
+  }
+}
+
