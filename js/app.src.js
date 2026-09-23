@@ -2082,6 +2082,7 @@ function abrirCropModal(src, target) {
   const old = document.getElementById("crop-modal");
   if (old) old.remove();
 
+  const isPerfil = target === "perfil";
   const modal = document.createElement("div");
   modal.id = "crop-modal";
   modal.style.cssText = `
@@ -2096,59 +2097,70 @@ function abrirCropModal(src, target) {
       background:var(--c-card);
       border-radius:16px;
       padding:24px;
-      width:min(420px,95vw);
+      width:min(400px,94vw);
       box-shadow:0 24px 80px rgba(0,0,0,0.5);
       animation:slideUp 0.25s ease;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
     ">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-        <span style="font-weight:600;font-size:15px;color:var(--c-text-1)">Ajustar foto</span>
+      <div style="width:100%;display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <span style="font-weight:600;font-size:15px;color:var(--c-text-1)">${isPerfil ? "Ajustar foto de perfil" : "Ajustar foto do animal"}</span>
         <button onclick="fecharCropModal()" style="background:none;border:none;color:var(--c-text-3);cursor:pointer;font-size:20px;line-height:1;padding:2px 6px">×</button>
       </div>
 
       <div id="crop-viewport" style="
-        width:100%;height:320px;
-        border-radius:12px;
+        width:min(280px,72vw);
+        height:min(280px,72vw);
+        aspect-ratio:1/1;
+        border-radius:${isPerfil ? "50%" : "12px"};
         background:#111;
         overflow:hidden;
         position:relative;
         cursor:grab;
         user-select:none;
         touch-action:none;
+        margin:0 auto;
+        box-shadow:0 0 0 1px var(--c-border);
       ">
         <img id="crop-img" src="${src}" style="
           position:absolute;
-          transform-origin:center center;
+          transform-origin:0 0;
           pointer-events:none;
           max-width:none;
         " draggable="false" />
         <div style="
           position:absolute;inset:0;
           pointer-events:none;
-          box-shadow:inset 0 0 0 3px rgba(255,255,255,0.4);
-          border-radius:12px;
+          box-shadow:inset 0 0 0 2px rgba(255,255,255,0.7);
+          border-radius:${isPerfil ? "50%" : "12px"};
         "></div>
-        <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0.2" viewBox="0 0 3 3" preserveAspectRatio="none">
-          <line x1="1" y1="0" x2="1" y2="3" stroke="white" stroke-width="0.03"/>
-          <line x1="2" y1="0" x2="2" y2="3" stroke="white" stroke-width="0.03"/>
-          <line x1="0" y1="1" x2="3" y2="1" stroke="white" stroke-width="0.03"/>
-          <line x1="0" y1="2" x2="3" y2="2" stroke="white" stroke-width="0.03"/>
-        </svg>
+        ${
+          !isPerfil
+            ? `<svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0.25" viewBox="0 0 3 3" preserveAspectRatio="none">
+                <line x1="1" y1="0" x2="1" y2="3" stroke="white" stroke-width="0.03"/>
+                <line x1="2" y1="0" x2="2" y2="3" stroke="white" stroke-width="0.03"/>
+                <line x1="0" y1="1" x2="3" y2="1" stroke="white" stroke-width="0.03"/>
+                <line x1="0" y1="2" x2="3" y2="2" stroke="white" stroke-width="0.03"/>
+              </svg>`
+            : ""
+        }
       </div>
 
-      <div style="margin-top:14px;display:flex;align-items:center;gap:10px">
+      <div style="width:100%;margin-top:16px;display:flex;align-items:center;gap:10px">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;color:var(--c-text-3)">
           <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="1.8"/>
           <path d="M21 21l-2-2M11 8v6M8 11h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
         </svg>
-        <input type="range" id="crop-zoom" min="10" max="300" value="100" style="flex:1;accent-color:var(--c-accent);cursor:pointer" oninput="aplicarZoom(this.value)" />
+        <input type="range" id="crop-zoom" min="50" max="300" value="100" style="flex:1;accent-color:var(--c-accent);cursor:pointer" oninput="aplicarZoom(this.value)" />
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;color:var(--c-text-3)">
           <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="1.8"/>
           <path d="M21 21l-2-2M11 8v6M8 11h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
         </svg>
       </div>
-      <p style="text-align:center;font-size:11px;color:var(--c-text-3);margin-top:6px">Arraste para reposicionar · Use o controle para zoom</p>
+      <p style="text-align:center;font-size:11px;color:var(--c-text-3);margin-top:6px">Arraste para posicionar · Ajuste o zoom abaixo</p>
 
-      <div style="display:flex;gap:10px;margin-top:20px">
+      <div style="width:100%;display:flex;gap:10px;margin-top:18px">
         <button onclick="fecharCropModal()" style="
           flex:1;padding:10px;border:1.5px solid var(--c-border);
           background:none;border-radius:8px;color:var(--c-text-2);
@@ -2169,6 +2181,7 @@ function abrirCropModal(src, target) {
   const viewport = document.getElementById("crop-viewport");
   cropState = {
     scale: 1,
+    baseRatio: 1,
     offsetX: 0,
     offsetY: 0,
     dragging: false,
@@ -2184,47 +2197,76 @@ function abrirCropModal(src, target) {
     const vw = viewport.clientWidth,
       vh = viewport.clientHeight;
     const ratio = Math.max(vw / img.naturalWidth, vh / img.naturalHeight);
+    cropState.baseRatio = ratio;
     cropState.scale = ratio;
     cropState.offsetX = (vw - img.naturalWidth * ratio) / 2;
     cropState.offsetY = (vh - img.naturalHeight * ratio) / 2;
-    document.getElementById("crop-zoom").value = Math.round(ratio * 100);
+    const zoomEl = document.getElementById("crop-zoom");
+    if (zoomEl) zoomEl.value = "100";
     applyTransform();
   };
 
   viewport.addEventListener("mousedown", startDrag);
-  viewport.addEventListener("mousemove", doDrag);
-  viewport.addEventListener("mouseup", endDrag);
-  viewport.addEventListener("mouseleave", endDrag);
+  window.addEventListener("mousemove", doDrag);
+  window.addEventListener("mouseup", endDrag);
+
+  let touchStartDist = 0;
+  let initialZoom = 100;
+
   viewport.addEventListener(
     "touchstart",
     (e) => {
       e.preventDefault();
-      startDrag(e.touches[0]);
+      if (e.touches.length === 1) {
+        startDrag(e.touches[0]);
+      } else if (e.touches.length === 2) {
+        cropState.dragging = false;
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        touchStartDist = Math.hypot(dx, dy);
+        initialZoom = parseInt(document.getElementById("crop-zoom")?.value) || 100;
+      }
     },
     { passive: false },
   );
-  viewport.addEventListener(
+
+  window.addEventListener(
     "touchmove",
     (e) => {
-      e.preventDefault();
-      doDrag(e.touches[0]);
+      if (cropState.dragging && e.touches.length === 1) {
+        e.preventDefault();
+        doDrag(e.touches[0]);
+      } else if (e.touches.length === 2 && touchStartDist > 0) {
+        e.preventDefault();
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        const dist = Math.hypot(dx, dy);
+        const factor = dist / touchStartDist;
+        const newZoom = Math.min(300, Math.max(50, Math.round(initialZoom * factor)));
+        const zoomInput = document.getElementById("crop-zoom");
+        if (zoomInput) {
+          zoomInput.value = newZoom;
+          aplicarZoom(newZoom);
+        }
+      }
     },
     { passive: false },
   );
-  viewport.addEventListener("touchend", endDrag);
+
+  window.addEventListener("touchend", () => {
+    endDrag();
+    touchStartDist = 0;
+  });
+
   viewport.addEventListener(
     "wheel",
     (e) => {
       e.preventDefault();
       const delta = e.deltaY > 0 ? -5 : 5;
-      const newVal = Math.min(
-        300,
-        Math.max(
-          10,
-          parseInt(document.getElementById("crop-zoom").value) + delta,
-        ),
-      );
-      document.getElementById("crop-zoom").value = newVal;
+      const curZoom = parseInt(document.getElementById("crop-zoom")?.value) || 100;
+      const newVal = Math.min(300, Math.max(50, curZoom + delta));
+      const zoomInput = document.getElementById("crop-zoom");
+      if (zoomInput) zoomInput.value = newVal;
       aplicarZoom(newVal);
     },
     { passive: false },
@@ -2235,27 +2277,32 @@ function startDrag(e) {
   cropState.dragging = true;
   cropState.startX = e.clientX - cropState.offsetX;
   cropState.startY = e.clientY - cropState.offsetY;
-  document.getElementById("crop-viewport").style.cursor = "grabbing";
+  const vp = document.getElementById("crop-viewport");
+  if (vp) vp.style.cursor = "grabbing";
 }
+
 function doDrag(e) {
   if (!cropState.dragging) return;
   cropState.offsetX = e.clientX - cropState.startX;
   cropState.offsetY = e.clientY - cropState.startY;
   applyTransform();
 }
+
 function endDrag() {
   cropState.dragging = false;
   const vp = document.getElementById("crop-viewport");
   if (vp) vp.style.cursor = "grab";
 }
+
 function aplicarZoom(val) {
   const img = document.getElementById("crop-img");
   if (!img) return;
   const vp = document.getElementById("crop-viewport");
+  if (!vp) return;
   const vw = vp.clientWidth,
     vh = vp.clientHeight;
-  const oldScale = cropState.scale;
-  cropState.scale = val / 100;
+  const oldScale = cropState.scale || 1;
+  cropState.scale = cropState.baseRatio * (parseFloat(val) / 100);
 
   cropState.offsetX =
     vw / 2 - (vw / 2 - cropState.offsetX) * (cropState.scale / oldScale);
@@ -2263,6 +2310,7 @@ function aplicarZoom(val) {
     vh / 2 - (vh / 2 - cropState.offsetY) * (cropState.scale / oldScale);
   applyTransform();
 }
+
 function applyTransform() {
   const img = document.getElementById("crop-img");
   if (!img) return;
@@ -2277,27 +2325,31 @@ function confirmarCrop() {
   const viewport = document.getElementById("crop-viewport");
   if (!img || !viewport) return;
 
-  const vw = viewport.clientWidth,
-    vh = viewport.clientHeight;
+  const vw = viewport.clientWidth;
+  const vh = viewport.clientHeight;
+  const outSize = 600;
   const canvas = document.createElement("canvas");
-  const size = Math.min(vw, vh);
-  canvas.width = size;
-  canvas.height = size;
+  canvas.width = outSize;
+  canvas.height = outSize;
   const ctx = canvas.getContext("2d");
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
 
   const sx = -cropState.offsetX / cropState.scale;
   const sy = -cropState.offsetY / cropState.scale;
-  const sw = size / cropState.scale;
-  const sh = size / cropState.scale;
+  const sw = vw / cropState.scale;
+  const sh = vh / cropState.scale;
 
-  ctx.drawImage(img, sx, sy, sw, sh, 0, 0, size, size);
-  const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+  ctx.drawImage(img, sx, sy, sw, sh, 0, 0, outSize, outSize);
+  const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
   fecharCropModal();
 
   if (cropState.target === "perfil") {
     _perfilAvatarPending = dataUrl;
     const avatarEl = document.getElementById("perfil-avatar-large");
     if (avatarEl) avatarEl.src = dataUrl;
+    const headerAvatar = document.getElementById("um-avatar-img");
+    if (headerAvatar) headerAvatar.src = dataUrl;
   } else {
     fotoTemp = dataUrl;
     const frame = document.querySelector(".foto-frame");
