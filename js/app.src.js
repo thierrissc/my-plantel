@@ -892,6 +892,192 @@ function renderFichaContent(a) {
 
   const areasDisponiveis = ["", ...getAreas().filter((x) => x !== "Todos")];
   const temVacinas = Boolean((a.vacinas && a.vacinas.length > 0) || a.exibirVacinacao);
+  const emTratamento = a.status === "Em tratamento";
+  let tratHtml = "";
+
+  if (emTratamento) {
+    const trat = a.tratamento || { motivo: "", inicio: "", fim: "", obs: "", remedios: [] };
+    const remedios = trat.remedios || [];
+
+    const remediosListHtml = remedios.length
+      ? remedios
+          .map((rem, idx) => {
+            const info = calcularInfoDose(rem);
+            return `
+            <div class="remedio-card ${info.pendente ? "dose-pendente" : "dose-ok"}">
+              <div class="remedio-card-main">
+                <div class="remedio-header">
+                  <div class="remedio-nome-wrap">
+                    <span class="remedio-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><rect x="3" y="8" width="18" height="8" rx="4"/><path d="M12 8v8"/></svg>
+                    </span>
+                    <div>
+                      <strong class="remedio-nome">${rem.nome}</strong>
+                      <span class="remedio-dose-tag">${rem.dose || "Dose padrão"}</span>
+                    </div>
+                  </div>
+                  <div class="remedio-header-actions">
+                    <span class="remedio-intervalo-badge">A cada ${info.intervaloHoras}h</span>
+                    <button type="button" class="btn-action-icon btn-danger" onclick="removerRemedioTratamento(${a.id}, ${idx})" title="Remover medicamento">
+                      <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><path d="M4 6h12M8 6V4h4v2M6 6v10h8V6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="remedio-stats-bar">
+                  <div class="remedio-count-pill" title="Doses administradas hoje">
+                    <span class="count-num">${info.dosesHoje}</span>
+                    <span class="count-lbl">hoje</span>
+                  </div>
+                  <div class="remedio-count-pill" title="Doses administradas nos últimos 7 dias">
+                    <span class="count-num">${info.dosesSemana}</span>
+                    <span class="count-lbl">na semana</span>
+                  </div>
+                  <div class="remedio-timing-info">
+                    ${
+                      info.pendente
+                        ? `<span class="timing-badge timing-pendente">
+                            <span class="pulse-dot"></span>
+                            ${rem.ultimaDose ? "Hora de tomar novamente" : "Primeira dose pendente"}
+                           </span>`
+                        : `<span class="timing-badge timing-ok">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                            Próxima dose em ${info.tempoRestanteTexto} (às ${info.horaProxima})
+                           </span>`
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <div class="remedio-card-action">
+                ${
+                  info.pendente
+                    ? `<button type="button" class="btn-dose-registrar" onclick="marcarDoseRemedio(${a.id}, ${idx})" title="Registrar dose como administrada agora">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                        Dar Remédio
+                       </button>`
+                    : `<div class="dose-tomada-wrap">
+                        <span class="dose-tomada-badge">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                          Dose Tomada
+                        </span>
+                        <button type="button" class="btn-desfazer-dose" onclick="desfazerDoseRemedio(${a.id}, ${idx})" title="Desfazer última dose">
+                          Desfazer
+                        </button>
+                       </div>`
+                }
+              </div>
+            </div>`;
+          })
+          .join("")
+      : `<div class="vac-empty-state">Nenhum remédio cadastrado para este tratamento</div>`;
+
+    const progressoTexto = calcularProgressoTratamento(trat.inicio, trat.fim);
+
+    tratHtml = `
+      <div class="section-card tratamento-card">
+        <div class="section-header">
+          <div class="section-icon trat-icon-bg">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="8" width="18" height="8" rx="4"/>
+              <path d="M12 8v8"/>
+            </svg>
+          </div>
+          <span class="section-title">Tratamento & Medicamentos</span>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+            <span class="trat-badge-status">Em andamento</span>
+            <button type="button" class="btn-action-icon btn-danger" onclick="limparTratamentoAnimal(${a.id})" title="Limpar / Excluir dados do tratamento">
+              <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><path d="M4 6h12M8 6V4h4v2M6 6v10h8V6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="trat-overview-grid">
+          ${
+            ed
+              ? `
+              <div class="trat-info-box trat-box-full">
+                <span class="trat-lbl">Motivo / Diagnóstico do Tratamento *</span>
+                <input id="tr-motivo" type="text" class="trat-input-field" placeholder="Ex: Coccidiose, Infecção respiratória, Vermifugação..." value="${trat.motivo || ""}" />
+              </div>
+              <div class="trat-info-box">
+                <span class="trat-lbl">Data de Início</span>
+                <input id="tr-inicio" type="date" class="trat-input-field" value="${trat.inicio || ""}" />
+              </div>
+              <div class="trat-info-box">
+                <span class="trat-lbl">Previsão de Término</span>
+                <input id="tr-fim" type="date" class="trat-input-field" value="${trat.fim || ""}" />
+              </div>
+              <div class="trat-info-box trat-box-full">
+                <span class="trat-lbl">Observações e Recomendações</span>
+                <input id="tr-obs" type="text" class="trat-input-field" placeholder="Ex: Manter água fresca, evitar correntes de ar..." value="${trat.obs || ""}" />
+              </div>`
+              : `
+              <div class="trat-info-box">
+                <span class="trat-lbl">Motivo / Diagnóstico</span>
+                <span class="trat-val">${trat.motivo || "Tratamento em andamento"}</span>
+              </div>
+              <div class="trat-info-box">
+                <span class="trat-lbl">Período e Duração</span>
+                <div class="trat-val-dates">
+                  ${trat.inicio ? fmtDate(trat.inicio) : "Início não definido"}
+                  ${trat.fim ? `<span>até</span> ${fmtDate(trat.fim)}` : ""}
+                  ${progressoTexto ? `<span class="trat-dias-tag">${progressoTexto}</span>` : ""}
+                </div>
+              </div>
+              ${
+                trat.obs
+                  ? `
+                  <div class="trat-info-box trat-box-full">
+                    <span class="trat-lbl">Observações</span>
+                    <span class="trat-val-obs">${trat.obs}</span>
+                  </div>`
+                  : ""
+              }`
+          }
+        </div>
+
+        <div class="trat-remedios-section">
+          <div class="trat-sub-header">
+            <span class="trat-sub-title">Medicamentos Prescritos</span>
+          </div>
+
+          <div class="remedios-list-container">
+            ${remediosListHtml}
+          </div>
+
+          <div class="add-remedio-box">
+            <div class="add-remedio-title">+ Prescrever Medicamento</div>
+            <div class="add-remedio-form">
+              <div class="form-field">
+                <label>Nome do Medicamento *</label>
+                <input id="nv-rem-nome" type="text" placeholder="Ex: Baytril, Nalyt, Dipirona..." />
+              </div>
+              <div class="form-field">
+                <label>Dose (Ex: 0.5ml, 2 gotas, 1 comp)</label>
+                <input id="nv-rem-dose" type="text" placeholder="Ex: 2 gotas no bebedouro" />
+              </div>
+              <div class="form-field">
+                <label>Intervalo / Frequência *</label>
+                <select id="nv-rem-intervalo">
+                  <option value="4">A cada 4 horas (6x ao dia)</option>
+                  <option value="6">A cada 6 horas (4x ao dia)</option>
+                  <option value="8" selected>A cada 8 horas (3x ao dia)</option>
+                  <option value="12">A cada 12 horas (2x ao dia)</option>
+                  <option value="24">A cada 24 horas (1x ao dia)</option>
+                  <option value="48">A cada 48 horas (Dia sim, dia não)</option>
+                </select>
+              </div>
+              <button type="button" class="btn-add-remedio" onclick="adicionarRemedioTratamento(${a.id})">
+                + Adicionar Remédio
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
 
   const vacRows = (a.vacinas || [])
     .map((v, i) => {
@@ -989,7 +1175,7 @@ function renderFichaContent(a) {
         ${field("Área / Local", a.area || "", "area", "select", areasDisponiveis)}
       </div>
     </div>
-
+    ${tratHtml}
     ${
       temVacinas
         ? `<div class="section-card">
@@ -1620,6 +1806,16 @@ function salvarEdicao() {
     a.foto = fotoTemp;
     fotoTemp = null;
   }
+  if (a.status === "Em tratamento" && !a.tratamento) {
+    a.tratamento = { motivo: "", inicio: new Date().toISOString().slice(0, 10), fim: "", obs: "", remedios: [] };
+  }
+  if (document.getElementById("tr-motivo")) {
+    if (!a.tratamento) a.tratamento = { motivo: "", inicio: "", fim: "", obs: "", remedios: [] };
+    a.tratamento.motivo = g("tr-motivo");
+    a.tratamento.inicio = g("tr-inicio");
+    a.tratamento.fim = g("tr-fim");
+    a.tratamento.obs = g("tr-obs");
+  }
   editando = false;
   salvarAnimais();
   renderSidebar();
@@ -1673,6 +1869,182 @@ function removerVacina(i) {
       renderFicha();
     },
   );
+}
+
+function limparTratamentoAnimal(id) {
+  mostrarConfirm("Excluir Tratamento", "Deseja excluir os dados e histórico deste tratamento?", () => {
+    const a = animais.find((x) => x.id === id);
+    if (!a) return;
+    a.tratamento = null;
+    salvarAnimais();
+    renderFicha();
+  });
+}
+
+function calcularProgressoTratamento(inicio, fim) {
+  if (!inicio && !fim) return "";
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+
+  if (inicio && fim) {
+    const dIni = new Date(inicio + "T00:00:00");
+    const dFim = new Date(fim + "T00:00:00");
+    const totalDias = Math.max(1, Math.round((dFim - dIni) / (86400 * 1000)) + 1);
+    const diasPassados = Math.max(1, Math.round((hoje - dIni) / (86400 * 1000)) + 1);
+
+    if (hoje > dFim) {
+      return `Período concluído (${totalDias} dias)`;
+    } else if (hoje < dIni) {
+      const faltam = Math.round((dIni - hoje) / (86400 * 1000));
+      return `Inicia em ${faltam} dias (${totalDias} dias de duração)`;
+    } else {
+      const restantes = Math.max(0, Math.round((dFim - hoje) / (86400 * 1000)));
+      return `Dia ${diasPassados} de ${totalDias} · ${restantes} dias restantes`;
+    }
+  } else if (inicio) {
+    const dIni = new Date(inicio + "T00:00:00");
+    const dias = Math.max(1, Math.round((hoje - dIni) / (86400 * 1000)) + 1);
+    return `${dias}º dia de tratamento`;
+  } else if (fim) {
+    const dFim = new Date(fim + "T00:00:00");
+    const restantes = Math.round((dFim - hoje) / (86400 * 1000));
+    return restantes >= 0 ? `${restantes} dias restantes` : "Previsão ultrapassada";
+  }
+  return "";
+}
+
+function calcularInfoDose(rem) {
+  const agora = Date.now();
+  const hist = rem.historicoDoses || [];
+
+  const hojeStr = new Date().toDateString();
+  const dosesHoje = hist.filter((ts) => new Date(ts).toDateString() === hojeStr).length;
+
+  const seteDiasAtras = agora - 7 * 24 * 3600 * 1000;
+  const dosesSemana = hist.filter((ts) => ts >= seteDiasAtras).length;
+
+  const intervaloHoras = parseFloat(rem.intervaloHoras) || 8;
+  const intervaloMs = intervaloHoras * 3600 * 1000;
+
+  let pendente = true;
+  let tempoRestanteMs = 0;
+  let proximaDoseTs = null;
+
+  if (rem.ultimaDose) {
+    proximaDoseTs = rem.ultimaDose + intervaloMs;
+    tempoRestanteMs = proximaDoseTs - agora;
+    if (tempoRestanteMs > 0) {
+      pendente = false;
+    }
+  }
+
+  let tempoRestanteTexto = "";
+  if (!pendente && tempoRestanteMs > 0) {
+    const minsTotal = Math.floor(tempoRestanteMs / 60000);
+    const horas = Math.floor(minsTotal / 60);
+    const mins = minsTotal % 60;
+    if (horas > 0) {
+      tempoRestanteTexto = `${horas}h ${mins}min`;
+    } else {
+      tempoRestanteTexto = `${mins}min`;
+    }
+  }
+
+  const horaProxima = proximaDoseTs
+    ? new Date(proximaDoseTs).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    : "";
+  const horaUltima = rem.ultimaDose
+    ? new Date(rem.ultimaDose).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    : "";
+
+  return {
+    dosesHoje,
+    dosesSemana,
+    pendente,
+    tempoRestanteTexto,
+    horaProxima,
+    horaUltima,
+    intervaloHoras
+  };
+}
+
+function adicionarRemedioTratamento(animalId) {
+  const a = animais.find((x) => x.id === animalId);
+  if (!a) return;
+  const nome = document.getElementById("nv-rem-nome")?.value?.trim();
+  const dose = document.getElementById("nv-rem-dose")?.value?.trim();
+  const intervaloHoras = parseFloat(document.getElementById("nv-rem-intervalo")?.value) || 8;
+
+  if (!nome) {
+    mostrarDialog({ title: "Campo Obrigatório", desc: "Por favor, informe o nome do medicamento." });
+    return;
+  }
+
+  if (!a.tratamento) {
+    a.tratamento = { motivo: "", inicio: new Date().toISOString().slice(0, 10), fim: "", obs: "", remedios: [] };
+  }
+  if (!a.tratamento.remedios) a.tratamento.remedios = [];
+
+  a.tratamento.remedios.push({
+    id: Date.now(),
+    nome,
+    dose: dose || "1 dose",
+    intervaloHoras,
+    ultimaDose: null,
+    historicoDoses: []
+  });
+
+  salvarAnimais();
+  renderFicha();
+}
+
+function removerRemedioTratamento(animalId, idx) {
+  mostrarConfirm("Remover Medicamento", "Deseja remover este medicamento do tratamento?", () => {
+    const a = animais.find((x) => x.id === animalId);
+    if (!a || !a.tratamento || !a.tratamento.remedios) return;
+    a.tratamento.remedios.splice(idx, 1);
+    salvarAnimais();
+    renderFicha();
+  });
+}
+
+function marcarDoseRemedio(animalId, idx) {
+  const a = animais.find((x) => x.id === animalId);
+  if (!a || !a.tratamento || !a.tratamento.remedios) return;
+  const rem = a.tratamento.remedios[idx];
+  if (!rem) return;
+
+  const agora = Date.now();
+  if (!rem.historicoDoses) rem.historicoDoses = [];
+  rem.historicoDoses.push(agora);
+  rem.ultimaDose = agora;
+
+  salvarAnimais();
+  renderFicha();
+}
+
+function desfazerDoseRemedio(animalId, idx) {
+  const a = animais.find((x) => x.id === animalId);
+  if (!a || !a.tratamento || !a.tratamento.remedios) return;
+  const rem = a.tratamento.remedios[idx];
+  if (!rem || !rem.historicoDoses || rem.historicoDoses.length === 0) return;
+
+  rem.historicoDoses.pop();
+  rem.ultimaDose = rem.historicoDoses.length ? rem.historicoDoses[rem.historicoDoses.length - 1] : null;
+
+  salvarAnimais();
+  renderFicha();
+}
+
+if (!window._tratamentoTimer) {
+  window._tratamentoTimer = setInterval(() => {
+    if (abaAtiva === "ficha" && selecionado && !editando) {
+      const a = animais.find((x) => x.id === selecionado);
+      if (a && a.status === "Em tratamento") {
+        renderFicha();
+      }
+    }
+  }, 20000);
 }
 
 function carregarFoto(event) {
