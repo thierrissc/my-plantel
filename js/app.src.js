@@ -870,7 +870,7 @@ function gerarLinhasRemediosHtml(a, ed = editando) {
   const trat = a.tratamento || { motivo: "", inicio: "", fim: "", obs: "", remedios: [] };
   const remedios = trat.remedios || [];
   if (!remedios.length) {
-    return `<tr><td colspan="${ed ? 7 : 6}" style="text-align:center;color:var(--c-text-3);padding:14px">Nenhum remédio cadastrado</td></tr>`;
+    return `<tr><td colspan="6" style="text-align:center;color:var(--c-text-3);padding:14px">Nenhum remédio cadastrado</td></tr>`;
   }
   return remedios
     .map((rem, idx) => {
@@ -913,27 +913,28 @@ function gerarLinhasRemediosHtml(a, ed = editando) {
             ${
               info.pendente
                 ? `<button type="button" class="btn-dar-remedio" onclick="event.stopPropagation(); marcarDoseRemedio(${a.id}, ${idx})" title="Registrar dose administrada agora">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                    Dar remédio
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    Dar
                    </button>`
                 : `<button type="button" class="btn-dar-remedio-extra" onclick="event.stopPropagation(); marcarDoseRemedio(${a.id}, ${idx})" title="Administrar outra dose agora">
-                    + Dar dose
+                    + Dar
                    </button>
                    <button type="button" class="btn-desfazer-dose" onclick="event.stopPropagation(); desfazerDoseRemedio(${a.id}, ${idx})" title="Desfazer última dose registrada">
                     Desfazer
                    </button>`
             }
             <button type="button" class="btn-edit-remedio" onclick="event.stopPropagation(); abrirModalEditarRemedio(${a.id}, ${idx})" title="Editar informações do medicamento">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-              Editar
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             </button>
+            ${
+              ed
+                ? `<button type="button" class="btn-danger-icon" onclick="event.stopPropagation(); removerRemedioTratamento(${a.id}, ${idx})" title="Remover medicamento">
+                    <svg width="11" height="11" viewBox="0 0 20 20" fill="none"><path d="M4 6h12M8 6V4h4v2M6 6v10h8V6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                   </button>`
+                : ""
+            }
           </div>
         </td>
-        ${
-          ed
-            ? `<td><span class="vac-remove" onclick="event.stopPropagation(); removerRemedioTratamento(${a.id}, ${idx})" title="Remover">✕</span></td>`
-            : ""
-        }
       </tr>`;
     })
     .join("");
@@ -1102,13 +1103,12 @@ function renderFichaContent(a) {
         <table class="vac-table">
           <thead>
             <tr>
-              <th style="min-width:130px;text-align:left">Remédio</th>
-              <th style="min-width:110px;text-align:left">Frequência</th>
-              <th style="width:70px;text-align:center">Hoje</th>
-              <th style="width:90px;text-align:center">Na Semana</th>
-              <th style="min-width:140px;text-align:left">Situação</th>
-              <th style="min-width:210px;text-align:left">Ações</th>
-              ${ed ? "<th style='width:30px'></th>" : ""}
+              <th style="min-width:110px;text-align:left">Remédio</th>
+              <th style="min-width:85px;text-align:left">Frequência</th>
+              <th style="width:55px;text-align:center">Hoje</th>
+              <th style="width:75px;text-align:center">Na Semana</th>
+              <th style="min-width:115px;text-align:left">Situação</th>
+              <th style="min-width:130px;text-align:left">Ações</th>
             </tr>
           </thead>
           <tbody id="tabela-remedios-body">
