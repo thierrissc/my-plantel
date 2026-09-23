@@ -1,3 +1,23 @@
+if (typeof _0x_app_tpl !== "undefined" && !document.getElementById("app")) {
+  document.body.innerHTML = decodeURIComponent(_0x_app_tpl);
+}
+
+document.addEventListener("contextmenu", (e) => {
+  e.preventDefault();
+});
+
+document.addEventListener("keydown", (e) => {
+  if (
+    e.key === "F12" ||
+    (e.ctrlKey && e.shiftKey && ["I", "i", "J", "j", "C", "c"].includes(e.key)) ||
+    (e.ctrlKey && ["u", "U", "s", "S"].includes(e.key))
+  ) {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  }
+});
+
 const USER_CACHE_KEY = "plantel_user";
 const TOKEN_CACHE_KEY = "plantel_token";
 
@@ -863,12 +883,12 @@ function gerarLinhasRemediosHtml(a, ed = editando) {
           <div style="font-weight:600;color:var(--c-text-1)">${rem.nome}</div>
           ${rem.dose ? `<div style="font-size:11px;color:var(--c-text-3)">${rem.dose}</div>` : ""}
         </td>
-        <td>${freqTexto}</td>
-        <td>
+        <td style="white-space:nowrap">${freqTexto}</td>
+        <td style="text-align:center">
           <div style="font-weight:600;color:var(--c-text-1)">${info.dosesHoje}</div>
           <div style="font-size:10.5px;color:var(--c-text-3)">${info.dosesHoje === 1 ? "dose" : "doses"}</div>
         </td>
-        <td>
+        <td style="text-align:center">
           <div style="font-weight:600;color:var(--c-text-1)">${info.dosesSemana}</div>
           <div style="font-size:10.5px;color:var(--c-text-3)">${info.dosesSemana === 1 ? "dose" : "doses"}</div>
         </td>
@@ -889,7 +909,7 @@ function gerarLinhasRemediosHtml(a, ed = editando) {
           }
         </td>
         <td>
-          <div style="display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <div style="display:inline-flex;align-items:center;gap:5px;flex-wrap:nowrap">
             ${
               info.pendente
                 ? `<button type="button" class="btn-dar-remedio" onclick="event.stopPropagation(); marcarDoseRemedio(${a.id}, ${idx})" title="Registrar dose administrada agora">
@@ -900,8 +920,7 @@ function gerarLinhasRemediosHtml(a, ed = editando) {
                     + Dar dose
                    </button>
                    <button type="button" class="btn-desfazer-dose" onclick="event.stopPropagation(); desfazerDoseRemedio(${a.id}, ${idx})" title="Desfazer última dose registrada">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10h10a5 5 0 015 5v2M3 10l6-6M3 10l6 6"/></svg>
-                    Desfazer dose
+                    Desfazer
                    </button>`
             }
             <button type="button" class="btn-edit-remedio" onclick="event.stopPropagation(); abrirModalEditarRemedio(${a.id}, ${idx})" title="Editar informações do medicamento">
@@ -1001,15 +1020,17 @@ function renderFichaContent(a) {
         <input id="nv-rem-dose" type="text" placeholder="Ex: 2 gotas, 0.5ml" />
       </div>
       <div class="form-field">
-        <label for="nv-rem-intervalo">Quantas vezes *</label>
-        <select id="nv-rem-intervalo">
-          <option value="4">A cada 4h</option>
-          <option value="6">A cada 6h</option>
-          <option value="8" selected>A cada 8h</option>
-          <option value="12">A cada 12h</option>
-          <option value="24">A cada 24h</option>
-          <option value="48">A cada 48h</option>
-        </select>
+        <label>Quantas vezes *</label>
+        <div class="raca-combo-wrap" id="intervalo-add-modal-wrap" onclick="toggleModalCombo('intervalo-add',event)">
+          <span class="modal-combo-label" id="intervalo-add-modal-label"
+            style="flex:1;padding:0 10px;font-size:13px;color:var(--c-text-1);line-height:1;pointer-events:none;">A cada 8h</span>
+          <button type="button" class="raca-arrow-btn" tabindex="-1" style="pointer-events:none;">
+            <svg width="12" height="8" viewBox="0 0 12 8">
+              <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
+            </svg>
+          </button>
+        </div>
+        <input type="hidden" id="nv-rem-intervalo" value="8" />
       </div>
       <button type="button" class="btn-add-vac" onclick="adicionarRemedioTratamento(${a.id})">
         + Adicionar Remédio
@@ -1081,13 +1102,13 @@ function renderFichaContent(a) {
         <table class="vac-table">
           <thead>
             <tr>
-              <th>Remédio</th>
-              <th>Quantas Vezes</th>
-              <th>Hoje</th>
-              <th>Na Semana</th>
-              <th>Situação</th>
-              <th>Ação</th>
-              ${ed ? "<th></th>" : ""}
+              <th style="min-width:130px;text-align:left">Remédio</th>
+              <th style="min-width:110px;text-align:left">Frequência</th>
+              <th style="width:70px;text-align:center">Hoje</th>
+              <th style="width:90px;text-align:center">Na Semana</th>
+              <th style="min-width:140px;text-align:left">Situação</th>
+              <th style="min-width:210px;text-align:left">Ações</th>
+              ${ed ? "<th style='width:30px'></th>" : ""}
             </tr>
           </thead>
           <tbody id="tabela-remedios-body">
@@ -2037,6 +2058,15 @@ function adicionarRemedioTratamento(animalId) {
     historicoDoses: []
   });
 
+  const nvNome = document.getElementById("nv-rem-nome");
+  if (nvNome) nvNome.value = "";
+  const nvDose = document.getElementById("nv-rem-dose");
+  if (nvDose) nvDose.value = "";
+  const nvInt = document.getElementById("nv-rem-intervalo");
+  if (nvInt) nvInt.value = "8";
+  const nvIntLbl = document.getElementById("intervalo-add-modal-label");
+  if (nvIntLbl) nvIntLbl.textContent = "A cada 8h";
+
   salvarAnimais();
   renderFicha();
 }
@@ -2107,7 +2137,10 @@ function abrirModalEditarRemedio(animalId, idx) {
   if (idxInput) idxInput.value = idx;
   if (nomeInput) nomeInput.value = rem.nome || "";
   if (doseInput) doseInput.value = rem.dose || "";
-  if (intInput) intInput.value = String(rem.intervaloHoras || 8);
+  const valHoras = String(rem.intervaloHoras || 8);
+  if (intInput) intInput.value = valHoras;
+  const intLbl = document.getElementById("intervalo-edit-modal-label");
+  if (intLbl) intLbl.textContent = `A cada ${valHoras}h`;
 
   const modalEl = document.getElementById("modal-editar-remedio");
   if (modalEl) modalEl.style.display = "flex";
@@ -3250,6 +3283,22 @@ const _MODAL_COMBO_OPTIONS = {
     { value: "Inativo", label: "Inativo" },
   ],
   area: [],
+  "intervalo-add": [
+    { value: "4", label: "A cada 4h" },
+    { value: "6", label: "A cada 6h" },
+    { value: "8", label: "A cada 8h" },
+    { value: "12", label: "A cada 12h" },
+    { value: "24", label: "A cada 24h" },
+    { value: "48", label: "A cada 48h" },
+  ],
+  "intervalo-edit": [
+    { value: "4", label: "A cada 4h" },
+    { value: "6", label: "A cada 6h" },
+    { value: "8", label: "A cada 8h" },
+    { value: "12", label: "A cada 12h" },
+    { value: "24", label: "A cada 24h" },
+    { value: "48", label: "A cada 48h" },
+  ],
 };
 
 let _openModalComboId = null;
@@ -3279,13 +3328,18 @@ function toggleModalCombo(id, e) {
   if (!wrap) return;
 
   const opts = _MODAL_COMBO_OPTIONS[id] || [];
-  const currentVal = document.getElementById("m-" + id)?.value || "";
+  let currentVal = document.getElementById("m-" + id)?.value;
+  if (currentVal === undefined) {
+    if (id === "intervalo-add") currentVal = document.getElementById("nv-rem-intervalo")?.value || "8";
+    else if (id === "intervalo-edit") currentVal = document.getElementById("edit-rem-intervalo")?.value || "8";
+    else currentVal = "";
+  }
 
   const dd = _getOrCreateModalDropdown(id);
   dd.innerHTML = opts
     .map(
       (o) =>
-        `<div class="raca-dropdown-item${o.value === currentVal ? " active" : ""}"
+        `<div class="raca-dropdown-item${String(o.value) === String(currentVal) ? " active" : ""}"
       onclick="selectModalCombo('${id}','${o.value.replace(/'/g, "\\'")}','${o.label.replace(/'/g, "\\'")}')"
     >${o.label}</div>`,
     )
@@ -3303,7 +3357,11 @@ function toggleModalCombo(id, e) {
 }
 
 function selectModalCombo(id, value, label) {
-  const hidden = document.getElementById("m-" + id);
+  let hidden = document.getElementById("m-" + id);
+  if (!hidden) {
+    if (id === "intervalo-add") hidden = document.getElementById("nv-rem-intervalo");
+    else if (id === "intervalo-edit") hidden = document.getElementById("edit-rem-intervalo");
+  }
   const lbl = document.getElementById(id + "-modal-label");
   if (hidden) hidden.value = value;
   if (lbl) lbl.textContent = label;

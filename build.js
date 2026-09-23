@@ -8,9 +8,55 @@ const __dirname = path.dirname(__filename);
 
 const srcFile = path.join(__dirname, "js", "app.src.js");
 const targetFile = path.join(__dirname, "js", "app.js");
+const srcHtmlFile = path.join(__dirname, "index.src.html");
+const targetHtmlFile = path.join(__dirname, "index.html");
+
+if (fs.existsSync(targetHtmlFile) && !fs.existsSync(srcHtmlFile)) {
+  fs.copyFileSync(targetHtmlFile, srcHtmlFile);
+}
+
+let bodyHtmlPayload = "";
+if (fs.existsSync(srcHtmlFile)) {
+  const htmlRaw = fs.readFileSync(srcHtmlFile, "utf8");
+  const bodyMatch = htmlRaw.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+  if (bodyMatch) {
+    let innerBody = bodyMatch[1];
+    innerBody = innerBody.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "").trim();
+    bodyHtmlPayload = encodeURIComponent(innerBody);
+  }
+
+  const securedHtml = `<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plantel - Gestão de Animais</title>
+  <link rel="icon" type="image/png" href="img/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Noto+Emoji:wght@400&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css?v=3.6" />
+  <link rel="preload" as="image" href="img/loginicon.png" />
+</head>
+
+<body>
+  <div id="app-root"></div>
+  <script src="js/app.js?v=3.6"></script>
+</body>
+
+</html>`;
+
+  fs.writeFileSync(targetHtmlFile, securedHtml, "utf8");
+}
 
 if (fs.existsSync(srcFile)) {
-  const jsSrc = fs.readFileSync(srcFile, "utf8");
+  let jsSrc = fs.readFileSync(srcFile, "utf8");
+  if (bodyHtmlPayload) {
+    jsSrc = `const _0x_app_tpl = "${bodyHtmlPayload}";\n` + jsSrc;
+  }
   const obfResult = JavaScriptObfuscator.obfuscate(jsSrc, {
     compact: true,
     controlFlowFlattening: true,
