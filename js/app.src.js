@@ -874,11 +874,13 @@ function renderFichaContent(a) {
       </div>`;
     }
     if (ed) {
-      if (opts)
+      if (opts) {
+        const onchange = id === "status" ? ` onchange="aoMudarStatusFicha(this.value, ${a.id})"` : "";
         return `<div class="form-field">
         <label>${label}</label>
-        <select id="f-${id}">${opts.map((o) => `<option${val === o ? " selected" : ""}>${o}</option>`).join("")}</select>
+        <select id="f-${id}"${onchange}>${opts.map((o) => `<option${val === o ? " selected" : ""}>${o}</option>`).join("")}</select>
       </div>`;
+      }
       return `<div class="form-field">
         <label>${label}</label>
         <input type="${type}" id="f-${id}" value="${val || ""}" />
@@ -899,181 +901,155 @@ function renderFichaContent(a) {
     const trat = a.tratamento || { motivo: "", inicio: "", fim: "", obs: "", remedios: [] };
     const remedios = trat.remedios || [];
 
-    const remediosListHtml = remedios.length
+    const remediosRows = remedios.length
       ? remedios
           .map((rem, idx) => {
             const info = calcularInfoDose(rem);
-            return `
-            <div class="remedio-card ${info.pendente ? "dose-pendente" : "dose-ok"}">
-              <div class="remedio-card-main">
-                <div class="remedio-header">
-                  <div class="remedio-nome-wrap">
-                    <span class="remedio-icon">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><rect x="3" y="8" width="18" height="8" rx="4"/><path d="M12 8v8"/></svg>
-                    </span>
-                    <div>
-                      <strong class="remedio-nome">${rem.nome}</strong>
-                      <span class="remedio-dose-tag">${rem.dose || "Dose padrão"}</span>
-                    </div>
-                  </div>
-                  <div class="remedio-header-actions">
-                    <span class="remedio-intervalo-badge">A cada ${info.intervaloHoras}h</span>
-                    <button type="button" class="btn-action-icon btn-danger" onclick="removerRemedioTratamento(${a.id}, ${idx})" title="Remover medicamento">
-                      <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><path d="M4 6h12M8 6V4h4v2M6 6v10h8V6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-                    </button>
-                  </div>
-                </div>
-
-                <div class="remedio-stats-bar">
-                  <div class="remedio-count-pill" title="Doses administradas hoje">
-                    <span class="count-num">${info.dosesHoje}</span>
-                    <span class="count-lbl">hoje</span>
-                  </div>
-                  <div class="remedio-count-pill" title="Doses administradas nos últimos 7 dias">
-                    <span class="count-num">${info.dosesSemana}</span>
-                    <span class="count-lbl">na semana</span>
-                  </div>
-                  <div class="remedio-timing-info">
-                    ${
-                      info.pendente
-                        ? `<span class="timing-badge timing-pendente">
-                            <span class="pulse-dot"></span>
-                            ${rem.ultimaDose ? "Hora de tomar novamente" : "Primeira dose pendente"}
-                           </span>`
-                        : `<span class="timing-badge timing-ok">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                            Próxima dose em ${info.tempoRestanteTexto} (às ${info.horaProxima})
-                           </span>`
-                    }
-                  </div>
-                </div>
-              </div>
-
-              <div class="remedio-card-action">
+            const freqTexto = rem.intervaloHoras
+              ? `${Math.round(24 / rem.intervaloHoras)}x ao dia (${rem.intervaloHoras}h)`
+              : "Conforme prescrição";
+            return `<tr>
+              <td>
+                <div style="font-weight:600;color:var(--c-text-1)">${rem.nome}</div>
+                ${rem.dose ? `<div style="font-size:11px;color:var(--c-text-3)">${rem.dose}</div>` : ""}
+              </td>
+              <td>${freqTexto}</td>
+              <td>
                 ${
-                  info.pendente
-                    ? `<button type="button" class="btn-dose-registrar" onclick="marcarDoseRemedio(${a.id}, ${idx})" title="Registrar dose como administrada agora">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                        Dar Remédio
-                       </button>`
-                    : `<div class="dose-tomada-wrap">
-                        <span class="dose-tomada-badge">
-                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                          Dose Tomada
-                        </span>
-                        <button type="button" class="btn-desfazer-dose" onclick="desfazerDoseRemedio(${a.id}, ${idx})" title="Desfazer última dose">
-                          Desfazer
-                        </button>
-                       </div>`
+                  info.dosesHoje > 0
+                    ? `<span class="pill pill-ok">${info.dosesHoje}x administrado</span>`
+                    : `<span class="pill pill-vence">Pendente hoje</span>`
                 }
-              </div>
-            </div>`;
+              </td>
+              <td>
+                <span style="font-weight:600;color:var(--c-text-1)">${info.dosesSemana}</span>
+              </td>
+              <td>
+                <div style="display:inline-flex;align-items:center;gap:6px">
+                  <button type="button" class="btn-sm btn-primary" onclick="event.stopPropagation(); marcarDoseRemedio(${a.id}, ${idx})" style="padding:4px 10px;font-size:12px;border-radius:var(--r-sm);background:var(--c-accent);color:#fff;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:4px">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    Dar remédio
+                  </button>
+                  ${
+                    info.dosesHoje > 0
+                      ? `<button type="button" onclick="event.stopPropagation(); desfazerDoseRemedio(${a.id}, ${idx})" title="Desfazer dose" style="background:none;border:none;color:var(--c-text-3);cursor:pointer;font-size:11px;text-decoration:underline">Desfazer</button>`
+                      : ""
+                  }
+                </div>
+              </td>
+              ${
+                ed
+                  ? `<td><span class="vac-remove" onclick="event.stopPropagation(); removerRemedioTratamento(${a.id}, ${idx})" title="Remover">✕</span></td>`
+                  : ""
+              }
+            </tr>`;
           })
           .join("")
-      : `<div class="vac-empty-state">Nenhum remédio cadastrado para este tratamento</div>`;
+      : `<tr><td colspan="${ed ? 6 : 5}" style="text-align:center;color:var(--c-text-3);padding:14px">Nenhum remédio cadastrado</td></tr>`;
 
-    const progressoTexto = calcularProgressoTratamento(trat.inicio, trat.fim);
+    const addRemForm = ed
+      ? `
+      <div class="add-vac-form">
+        <div class="form-field">
+          <label>Nome do Remédio *</label>
+          <input id="nv-rem-nome" type="text" placeholder="Ex: Baytril, Nalyt..." />
+        </div>
+        <div class="form-field">
+          <label>Dose (opcional)</label>
+          <input id="nv-rem-dose" type="text" placeholder="Ex: 2 gotas, 0.5ml" />
+        </div>
+        <div class="form-field">
+          <label>Quantas vezes *</label>
+          <select id="nv-rem-intervalo">
+            <option value="4">A cada 4h (6x ao dia)</option>
+            <option value="6">A cada 6h (4x ao dia)</option>
+            <option value="8" selected>A cada 8h (3x ao dia)</option>
+            <option value="12">A cada 12h (2x ao dia)</option>
+            <option value="24">A cada 24h (1x ao dia)</option>
+            <option value="48">A cada 48h (Dia sim, dia não)</option>
+          </select>
+        </div>
+        <button type="button" class="btn-add-vac" onclick="adicionarRemedioTratamento(${a.id})">
+          + Adicionar Remédio
+        </button>
+      </div>`
+      : "";
 
     tratHtml = `
-      <div class="section-card tratamento-card">
+      <div id="card-tratamento-wrapper" class="section-card">
         <div class="section-header">
-          <div class="section-icon trat-icon-bg">
+          <div class="section-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="3" y="8" width="18" height="8" rx="4"/>
               <path d="M12 8v8"/>
             </svg>
           </div>
-          <span class="section-title">Tratamento & Medicamentos</span>
+          <span class="section-title">Tratamento</span>
+          <span class="pill pill-vence" style="font-weight:700;letter-spacing:0.04em">EM ANDAMENTO</span>
           <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
-            <span class="trat-badge-status">Em andamento</span>
-            <button type="button" class="btn-action-icon btn-danger" onclick="limparTratamentoAnimal(${a.id})" title="Limpar / Excluir dados do tratamento">
-              <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><path d="M4 6h12M8 6V4h4v2M6 6v10h8V6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <button type="button" class="btn-vac-toggle-off" onclick="concluirTratamentoAnimal(${a.id})" title="Marcar animal como tratado e retornar status para Ativo">
+              Concluir / Tratado
             </button>
+            ${
+              ed
+                ? `<button type="button" class="btn-action-icon btn-danger" onclick="limparTratamentoAnimal(${a.id})" title="Limpar dados do tratamento">
+                    <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><path d="M4 6h12M8 6V4h4v2M6 6v10h8V6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                   </button>`
+                : ""
+            }
           </div>
         </div>
 
-        <div class="trat-overview-grid">
+        <div class="grid-3 mt">
           ${
             ed
               ? `
-              <div class="trat-info-box trat-box-full">
-                <span class="trat-lbl">Motivo / Diagnóstico do Tratamento *</span>
-                <input id="tr-motivo" type="text" class="trat-input-field" placeholder="Ex: Coccidiose, Infecção respiratória, Vermifugação..." value="${trat.motivo || ""}" />
+              <div class="form-field">
+                <label>Motivo / Diagnóstico</label>
+                <input id="tr-motivo" type="text" placeholder="Ex: Coccidiose, Infecção..." value="${trat.motivo || ""}" />
               </div>
-              <div class="trat-info-box">
-                <span class="trat-lbl">Data de Início</span>
-                <input id="tr-inicio" type="date" class="trat-input-field" value="${trat.inicio || ""}" />
+              <div class="form-field">
+                <label>Início</label>
+                <input id="tr-inicio" type="date" value="${trat.inicio || ""}" />
               </div>
-              <div class="trat-info-box">
-                <span class="trat-lbl">Previsão de Término</span>
-                <input id="tr-fim" type="date" class="trat-input-field" value="${trat.fim || ""}" />
-              </div>
-              <div class="trat-info-box trat-box-full">
-                <span class="trat-lbl">Observações e Recomendações</span>
-                <input id="tr-obs" type="text" class="trat-input-field" placeholder="Ex: Manter água fresca, evitar correntes de ar..." value="${trat.obs || ""}" />
+              <div class="form-field">
+                <label>Previsão de Término</label>
+                <input id="tr-fim" type="date" value="${trat.fim || ""}" />
               </div>`
               : `
-              <div class="trat-info-box">
-                <span class="trat-lbl">Motivo / Diagnóstico</span>
-                <span class="trat-val">${trat.motivo || "Tratamento em andamento"}</span>
+              <div class="form-field">
+                <label>Motivo / Diagnóstico</label>
+                <div class="field-value">${trat.motivo || "Tratamento em andamento"}</div>
               </div>
-              <div class="trat-info-box">
-                <span class="trat-lbl">Período e Duração</span>
-                <div class="trat-val-dates">
-                  ${trat.inicio ? fmtDate(trat.inicio) : "Início não definido"}
-                  ${trat.fim ? `<span>até</span> ${fmtDate(trat.fim)}` : ""}
-                  ${progressoTexto ? `<span class="trat-dias-tag">${progressoTexto}</span>` : ""}
-                </div>
+              <div class="form-field">
+                <label>Início</label>
+                <div class="field-value">${trat.inicio ? fmtDate(trat.inicio) : "-"}</div>
               </div>
-              ${
-                trat.obs
-                  ? `
-                  <div class="trat-info-box trat-box-full">
-                    <span class="trat-lbl">Observações</span>
-                    <span class="trat-val-obs">${trat.obs}</span>
-                  </div>`
-                  : ""
-              }`
+              <div class="form-field">
+                <label>Previsão de Término</label>
+                <div class="field-value">${trat.fim ? fmtDate(trat.fim) : "-"}</div>
+              </div>`
           }
         </div>
 
-        <div class="trat-remedios-section">
-          <div class="trat-sub-header">
-            <span class="trat-sub-title">Medicamentos Prescritos</span>
-          </div>
-
-          <div class="remedios-list-container">
-            ${remediosListHtml}
-          </div>
-
-          <div class="add-remedio-box">
-            <div class="add-remedio-title">+ Prescrever Medicamento</div>
-            <div class="add-remedio-form">
-              <div class="form-field">
-                <label>Nome do Medicamento *</label>
-                <input id="nv-rem-nome" type="text" placeholder="Ex: Baytril, Nalyt, Dipirona..." />
-              </div>
-              <div class="form-field">
-                <label>Dose (Ex: 0.5ml, 2 gotas, 1 comp)</label>
-                <input id="nv-rem-dose" type="text" placeholder="Ex: 2 gotas no bebedouro" />
-              </div>
-              <div class="form-field">
-                <label>Intervalo / Frequência *</label>
-                <select id="nv-rem-intervalo">
-                  <option value="4">A cada 4 horas (6x ao dia)</option>
-                  <option value="6">A cada 6 horas (4x ao dia)</option>
-                  <option value="8" selected>A cada 8 horas (3x ao dia)</option>
-                  <option value="12">A cada 12 horas (2x ao dia)</option>
-                  <option value="24">A cada 24 horas (1x ao dia)</option>
-                  <option value="48">A cada 48 horas (Dia sim, dia não)</option>
-                </select>
-              </div>
-              <button type="button" class="btn-add-remedio" onclick="adicionarRemedioTratamento(${a.id})">
-                + Adicionar Remédio
-              </button>
-            </div>
-          </div>
+        <div class="vac-table-wrap" style="margin-top:14px">
+          <table class="vac-table">
+            <thead>
+              <tr>
+                <th>Remédio</th>
+                <th>Quantas Vezes</th>
+                <th>Hoje</th>
+                <th>Na Semana</th>
+                <th>Ação</th>
+                ${ed ? "<th></th>" : ""}
+              </tr>
+            </thead>
+            <tbody>
+              ${remediosRows}
+            </tbody>
+          </table>
         </div>
+        ${addRemForm}
       </div>
     `;
   }
@@ -1873,7 +1849,7 @@ function removerVacina(i) {
 
 function limparTratamentoAnimal(id) {
   mostrarConfirm("Excluir Tratamento", "Deseja excluir os dados e histórico deste tratamento?", () => {
-    const a = animais.find((x) => x.id === id);
+    const a = animais.find((x) => String(x.id) === String(id));
     if (!a) return;
     a.tratamento = null;
     salvarAnimais();
@@ -1968,8 +1944,39 @@ function calcularInfoDose(rem) {
   };
 }
 
+function aoMudarStatusFicha(statusVal, animalId) {
+  const card = document.getElementById("card-tratamento-wrapper");
+  if (statusVal === "Em tratamento") {
+    if (card) {
+      card.style.display = "";
+    } else {
+      const a = animais.find((x) => String(x.id) === String(animalId));
+      if (a) {
+        a.status = "Em tratamento";
+        if (!a.tratamento) {
+          a.tratamento = { motivo: "", inicio: new Date().toISOString().slice(0, 10), fim: "", obs: "", remedios: [] };
+        }
+        renderFicha();
+      }
+    }
+  } else {
+    if (card) {
+      card.style.display = "none";
+    }
+  }
+}
+
+function concluirTratamentoAnimal(animalId) {
+  const a = animais.find((x) => String(x.id) === String(animalId));
+  if (!a) return;
+  a.status = "Ativo";
+  salvarAnimais();
+  renderSidebar();
+  renderFicha();
+}
+
 function adicionarRemedioTratamento(animalId) {
-  const a = animais.find((x) => x.id === animalId);
+  const a = animais.find((x) => String(x.id) === String(animalId));
   if (!a) return;
   const nome = document.getElementById("nv-rem-nome")?.value?.trim();
   const dose = document.getElementById("nv-rem-dose")?.value?.trim();
@@ -2000,7 +2007,7 @@ function adicionarRemedioTratamento(animalId) {
 
 function removerRemedioTratamento(animalId, idx) {
   mostrarConfirm("Remover Medicamento", "Deseja remover este medicamento do tratamento?", () => {
-    const a = animais.find((x) => x.id === animalId);
+    const a = animais.find((x) => String(x.id) === String(animalId));
     if (!a || !a.tratamento || !a.tratamento.remedios) return;
     a.tratamento.remedios.splice(idx, 1);
     salvarAnimais();
@@ -2009,7 +2016,7 @@ function removerRemedioTratamento(animalId, idx) {
 }
 
 function marcarDoseRemedio(animalId, idx) {
-  const a = animais.find((x) => x.id === animalId);
+  const a = animais.find((x) => String(x.id) === String(animalId));
   if (!a || !a.tratamento || !a.tratamento.remedios) return;
   const rem = a.tratamento.remedios[idx];
   if (!rem) return;
@@ -2024,7 +2031,7 @@ function marcarDoseRemedio(animalId, idx) {
 }
 
 function desfazerDoseRemedio(animalId, idx) {
-  const a = animais.find((x) => x.id === animalId);
+  const a = animais.find((x) => String(x.id) === String(animalId));
   if (!a || !a.tratamento || !a.tratamento.remedios) return;
   const rem = a.tratamento.remedios[idx];
   if (!rem || !rem.historicoDoses || rem.historicoDoses.length === 0) return;
